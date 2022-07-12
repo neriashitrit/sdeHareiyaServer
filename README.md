@@ -22,10 +22,10 @@ DATABASE_URL="postgres://username:password@localhost:5432/iottemplate"
 To create a development DB for the first time:
 
 ```
-DROP DATABASE IF EXISTS ubtech;
-DROP ROLE IF EXISTS ubuser;
-CREATE DATABASE ubtech;
-CREATE ROLE username WITH PASSWORD 'ubpass';
-ALTER DATABASE ubtech OWNER TO ubuser;
-ALTER ROLE ubuser WITH LOGIN;
+DROP DATABASE IF EXISTS trustnet;
+DROP ROLE IF EXISTS trustnetuser;
+CREATE DATABASE trustnet;
+CREATE ROLE trustnetuser WITH PASSWORD 'trustnetpass';
+ALTER DATABASE trustnet OWNER TO trustnetuser;
+ALTER ROLE trustnetuser WITH LOGIN;
 ```
