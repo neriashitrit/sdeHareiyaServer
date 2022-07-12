@@ -1,29 +1,31 @@
-# README #
+## Development
+### Local Setup
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Nodejs: 16.15.0
+Postgres: v14.3
 
-### What is this repository for? ###
+Run `yarn install` to install the dependencies.
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+### Dotenv
 
-### How do I get set up? ###
+Create a `.env` file in the project root directory: `touch .env`.
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+Fill the new file with the following:
+```
+DATABASE_URL="postgres://username:password@localhost:5432/iottemplate"
+```
+(DATABASE_URL=postgres://{db_username}:{db_password}@{host}:{port}/{db_name})
 
-### Contribution guidelines ###
 
-* Writing tests
-* Code review
-* Other guidelines
+### DB Setup
 
-### Who do I talk to? ###
+To create a development DB for the first time:
 
-* Repo owner or admin
-* Other community or team contact
+```
+DROP DATABASE IF EXISTS ubtech;
+DROP ROLE IF EXISTS ubuser;
+CREATE DATABASE ubtech;
+CREATE ROLE username WITH PASSWORD 'ubpass';
+ALTER DATABASE ubtech OWNER TO ubuser;
+ALTER ROLE ubuser WITH LOGIN;
+```
