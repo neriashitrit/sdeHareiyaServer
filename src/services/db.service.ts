@@ -13,7 +13,9 @@ export default class DbService {
     DbService.instance = this
   }
 
-  getOneById = (tableName: string, id: number): Promise<any> => this.db.select().from(tableName).where({ id }).first()
+  getOneById = (schemaName: string, tableName: string, searchField:string, id: number): Promise<any> =>
+    this.db.withSchema(schemaName).select().from(tableName).where(`${searchField}`, id).first()
+  
 
   getOne = (tableName: string, condition: Record<string, any> = {}): Promise<any> =>
     this.db.select().from(tableName).where(condition).first()
@@ -21,11 +23,11 @@ export default class DbService {
   getAll = (tableName: string, condition: Record<string, any> = {}): Promise<any> =>
     this.db.select().from(tableName).where(condition)
 
-  insert = (tableName: string, records: Record<string, string | number>[]): Promise<any> =>
-    this.db.insert(records, ['*']).into(tableName)
+  insert = (schemaName: string, tableName: string, records: Record<string, string | number | boolean | any>[]): Promise<any> =>
+    this.db.withSchema(schemaName).insert(records, ['*']).into(tableName)
 
-  insertOne = (tableName: string, record: Record<string, string | number>): Promise<any> =>
-    this.insert(tableName, [record]).then((result) => Promise.resolve(result?.[0]))
+  insertOne = (schemaName: string, tableName: string, record: Record<string, string | number | boolean|any>): Promise<any> =>
+    this.insert(schemaName, tableName, [record]).then((result) => Promise.resolve(result?.[0]))
 
   update = (tableName: string, updatedRecord: Record<string, any>, condition: Record<string, any> = {}): Promise<any> =>
     this.db(tableName).update(updatedRecord).where(condition).returning('*')
@@ -37,6 +39,11 @@ export default class DbService {
     this.db.delete().from(tableName).where(condition)
 
   deleteAll = (tableName: string): Promise<any> => this.db.delete().from(tableName)
+
+  upsertMerge = async (schemaName: string, tableName: string, updatedRecord: Record<string, any>, conflictField: string):Promise<string> =>{
+    const returnedId = await this.db.withSchema(schemaName).into(tableName).insert(updatedRecord).onConflict(conflictField).merge().returning('id').then((returned)=>{return returned[0].id})
+    return returnedId as string
+  }
 
   // Read more on how to use: https://knexjs.org/#Raw
   sql = (query: string, params: any[] | Record<string, any>): Promise<any> => this.db.raw(query, params)

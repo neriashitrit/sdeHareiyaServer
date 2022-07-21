@@ -7,11 +7,11 @@ export const shorthands: ColumnDefinitions | undefined = undefined
 //TODO when finish with defining the db, create the schema by request with schema name
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
-  pgm.createType('incident_status_types', [IncidentStatus.OPEN, IncidentStatus.IN_TREATMENT, IncidentStatus.WAITING_FOR_COMPANY, IncidentStatus.CLOSE])
+  pgm.createType('incident_status_types', [IncidentStatus.OPEN, IncidentStatus.IN_PROGRESS, IncidentStatus.WAITING, IncidentStatus.CLOSE])
   pgm.createType('severity_types', [IncidentSeverity.RARE, IncidentSeverity.LOW, IncidentSeverity.MEDIUM, IncidentSeverity.HIGH, IncidentSeverity.EXTREME, ])
   pgm.createTable({ schema: 'spectory', name: COMPANIES_TABLES.INCIDENT }, {
     id: 'id',
-    external_id: { type: PgType.INT, notNull: true },
+    external_id: { type: PgType.INT, unique:true, notNull: true },
     incident_name: { type: PgType.VARCHAR, notNull: true },
     severity: { type: 'severity_types' },
     status: { type: 'incident_status_types' },
@@ -39,7 +39,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     sla_assign: { type: PgType.TIMESTAMP },
     sla_initial_triage: { type: PgType.TIMESTAMP },
     sla_time_to_resolve: { type: PgType.TIMESTAMP },
-    country: { type: PgType.VARCHAR },
     remediation_action: { type: PgType.INT, references: { schema: 'spectory', name: COMPANIES_TABLES.TASK }, onDelete: 'NO ACTION', notNull: true },
   })
 }

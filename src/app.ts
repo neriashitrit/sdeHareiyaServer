@@ -7,7 +7,7 @@ import cors from 'cors'
 // import path from 'path'
 
 import userRouter from './routes/routes'
-import { bearerStrategy } from './middlewares/auth.middleware'
+import { apiSenderAuth, bearerStrategy } from './middlewares/auth.middleware'
 
 dotenv.config()
 const PORT = process.env.PORT || 3000
@@ -19,14 +19,12 @@ app.use(express.json()) // middleware to recognize JSON
 app.use(express.urlencoded({ extended: false })) // recognize object as strings or arrays
 app.use(logger('dev')) // logger middleware
 app.use(cookieParser()) // parses incoming cookies from request to JSON
-// app.use(express.static(path.join(__dirname, 'public'))) // serves static page
 
 app.use(passport.initialize())
-passport.use(bearerStrategy)
+// passport.use(bearerStrategy)
 
 // Routes
-app.use('/api',/* passport.authenticate('oauth-bearer', { session: false }),*/ userRouter)
-
+app.use('/api',apiSenderAuth, userRouter)
 app.listen(PORT, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${PORT}`)
 })

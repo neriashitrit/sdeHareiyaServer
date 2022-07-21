@@ -5,18 +5,18 @@ import { MigrationBuilder, ColumnDefinitions, PgType } from 'node-pg-migrate'
 export const shorthands: ColumnDefinitions | undefined = undefined
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
-  pgm.createTable({ schema: 'trustnet', name: TRUSTNET_TABLES.COMPANIES }, {
+  pgm.createTable({ schema: 'public', name: TRUSTNET_TABLES.COMPANY }, {
     id: 'id',
     company_name: { type: PgType.VARCHAR, notNull: true },
-    Joining_date: { type: PgType.TIMESTAMP,default: 'NOW ()' },
+    joining_date: { type: PgType.TIMESTAMP,default: 'NOW ()' },
     renew_date: { type: PgType.TIMESTAMP },
-    active: { type: PgType.BOOLEAN, default: false },
+    active: { type: PgType.BOOLEAN, default: true },
     sector: { type: PgType.VARCHAR },
     country: { type: PgType.VARCHAR },
   })
-  pgm.createTable({ schema: 'trustnet', name: TRUSTNET_TABLES.USERS }, {
+  pgm.createTable({ schema: 'public', name: TRUSTNET_TABLES.USERS }, {
     id: 'id',
-    company_id: { type: PgType.INT, references: { schema: 'trustnet', name: TRUSTNET_TABLES.COMPANIES }, onDelete: 'CASCADE', notNull: true },
+    company_id: { type: PgType.INT, references: { schema: 'public', name: TRUSTNET_TABLES.COMPANY }, onDelete: 'CASCADE', notNull: true },
     first_name: { type: PgType.VARCHAR, notNull: true },
     last_name: { type: PgType.VARCHAR, notNull: true },
     position: { type: PgType.VARCHAR },
@@ -25,9 +25,9 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     createdAt: { type: PgType.TIMESTAMP, default: 'NOW ()' },
     updatedAt: { type: PgType.TIMESTAMP }
   })
-  pgm.createTable({ schema: 'trustnet', name: TRUSTNET_TABLES.ADMINS }, {
+  pgm.createTable({ schema: 'public', name: TRUSTNET_TABLES.ADMIN }, {
     id: 'id',
-    related_company_ids: { type: PgType.INT, references: { schema: 'trustnet', name: TRUSTNET_TABLES.COMPANIES }, onDelete: 'NO ACTION' },
+    related_company_ids: { type: PgType.INT, references: { schema: 'public', name: TRUSTNET_TABLES.COMPANY }, onDelete: 'NO ACTION' },
     first_name: { type: PgType.VARCHAR, notNull: true },
     last_name: { type: PgType.VARCHAR, notNull: true },
     last_login: { type: PgType.TIMESTAMP },
@@ -53,8 +53,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 export async function down(pgm: MigrationBuilder): Promise<void> {
   // pgm.dropTrigger(TABLES.USERS, 'save_user_update_time', { ifExists: true })
   // pgm.dropFunction('update_timestamp', [], { ifExists: true })
-  pgm.dropTable({ schema: 'trustnet', name: TRUSTNET_TABLES.ADMINS }, { ifExists: true })
+  pgm.dropTable({ schema: 'trustnet', name: TRUSTNET_TABLES.ADMIN }, { ifExists: true })
   pgm.dropTable({ schema: 'trustnet', name: TRUSTNET_TABLES.USERS }, { ifExists: true })
-  pgm.dropTable({ schema: 'trustnet', name: TRUSTNET_TABLES.COMPANIES }, { ifExists: true })
+  pgm.dropTable({ schema: 'trustnet', name: TRUSTNET_TABLES.COMPANY }, { ifExists: true })
   pgm.dropSchema('trustnet', { ifExists: true })
 }

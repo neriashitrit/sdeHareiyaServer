@@ -1,4 +1,5 @@
 import { BearerStrategy, IBearerStrategyOptionWithRequest, ITokenPayload, VerifyCallback } from 'passport-azure-ad'
+import { Request, Response } from 'express'
 
 // TODO match it to our AD
 
@@ -23,3 +24,19 @@ const bearerStrategyOptions: IBearerStrategyOptionWithRequest = {
 export const bearerStrategy = new BearerStrategy(bearerStrategyOptions, (token: ITokenPayload, done: VerifyCallback) =>
   done(null, {}, token)
 )
+
+export const apiSenderAuth =  (req: Request, res: Response, next: any)  =>{
+  console.log('in apiSenderAuth');
+  const schemaName = req.headers.company
+  // todo add a call to users table and check that  req.headers.authorization after hash === users where(schemaName).hashed password 
+  if (process.env.SUPER_ADMIN_PASS===req.headers.authorization){
+    console.log('it is')
+    return next()
+  }else{
+    return res.status(403).send({
+      status: 403,
+      message: 'FORBIDDEN'
+    })
+  }
+
+}

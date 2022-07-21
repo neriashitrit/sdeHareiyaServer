@@ -1,3 +1,4 @@
+import { IncidentSeverity, IncidentStatus, insightStatus, taskStatus } from "../src/constants"
 
 export interface IUser {
   id?: number
@@ -8,3 +9,56 @@ export interface IUser {
   updatedAt?: Date
 }
 
+export interface ITask {
+  id:number,
+  status?: taskStatus
+  priority?: string
+  title: string
+  summary: string
+  description: string
+  owner: string
+  is_relevant: boolean
+  created: Date
+}
+
+export interface IInsight {
+  title: string
+  status: insightStatus
+  priority?: string
+  summary: string
+  description: string
+  is_relevant: boolean
+  created: Date
+}
+
+export interface IIncident {
+  external_id: number// for know only like jira ticket
+  incident_name: string
+  severity?: IncidentSeverity 
+  status?: IncidentStatus 
+  category_name?: string
+  title: string
+  summary?: string
+  description?: string
+  mitre_tactic?: string
+  investigation?: string
+  owner?: string
+  origin?: string
+  host_name?: string
+  created?: Date
+  last_update?: Date
+  renew_date?: Date
+  source_user?: string
+  destination_user?: string
+  analyst_name?: string
+  source_ip?: string
+  destination_ip?: string
+  source_geo?: string
+  destination_geo?: string
+  active?: boolean
+  sector?: string
+  sla_assign?: Date
+  sla_initial_triage: Date
+  sla_time_to_resolve: Date
+  remediation_action:number
+}

@@ -10,11 +10,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createType('task_status_types', [taskStatus.OPEN, taskStatus.IN_PROGRESS, taskStatus.CLOSE])
   pgm.createTable({ schema: 'spectory', name: COMPANIES_TABLES.TASK }, {
     id: 'id',
-    status: { type: 'task_status_types' },
-    priority: { type: PgType.VARCHAR },
     title: { type: PgType.VARCHAR, notNull: true },
     summary: { type: PgType.VARCHAR },
     description: { type: PgType.VARCHAR },
+    status: { type: 'task_status_types' },
+    priority: { type: PgType.VARCHAR },
     owner: { type: PgType.VARCHAR },
     is_relevant: { type: PgType.BOOLEAN },
     created: { type: PgType.TIMESTAMP, default: 'NOW ()' },
