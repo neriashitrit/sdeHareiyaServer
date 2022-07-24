@@ -1,4 +1,6 @@
+import { config } from 'dotenv'
 import { Knex } from 'knex'
+import runMigrations from 'node-pg-migrate'
 import DbConnection from '../db/dbConfig'
 
 export default class DbService {
@@ -45,6 +47,20 @@ export default class DbService {
     return returnedId as string
   }
 
+  creteNewCompanySchema = async (schemaName: string,):Promise<string> =>{
+    const returnedId = await runMigrations({
+      databaseUrl: (process.env.NODE_ENV === 'test' ? process.env.TEST_DATABASE_URL : process.env.DATABASE_URL) || '',
+      dir: './dist/db/migrations/company',
+      direction: 'up',
+      migrationsTable: 'schema_migrations',
+      schema:schemaName,
+      createSchema: true,
+    })
+    console.log('Migrations done')
+    console.log(returnedId)
+    return "string"
+  }
+  
   // Read more on how to use: https://knexjs.org/#Raw
   sql = (query: string, params: any[] | Record<string, any>): Promise<any> => this.db.raw(query, params)
 }

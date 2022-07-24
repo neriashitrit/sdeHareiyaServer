@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { COMPANIES_TABLES, IncidentStatus, IncidentSeverity } from '../../constants'
+import { COMPANIES_TABLES, IncidentStatus, IncidentSeverity } from '../../../constants'
 import { MigrationBuilder, ColumnDefinitions, PgType } from 'node-pg-migrate'
 
 export const shorthands: ColumnDefinitions | undefined = undefined
@@ -9,12 +9,13 @@ export const shorthands: ColumnDefinitions | undefined = undefined
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createType('incident_status_types', [IncidentStatus.OPEN, IncidentStatus.IN_PROGRESS, IncidentStatus.WAITING, IncidentStatus.CLOSE])
   pgm.createType('severity_types', [IncidentSeverity.RARE, IncidentSeverity.LOW, IncidentSeverity.MEDIUM, IncidentSeverity.HIGH, IncidentSeverity.EXTREME, ])
-  pgm.createTable({ schema: 'spectory', name: COMPANIES_TABLES.INCIDENT }, {
+  pgm.createTable(COMPANIES_TABLES.INCIDENT, {
     id: 'id',
     external_id: { type: PgType.INT, unique:true, notNull: true },
     incident_name: { type: PgType.VARCHAR, notNull: true },
     severity: { type: 'severity_types' },
     status: { type: 'incident_status_types' },
+    closing_Reason: { type: PgType.VARCHAR }, 
     category_name: { type: PgType.VARCHAR },
     title: { type: PgType.VARCHAR, notNull: true },
     summary: { type: PgType.VARCHAR },
@@ -39,13 +40,13 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     sla_assign: { type: PgType.TIMESTAMP },
     sla_initial_triage: { type: PgType.TIMESTAMP },
     sla_time_to_resolve: { type: PgType.TIMESTAMP },
-    remediation_action: { type: PgType.INT, references: { schema: 'spectory', name: COMPANIES_TABLES.TASK }, onDelete: 'NO ACTION', notNull: true },
+    remediation_action: { type: PgType.INT, references: COMPANIES_TABLES.TASK, onDelete: 'NO ACTION', notNull: true },
   })
 }
 
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropTable({ schema: 'spectory', name: COMPANIES_TABLES.INCIDENT }, { ifExists: true })
+  pgm.dropTable(COMPANIES_TABLES.INCIDENT, { ifExists: true })
   pgm.dropType('status_types', { ifExists: true })
   pgm.dropType('severity_types', { ifExists: true })
 }

@@ -1,7 +1,7 @@
 import runMigrations from 'node-pg-migrate'
 
 import DbConnection from '../db/dbConfig'
-
+//TODO make it relevant to DB with schemas
 const run = async () => {
   const db = new DbConnection().getConnection()
   await db.raw('DROP SCHEMA IF EXISTS public CASCADE;')

@@ -7,7 +7,8 @@ import cors from 'cors'
 // import path from 'path'
 
 import userRouter from './routes/routes'
-import { apiSenderAuth, bearerStrategy } from './middlewares/auth.middleware'
+import companiesRouter from './routes/trustnetRoutes'
+import { apiSenderAuth, adminSenderAuth } from './middlewares/auth.middleware'
 
 dotenv.config()
 const PORT = process.env.PORT || 3000
@@ -24,7 +25,8 @@ app.use(passport.initialize())
 // passport.use(bearerStrategy)
 
 // Routes
-app.use('/api',apiSenderAuth, userRouter)
+app.use('/api/company', userRouter)
+app.use('/api/admin',adminSenderAuth, companiesRouter)
 app.listen(PORT, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${PORT}`)
 })

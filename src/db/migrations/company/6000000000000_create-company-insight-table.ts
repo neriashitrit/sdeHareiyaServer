@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { COMPANIES_TABLES, insightStatus } from '../../constants'
+import { COMPANIES_TABLES, insightStatus } from '../../../constants'
 import { MigrationBuilder, ColumnDefinitions, PgType } from 'node-pg-migrate'
 
 export const shorthands: ColumnDefinitions | undefined = undefined
@@ -8,7 +8,7 @@ export const shorthands: ColumnDefinitions | undefined = undefined
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createType('insight_status_types', [insightStatus.RECOMMENDED_FOR_YOU, insightStatus.WAITING_FOR_WORK, insightStatus.AT_WORK, insightStatus.FINISHED])
-  pgm.createTable({ schema: 'spectory', name: COMPANIES_TABLES.INSIGHT }, {
+  pgm.createTable(COMPANIES_TABLES.INSIGHT, {
     id: 'id',
     title: { type: PgType.VARCHAR, notNull: true },
     status: { type: 'insight_status_types' },
@@ -21,6 +21,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropTable({ schema: 'spectory', name: COMPANIES_TABLES.INSIGHT }, { ifExists: true })
+  pgm.dropTable(COMPANIES_TABLES.INSIGHT, { ifExists: true })
   pgm.dropType('insight_status_types', { ifExists: true })
 }

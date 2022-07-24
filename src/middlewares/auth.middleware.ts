@@ -38,5 +38,24 @@ export const apiSenderAuth =  (req: Request, res: Response, next: any)  =>{
       message: 'FORBIDDEN'
     })
   }
+}
 
+export const adminSenderAuth =  (req: Request, res: Response, next: any)  =>{
+  console.log('in adminSenderAuth');
+  const password  = req.headers.authorization
+  const matchPassword  = hashMatch(password)
+
+  // todo add a call to users table and check that  req.headers.authorization after hash === users where(schemaName).hashed password 
+  if (matchPassword){
+    return next()
+  }else{
+    return res.status(403).send({
+      status: 403,
+      message: 'FORBIDDEN'
+    })
+  }
+}
+
+function hashMatch(password: string | undefined):boolean {
+ return true
 }
