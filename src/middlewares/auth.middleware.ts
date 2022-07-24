@@ -1,5 +1,8 @@
 import { BearerStrategy, IBearerStrategyOptionWithRequest, ITokenPayload, VerifyCallback } from 'passport-azure-ad'
 import { Request, Response } from 'express'
+import AuthModel from '../models/auth.model'
+
+const authModel = new AuthModel()
 
 // TODO match it to our AD
 
@@ -40,12 +43,13 @@ export const apiSenderAuth =  (req: Request, res: Response, next: any)  =>{
   }
 }
 
-export const adminSenderAuth =  (req: Request, res: Response, next: any)  =>{
+export const adminSenderAuth = async (req: Request, res: Response, next: any)  =>{
   console.log('in adminSenderAuth');
-  const password  = req.headers.authorization
-  const matchPassword  = hashMatch(password)
-
-  // todo add a call to users table and check that  req.headers.authorization after hash === users where(schemaName).hashed password 
+  const authorization  = req?.headers?.authorization as string
+  const password  = authorization.replace('Bearer ','')
+  try{
+  const hashedPassword  = await authModel.getHashedPassword('trustnet','trustnet')
+  const matchPassword  = hashedPassword === hashMatch(password)
   if (matchPassword){
     return next()
   }else{
@@ -53,9 +57,15 @@ export const adminSenderAuth =  (req: Request, res: Response, next: any)  =>{
       status: 403,
       message: 'FORBIDDEN'
     })
+  } 
+  }catch{
+
   }
+
+  // todo add a call to users table and check that  req.headers.authorization after hash === users where(schemaName).hashed password 
+ 
 }
 
-function hashMatch(password: string | undefined):boolean {
- return true
+function hashMatch(password: string):string {
+ return password
 }

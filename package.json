@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "start:dev": "ts-node-dev ./src/app.ts",
-    "start": "tsc && node ./dist/app.js",
+    "build": "rm -r ./dist/* && tsc",
+    "start": "node ./dist/app.js",
     "test": "npm run db:reset:test && jest --detectOpenHandles",
     "db:reset": "ts-node-dev ./src/scripts/resetDb.script.ts",
+    "db:create": "ts-node-dev ./src/scripts/createDb.script.ts",
     "db:reset:test": "NODE_ENV=test ts-node-dev ./src/scripts/resetDb.script.ts",
     "db:migrate": "node-pg-migrate --migrations-dir='./src/db/migrations' --tsconfig=./tsconfig.json --migrations-table='schema_migrations'"
   },

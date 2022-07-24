@@ -19,8 +19,8 @@ export default class DbService {
     this.db.withSchema(schemaName).select().from(tableName).where(`${searchField}`, id).first()
   
 
-  getOne = (tableName: string, condition: Record<string, any> = {}): Promise<any> =>
-    this.db.select().from(tableName).where(condition).first()
+  getOne = (schemaName: string, tableName: string, condition: Record<string, any> = {}): Promise<any> =>
+    this.db.withSchema(schemaName).select().from(tableName).where(condition).first()
 
   getAll = (tableName: string, condition: Record<string, any> = {}): Promise<any> =>
     this.db.select().from(tableName).where(condition)
