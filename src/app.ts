@@ -4,15 +4,12 @@ import logger from 'morgan'
 import dotenv from 'dotenv'
 import passport from 'passport'
 import cors from 'cors'
-// import path from 'path'
 
 import userRouter from './routes/routes'
 import companiesRouter from './routes/trustnetRoutes'
 import { apiSenderAuth, adminSenderAuth } from './middlewares/auth.middleware'
 
 dotenv.config()
-const PORT = process.env.PORT || 3000
-
 const app = express()
 
 app.use(cors())
@@ -27,8 +24,10 @@ app.use(passport.initialize())
 // Routes
 app.use('/api/company', userRouter)
 app.use('/api/admin',adminSenderAuth, companiesRouter)
-app.listen(PORT, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${PORT}`)
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`⚡️[server]: Server is running at http://localhost:${port}`)
 })
 
 export default app
