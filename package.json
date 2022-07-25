@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start:dev": "ts-node-dev ./src/app.ts",
-    "build": "rm -r dist && tsc",
+    "build": "tsc",
     "start": "node ./dist/app.js",
     "test": "npm run db:reset:test && jest --detectOpenHandles",
     "db:reset": "ts-node-dev ./src/scripts/resetDb.script.ts",
