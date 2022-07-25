@@ -3,7 +3,7 @@ import express from 'express'
 import * as tasksController from '../controllers/tasks.controller'
 import * as incidentsController from '../controllers/incidents.controller'
 import * as insightsController from '../controllers/insights.controller'
-import { apiSenderAuth, adminSenderAuth } from '../middlewares/auth.middleware'
+import { adminSenderAuth } from '../middlewares/auth.middleware'
 
 const router = express.Router()
 
@@ -18,17 +18,17 @@ const healthCheck = async (req: express.Request, res:  express.Response) => {
 router.get('/healthCheck',healthCheck)
 
 // tasks
-router.post('/task/upsert', apiSenderAuth, tasksController.upsertTask)
-router.get('/task/get', apiSenderAuth, tasksController.getTask)
+router.post('/task/upsert', tasksController.upsertTask)
+router.get('/task/get', tasksController.getTask)
 
 
 // incidents
-router.post('/incident/upsert', apiSenderAuth, incidentsController.upsertIncident)
-router.get('/incident/get', apiSenderAuth, incidentsController.getIncident)
+router.post('/incident/upsert', incidentsController.upsertIncident)
+router.get('/incident/get', incidentsController.getIncident)
 
 
 // insights
-router.post('/insight/upsert', apiSenderAuth, insightsController.upsertInsight)
-router.get('/insight/get', apiSenderAuth, insightsController.getInsight)
+router.post('/insight/upsert', insightsController.upsertInsight)
+router.get('/insight/get', insightsController.getInsight)
 
 export default router

@@ -9,7 +9,7 @@ const taskModel = new TaskModel()
 export const upsertTask = async (req: Request, res: Response) => {
   console.log('in controller upsertTask');
   const  newTask: ITask  = req.body
-  const schemaName = req.headers.company as string
+  const schemaName = req.headers.company_name as string
   try {
     const taskId  = await taskModel.upsertTask(schemaName,newTask)
     return res.status(200).send({status:`task ${newTask.title} Received successfully`,taskId:taskId} )
@@ -21,7 +21,7 @@ export const upsertTask = async (req: Request, res: Response) => {
 
 export const getTask = async (req: Request, res: Response) => {
   console.log('in controller getTask');
-  const schemaName = req.headers.company as string
+  const schemaName = req.headers.company_name as string
   const queryParams = req.body
   try {
     const task  = await tasksHelper.getTaskByIdOrExternalId(schemaName,queryParams)
