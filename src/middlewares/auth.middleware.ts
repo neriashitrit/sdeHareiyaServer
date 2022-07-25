@@ -1,6 +1,9 @@
 import { BearerStrategy, IBearerStrategyOptionWithRequest, ITokenPayload, VerifyCallback } from 'passport-azure-ad'
 import { Request, Response } from 'express'
 import AuthModel from '../models/auth.model'
+import DbService from '../services/db.service'
+import { TRUSTNET_TABLES } from '../constants'
+import { comparePasswords } from '../services/password.service'
 
 const authModel = new AuthModel()
 
@@ -47,7 +50,7 @@ export const adminSenderAuth = async (req: Request, res: Response, next: any)  =
   console.log('in adminSenderAuth');
   const authorization  = req?.headers?.authorization as string
   const password  = authorization.replace('Bearer ','')
-  try{
+  try {
   const hashedPassword  = await authModel.getHashedPassword('trustnet','trustnet')
   const matchPassword  = hashedPassword === hashMatch(password)
   if (matchPassword){
@@ -69,3 +72,18 @@ export const adminSenderAuth = async (req: Request, res: Response, next: any)  =
 function hashMatch(password: string):string {
  return password
 }
+
+export const apiStrategy = 
+  async (req: any, res: any, next: any) => {
+    const { company_name, api_key }  = req?.headers
+    if(!company_name || !api_key) return res.status(401).send('missing params')
+    const dbService = new DbService()
+    try {
+      const company = await dbService.getOne('public', TRUSTNET_TABLES.COMPANY, { company_name })
+      if (!company) { throw 'company not found' }
+      if (!comparePasswords(api_key, company.api_key)) {{ throw 'password error' }}
+      return next();
+    } catch(error) {
+      return res.status(401).send(error)
+    }
+  }
