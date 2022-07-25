@@ -7,9 +7,9 @@ export const COMPANIES_TABLES = {
 }
 
 export const TRUSTNET_TABLES = {
-  ADMIN: 'admin',
   COMPANY: 'company',
   USERS: 'users',
+  ADMIN_COMPANY: 'admin_company',
 }
 
 export enum UserRole {
