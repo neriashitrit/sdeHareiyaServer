@@ -25,11 +25,11 @@ export enum IncidentStatus {
 }
 
 export enum IncidentSeverity {
-  RARE = 'rare',
+  INFO = 'info',
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  EXTREME = 'extreme',
+  CRITICAL = 'critical',
 }
 
 export enum taskStatus {

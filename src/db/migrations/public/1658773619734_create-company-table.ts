@@ -7,13 +7,13 @@ export const shorthands: ColumnDefinitions | undefined = undefined;
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createTable(TRUSTNET_TABLES.COMPANY, {
     id: 'id',
-    company_name: { type: PgType.VARCHAR, unique:true},
+    company_name: { type: PgType.VARCHAR, unique:true, notNull: true},
     sector: { type: PgType.VARCHAR },
     area_timestamp: { type: PgType.VARCHAR },
     api_key: { type: PgType.VARCHAR, notNull: true },
     active: { type: PgType.BOOLEAN, default: true, notNull: true },
-    renew_date: { type: PgType.TIMESTAMP },
-    joining_date: { type: PgType.TIMESTAMP, default: 'NOW ()' },
+    renew_date: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: "NOW ()"  }, // change to date + 1 year
+    joining_date: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
     created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
     updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
   })

@@ -3,22 +3,22 @@ import { COMPANIES_TABLES, taskStatus } from '../../../constants'
 import { MigrationBuilder, PgType } from 'node-pg-migrate'
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
-  pgm.createType('task_status_types', 
-    [taskStatus.OPEN, taskStatus.IN_PROGRESS, taskStatus.CLOSE])
+    pgm.createType('task_status_types', 
+        [taskStatus.OPEN, taskStatus.IN_PROGRESS, taskStatus.CLOSE])
     pgm.createTable(COMPANIES_TABLES.TASK, {
         id: 'id',
+        external_id: { type: PgType.INT },
         title: { type: PgType.VARCHAR, notNull: true },
-        summary: { type: PgType.VARCHAR },
         description: { type: PgType.VARCHAR },
         status: { type: 'task_status_types' },
         priority: { type: PgType.VARCHAR },
         owner: { type: PgType.VARCHAR },
-        is_relevant: { type: PgType.BOOLEAN, default: true, notNull: true },
+        is_visible: { type: PgType.BOOLEAN, default: true, notNull: true },
         incident_id: {
-        type: PgType.INT,
-        references: COMPANIES_TABLES.INCIDENT,
-        onDelete: 'CASCADE',
-        notNull: true
+            type: PgType.INT,
+            references: COMPANIES_TABLES.INCIDENT,
+            onDelete: 'CASCADE',
+            notNull: true
         },
         created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
         updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
