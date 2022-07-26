@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start:dev": "ts-node-dev ./src/app.ts",
+    "prebuild": "rm -rf dist",
     "build": "tsc",
     "start": "node ./dist/app.js",
     "test": "npm run db:reset:test && jest --detectOpenHandles",
