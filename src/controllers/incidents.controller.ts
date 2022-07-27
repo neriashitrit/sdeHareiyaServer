@@ -9,7 +9,7 @@ const incidentModel = new IncidentsModel()
 export const upsertIncident = async (req: Request, res: Response) => {
   console.log('in controller upsertIncident');
   const  newIncident: IIncident  = req.body
-  const schemaName = req.headers.company as string
+  const schemaName = req.headers.company_name as string
   try {
     const incidentId  = await incidentModel.upsertIncident(schemaName,newIncident)
     return res.status(200).send({status:`incident ${newIncident.title} Received successfully`, incidentId: incidentId})
@@ -21,7 +21,7 @@ export const upsertIncident = async (req: Request, res: Response) => {
 
 export const getIncident = async  (req: Request, res: Response) => {
   console.log('in controller get incident');
-  const schemaName = req.headers.company as string
+  const schemaName = req.headers.company_name as string
   const queryParams = req.body
   try {
     const incident  = await incidentsHelper.getIncidentByIdOrExternalId(schemaName,queryParams)

@@ -4,7 +4,7 @@ const incidentsHelper = {
   
     getIncidentByIdOrExternalId: async (schemaName: string, Params: any) => {  
     const userDb = new IncidentModel()
-    if(Params.id ^ Params.external_id){
+    if(!(!!Params.id != !!Params.external_id)){ //logical xor on Params.id and Params.external_id
         throw Error('you need to use only id or external_id')
     }
     const searchField = Params.id? 'id' : 'external_id'

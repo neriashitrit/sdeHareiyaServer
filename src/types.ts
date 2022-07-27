@@ -9,6 +9,15 @@ export interface IUser {
   updatedAt?: Date
 }
 
+export interface ICompany {
+  id: number
+  company_name: string,
+  joining_date: Date,
+  renew_date: Date,
+  active: boolean,
+  sector: string,
+  country: string,
+}
 export interface ITask {
   id:number,
   status?: taskStatus

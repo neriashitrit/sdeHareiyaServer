@@ -8,7 +8,6 @@ export default class DbConnection {
     dotenv.config()
     this.connectionString =
       (process.env.NODE_ENV === 'test' ? process.env.TEST_DATABASE_URL : process.env.DATABASE_URL) || ''
-    console.log('Connected to the DB:', this.connectionString)
   }
 
   getConnection = () =>

@@ -7,9 +7,9 @@ export const COMPANIES_TABLES = {
 }
 
 export const TRUSTNET_TABLES = {
-  ADMIN: 'admin',
   COMPANY: 'company',
   USERS: 'users',
+  ADMIN_COMPANY: 'admin_company',
 }
 
 export enum UserRole {
@@ -25,11 +25,11 @@ export enum IncidentStatus {
 }
 
 export enum IncidentSeverity {
-  RARE = 'rare',
+  INFO = 'info',
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  EXTREME = 'extreme',
+  CRITICAL = 'critical',
 }
 
 export enum taskStatus {
