@@ -11,11 +11,8 @@ export default class AuthModel {
 
   getHashedPassword = async (schemaName: string, company_name: string): Promise<string> =>{
     console.log('in getHashedPassword');
-
-    const hashedPassword = await this.db.getOne(schemaName,TRUSTNET_TABLES.COMPANY,{company_name})
-    console.log(hashedPassword);
-    
-    return hashedPassword
+    const company = await this.db.getOne(schemaName,TRUSTNET_TABLES.COMPANY,{company_name})
+    return company.api_key
   }
   
 }

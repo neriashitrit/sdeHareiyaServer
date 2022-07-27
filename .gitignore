@@ -7,3 +7,4 @@ dist
 .eslintcache
 yarn-debug.log*
 yarn-error.log*
+.env
