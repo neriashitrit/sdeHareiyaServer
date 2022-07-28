@@ -5,6 +5,7 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 
 import userRouter from './routes/routes'
+import openRouter from './routes/openRoutes'
 import companiesRouter from './routes/trustnetRoutes'
 import { adminSenderAuth, apiStrategy } from './middlewares/auth.middleware'
 
@@ -23,6 +24,7 @@ app.use(cookieParser()) // parses incoming cookies from request to JSON
 // Routes
 app.use('/api/company', apiStrategy, userRouter)
 app.use('/api/admin',adminSenderAuth, companiesRouter)
+app.use ('/api',openRouter)
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

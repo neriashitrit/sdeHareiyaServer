@@ -10,6 +10,7 @@ export interface IUser {
 }
 
 export interface ICompany {
+  api_key: string
   id: number
   company_name: string,
   joining_date: Date,

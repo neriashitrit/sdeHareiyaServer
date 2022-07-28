@@ -7,16 +7,6 @@ import { adminSenderAuth } from '../middlewares/auth.middleware'
 
 const router = express.Router()
 
-// users
-// router.post('/users/invite', userController.createUser)
-
-
-const healthCheck = async (req: express.Request, res:  express.Response) => {
-    return res.status(200).send("I am alive!!!")
-}
-
-router.get('/healthCheck',healthCheck)
-
 // tasks
 router.post('/task/upsert', tasksController.upsertTask)
 router.get('/task/get', tasksController.getTask)
