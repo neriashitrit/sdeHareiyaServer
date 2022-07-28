@@ -7,7 +7,7 @@ const insightModel = new InsightsModel()
 
 export const upsertInsight = async (req: Request, res: Response) => {
   const  newInsight: IInsight  = req.body
-  const schemaName = req.headers.company as string
+  const schemaName = req.headers.company_name as string
   try {
     const insightId = await insightModel.upsertInsight(schemaName,newInsight)
     return res.status(200).send({status:`insight ${newInsight.title} Received successfully`,insightId: insightId})
@@ -18,7 +18,7 @@ export const upsertInsight = async (req: Request, res: Response) => {
 }
 
 export const getInsight = async (req: Request, res: Response) => {
-  const schemaName = req.headers.company as string
+  const schemaName = req.headers.company_name as string
   const queryParams = req.body
   try {
     const insight  = await insightModel.getInsight(schemaName,queryParams)
