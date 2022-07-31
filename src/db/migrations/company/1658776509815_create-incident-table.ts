@@ -7,13 +7,13 @@ export const shorthands: ColumnDefinitions | undefined = undefined
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createType('incident_status_types', 
     [IncidentStatus.OPEN, IncidentStatus.IN_PROGRESS, IncidentStatus.WAITING, IncidentStatus.CLOSE])
-  pgm.createType('severity_types', 
+  pgm.createType('incident_severity_types', 
     [IncidentSeverity.INFO, IncidentSeverity.LOW, IncidentSeverity.MEDIUM, IncidentSeverity.HIGH, IncidentSeverity.CRITICAL, ])
   pgm.createTable(COMPANIES_TABLES.INCIDENT, {
     id: 'id',
     external_id: { type: PgType.INT, unique:true, notNull: true },
     title: { type: PgType.VARCHAR, notNull: true },
-    severity: { type: 'severity_types' },
+    severity: { type: 'incident_severity_types' },
     category_name: { type: PgType.VARCHAR },
     description: { type: PgType.VARCHAR },
     mitre_tactic: { type: PgType.VARCHAR },
@@ -50,5 +50,5 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
     pgm.dropTrigger(COMPANIES_TABLES.INCIDENT, 'save_incident_update_time', { ifExists: true })
     pgm.dropTable(COMPANIES_TABLES.INCIDENT, { ifExists: true })
     pgm.dropType('status_types', { ifExists: true })
-    pgm.dropType('severity_types', { ifExists: true })
+    pgm.dropType('incident_severity_types', { ifExists: true })
 }

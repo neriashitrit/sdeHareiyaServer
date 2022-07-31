@@ -12,8 +12,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     area_timestamp: { type: PgType.VARCHAR },
     api_key: { type: PgType.VARCHAR, notNull: true },
     active: { type: PgType.BOOLEAN, default: true, notNull: true },
-    renew_date: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: "NOW ()"  }, // change to date + 1 year
-    joining_date: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
+    renew_date: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()'  }, // change to date + 1 year
+    joining_date: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },// + INTERVAL 1 YEAR
     created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
     updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
   })
