@@ -25,6 +25,9 @@ export default class DbService {
   getAll = (tableName: string, condition: Record<string, any> = {}): Promise<any> =>
     this.db.select().from(tableName).where(condition)
 
+  getMany = (schemaName: string, tableName: string, condition: Record<string, any> = {}, columnName:string, order?:string): Promise<any> =>
+    this.db.withSchema(schemaName).select().from(tableName).where(condition).orderBy(columnName, order)
+
   insert = (schemaName: string, tableName: string, records: Record<string, string | number | boolean | any>[]): Promise<any> =>
     this.db.withSchema(schemaName).insert(records, ['*']).into(tableName)
 

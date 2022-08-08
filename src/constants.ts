@@ -1,3 +1,5 @@
+export const TRUSTNET_SCHEMA = 'public'
+
 export const COMPANIES_TABLES = {
   AUDIT: 'audit',
   INCIDENT: 'incident',

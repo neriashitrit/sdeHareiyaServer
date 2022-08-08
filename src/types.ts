@@ -72,3 +72,11 @@ export interface IIncident {
   sla_time_to_resolve: Date
   remediation_action:number
 }
+export interface INotification {
+  id: number
+  title: string
+  description: string
+  trigger: string
+  created_at: Date
+  updated_at: Date
+}

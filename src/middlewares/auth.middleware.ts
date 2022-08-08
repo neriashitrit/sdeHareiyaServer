@@ -2,7 +2,7 @@ import { BearerStrategy, IBearerStrategyOptionWithRequest, ITokenPayload, Verify
 import { Request, Response } from 'express'
 import AuthModel from '../models/auth.model'
 import DbService from '../services/db.service'
-import { TRUSTNET_TABLES } from '../constants'
+import { TRUSTNET_SCHEMA, TRUSTNET_TABLES } from '../constants'
 import { comparePasswords } from '../services/password.service'
 
 const authModel = new AuthModel()
@@ -36,7 +36,7 @@ export const adminSenderAuth = async (req: Request, res: Response, next: any)  =
   console.log('in adminSenderAuth');
   const api_key= req?.headers.api_key as string
   try {
-    const hashedPassword  = await authModel.getHashedPassword('public','trustnet')
+    const hashedPassword  = await authModel.getHashedPassword(TRUSTNET_SCHEMA,'trustnet')
     if (!comparePasswords(api_key,hashedPassword)){
       return res.status(403).send({
       status: 403,
@@ -55,7 +55,7 @@ async (req: any, res: any, next: any) => {
     const { company_name, api_key }  = req?.headers
     if(!company_name || !api_key) return res.status(401).send('missing params')
     try {
-      const hashedPassword  = await authModel.getHashedPassword('public',company_name)
+      const hashedPassword  = await authModel.getHashedPassword(TRUSTNET_SCHEMA,company_name)
       if (!hashedPassword) { throw 'company not found' }
       if (!comparePasswords(api_key, hashedPassword)) {
         return res.status(403).send({

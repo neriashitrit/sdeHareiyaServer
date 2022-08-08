@@ -1,5 +1,5 @@
 import DbService from '../services/db.service'
-import { TRUSTNET_TABLES } from '../constants'
+import { TRUSTNET_SCHEMA, TRUSTNET_TABLES } from '../constants'
 import { ICompany } from '../types'
 
 
@@ -20,9 +20,8 @@ export default class CompanyModel {
     return 
   }
 
-//   getByUsername = (username: string): Promise<IUser> => this.db.getOne(TRUSTNET_TABLES.COMPANY, { username })
-
-//   getById = (id: number): Promise<IUser> => this.db.updateOneById(TRUSTNET_TABLES.COMPANY, id)
-
-//   update = (id: number, user: Partial<IUser>): Promise<any> => this.db.updateOneById(TRUSTNET_TABLES.USERS, user, id)
+  getCompany = async (company_name: string): Promise<any> =>{
+    const company = await this.db.getOne(TRUSTNET_SCHEMA,TRUSTNET_TABLES.COMPANY,{company_name})
+    return company
+  }
 }
