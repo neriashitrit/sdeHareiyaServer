@@ -10,24 +10,35 @@ export default class IncidentsModel {
   }
 
   upsertIncident = async (schemaName: string, newIncident: IIncident): Promise<string> =>{
-      try{
-        const returnedId = await this.db.upsertMerge(schemaName,COMPANIES_TABLES.INCIDENT,newIncident,'external_id')//might be external_id
-        return returnedId
-      }
-      catch(error){
-      console.error(error);
-      throw error
-      }
+    try{
+      const returnedId = await this.db.upsertMerge(schemaName,COMPANIES_TABLES.INCIDENT,newIncident,'external_id')
+      return returnedId
     }
+    catch(error){
+    console.error(error);
+    throw error
+    }
+  }
   
-    getIncident = async (schemaName: string, searchField: string, id: number): Promise<IIncident> =>{
-        try{
-          const incident:IIncident = await this.db.getOneById(schemaName,COMPANIES_TABLES.INCIDENT, searchField, id)
-          return incident
-        }
-        catch(error){
-        console.error(error);
-        throw error
-        }
+  getIncident = async (schemaName: string, searchField: string, id: number): Promise<IIncident> =>{
+    try{
+      const incident:IIncident = await this.db.getOneById(schemaName,COMPANIES_TABLES.INCIDENT, searchField, id)
+      return incident
     }
+    catch(error){
+    console.error(error);
+    throw error
+    }
+  }
+  getIncidentsSince = async (schemaName: string, searchFiled: string, sinceDate: string, untilDate: string): Promise<IIncident[]> =>{
+    try{
+      const incidents:IIncident[] = await this.db.getManyByDate(schemaName,COMPANIES_TABLES.INCIDENT,{},searchFiled,sinceDate, untilDate)
+      return incidents
+    }
+    catch(error){
+    console.error(error);
+    throw error
+    }
+  }
+
 }

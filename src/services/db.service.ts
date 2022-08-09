@@ -28,6 +28,9 @@ export default class DbService {
   getMany = (schemaName: string, tableName: string, condition: Record<string, any> = {}, columnName:string, order?:string): Promise<any> =>
     this.db.withSchema(schemaName).select().from(tableName).where(condition).orderBy(columnName, order)
 
+  getManyByDate = (schemaName: string, tableName: string, condition: Record<string, any> = {}, columnName:string, from:string, to:string): Promise<any> =>
+  this.db.withSchema(schemaName).select().from(tableName).whereBetween(columnName,[from,to]).andWhere(condition)
+
   insert = (schemaName: string, tableName: string, records: Record<string, string | number | boolean | any>[]): Promise<any> =>
     this.db.withSchema(schemaName).insert(records, ['*']).into(tableName)
 

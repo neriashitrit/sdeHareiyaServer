@@ -20,7 +20,7 @@ export const upsertIncident = async (req: Request, res: Response) => {
 }
 
 export const getIncident = async  (req: Request, res: Response) => {
-  console.log('in controller get incident');
+  console.log('in controller getIncident');
   const schemaName = req.headers.company_name as string
   const queryParams = req.body
   try {
@@ -29,5 +29,19 @@ export const getIncident = async  (req: Request, res: Response) => {
   } catch (error:any) {
     console.error('ERROR in incidents.controller getIncident()', error.message);
     return res.status(400).send({message:'Something went wrong', error:error.message})
+  }
+}
+
+export const getIncidentsSince = async  (req: Request, res: Response) => {
+  console.log('in controller getIncidentsSince');
+  const schemaName = req.headers.company_name as string
+  const sinceDaysAgo = req?.body?.sinceDaysAgo||0
+  const untilDaysAgo = req?.body?.untilDaysAgo||0
+  try {
+    const incidents  = await incidentsHelper.getIncidentsSince(schemaName,sinceDaysAgo, untilDaysAgo)
+    return res.status(200).send(incidents)
+  } catch (error:any) {
+    console.error('ERROR in incidents.controller getIncident()', error);
+    return res.status(400).send({message:'Something went wrong', error:error})
   }
 }
