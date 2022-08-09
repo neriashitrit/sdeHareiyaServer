@@ -18,7 +18,6 @@ export default class DbService {
   getOneById = (schemaName: string, tableName: string, searchField:string, id: number): Promise<any> =>
     this.db.withSchema(schemaName).select().from(tableName).where(`${searchField}`, id).first()
   
-
   getOne = (schemaName: string, tableName: string, condition: Record<string, any> = {}): Promise<any> =>
     this.db.withSchema(schemaName).select().from(tableName).where(condition).first()
 

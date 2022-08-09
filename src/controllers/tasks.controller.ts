@@ -32,3 +32,17 @@ export const getTask = async (req: Request, res: Response) => {
   }
 }
 
+export const getTasksByDaysRange = async (req: Request, res: Response) => {
+  console.log('in controller getTasksByDaysRange');
+  const schemaName = req.headers.company_name as string
+  const sinceDaysAgo = req?.body?.sinceDaysAgo||0
+  const untilDaysAgo = req?.body?.untilDaysAgo||0
+  try {
+    const tasks  = await tasksHelper.getTasksByDaysRange(schemaName,sinceDaysAgo, untilDaysAgo)
+    return res.status(200).send(tasks)
+  } catch (error) {
+    console.error('ERROR in tasks.controller getTask()', error);
+    return res.status(400).send({message:'Something went wrong', error:error})
+  }
+}
+

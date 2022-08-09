@@ -32,13 +32,13 @@ export const getIncident = async  (req: Request, res: Response) => {
   }
 }
 
-export const getIncidentsSince = async  (req: Request, res: Response) => {
-  console.log('in controller getIncidentsSince');
+export const getIncidentsByDaysRange = async  (req: Request, res: Response) => {
+  console.log('in controller getIncidentsByDaysRange');
   const schemaName = req.headers.company_name as string
   const sinceDaysAgo = req?.body?.sinceDaysAgo||0
   const untilDaysAgo = req?.body?.untilDaysAgo||0
   try {
-    const incidents  = await incidentsHelper.getIncidentsSince(schemaName,sinceDaysAgo, untilDaysAgo)
+    const incidents  = await incidentsHelper.getIncidentsByDaysRange(schemaName,sinceDaysAgo, untilDaysAgo)
     return res.status(200).send(incidents)
   } catch (error:any) {
     console.error('ERROR in incidents.controller getIncident()', error);

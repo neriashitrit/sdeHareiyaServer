@@ -30,4 +30,14 @@ export default class TaskModel {
       throw error
       }
   }
+  getTasksByDaysRange = async (schemaName: string, searchFiled: string, sinceDate: string, untilDate: string): Promise<ITask[]> =>{
+    try{
+      const tasks:ITask[] = await this.db.getManyByDate(schemaName,COMPANIES_TABLES.TASK,{},searchFiled,sinceDate, untilDate)
+      return tasks
+    }
+    catch(error){
+    console.error(error);
+    throw error
+    }
+  }
 }

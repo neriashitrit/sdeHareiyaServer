@@ -30,7 +30,7 @@ export default class IncidentsModel {
     throw error
     }
   }
-  getIncidentsSince = async (schemaName: string, searchFiled: string, sinceDate: string, untilDate: string): Promise<IIncident[]> =>{
+  getIncidentsByDaysRange = async (schemaName: string, searchFiled: string, sinceDate: string, untilDate: string): Promise<IIncident[]> =>{
     try{
       const incidents:IIncident[] = await this.db.getManyByDate(schemaName,COMPANIES_TABLES.INCIDENT,{},searchFiled,sinceDate, untilDate)
       return incidents

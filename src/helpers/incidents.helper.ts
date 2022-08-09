@@ -1,4 +1,5 @@
 import IncidentModel from '../models/incidents.model'
+import globalHelper from './global.helper'
 
 const incidentsHelper = {
   
@@ -12,19 +13,13 @@ const incidentsHelper = {
         return incidentModel.getIncident(schemaName, searchField, id)
     },
 
-    getIncidentsSince: async (schemaName: string, sinceDaysAgo: string|number, untilDaysAgo:number) => {  
+    getIncidentsByDaysRange: async (schemaName: string, sinceDaysAgo: string|number, untilDaysAgo:number) => {  
         const incidentModel = new IncidentModel()
-        
         if ((typeof(sinceDaysAgo) !== 'number') && (sinceDaysAgo!='All') ){throw `send how many days ago incidents do you want? (int or 'ALL')`}
         if (typeof(untilDaysAgo) !== 'number'){throw 'send until how many days ago incidents do you want? (int)'}
-        if (sinceDaysAgo=='All') {return incidentModel.getIncidentsSince(schemaName, 'created_at', new Date(0).toJSON(),  new Date().toJSON())    }
-
-        const nowUtc = new Date()
-        const sinceInEpoch = new Date().setDate(nowUtc.getDate()-sinceDaysAgo)
-        const since = new Date(sinceInEpoch)
-        const untilInEpoch = new Date().setDate(nowUtc.getDate()-untilDaysAgo)
-        const until = new Date(untilInEpoch)
-        return incidentModel.getIncidentsSince(schemaName, 'created_at', since.toJSON(), until.toJSON())
+        if (sinceDaysAgo=='All') {return incidentModel.getIncidentsByDaysRange(schemaName, 'created_at', new Date(0).toJSON(),  new Date().toJSON())}
+        const[since, until] = globalHelper.getDaysRangeAsUtcDate(sinceDaysAgo, untilDaysAgo)
+        return incidentModel.getIncidentsByDaysRange(schemaName, 'created_at', since, until)
         },
 }
 export default incidentsHelper

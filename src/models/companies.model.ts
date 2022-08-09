@@ -1,6 +1,7 @@
 import DbService from '../services/db.service'
-import { TRUSTNET_SCHEMA, TRUSTNET_TABLES } from '../constants'
+import { COMPANIES_TABLES, TRUSTNET_SCHEMA, TRUSTNET_TABLES, deviceStatus } from '../constants'
 import { ICompany } from '../types'
+import DbConnection from '../db/dbConfig'
 
 
 export default class CompanyModel {
@@ -23,5 +24,11 @@ export default class CompanyModel {
   getCompany = async (company_name: string): Promise<any> =>{
     const company = await this.db.getOne(TRUSTNET_SCHEMA,TRUSTNET_TABLES.COMPANY,{company_name})
     return company
+  }
+  
+  getMonitoredDeviceNumber = async (schemaName: string): Promise<any> =>{
+    const db = new DbConnection().getConnection()
+    const connectedMonitoredDeviceSum = await db.withSchema(schemaName).select().from(COMPANIES_TABLES.MONITORED_DEVICE).where({status:deviceStatus.CONNECTED}).sum('count').first()
+    return connectedMonitoredDeviceSum
   }
 }
