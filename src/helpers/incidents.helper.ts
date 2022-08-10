@@ -18,7 +18,7 @@ const incidentsHelper = {
         if ((typeof(sinceDaysAgo) !== 'number') && (sinceDaysAgo!='All') ){throw `send how many days ago incidents do you want? (int or 'ALL')`}
         if (typeof(untilDaysAgo) !== 'number'){throw 'send until how many days ago incidents do you want? (int)'}
         if (sinceDaysAgo=='All') {return incidentModel.getIncidentsByDaysRange(schemaName, 'created_at', new Date(0).toJSON(),  new Date().toJSON())}
-        const[since, until] = globalHelper.getDaysRangeAsUtcDate(sinceDaysAgo, untilDaysAgo)
+        const [since, until] = globalHelper.getDaysRangeAsUtcDate(sinceDaysAgo, untilDaysAgo)
         return incidentModel.getIncidentsByDaysRange(schemaName, 'created_at', since, until)
         },
 }

@@ -8,8 +8,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     pgm.createTable(COMPANIES_TABLES.SOURCE_IP, {
         ip: { type: PgType.INT, notNull: true },
         description: { type: PgType.INT, notNull: true },
-        created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
-        updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
+        created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
+        updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
     })
     pgm.createTrigger(COMPANIES_TABLES.SOURCE_IP, 'save_source_ip_update_time', {
         when: 'BEFORE',

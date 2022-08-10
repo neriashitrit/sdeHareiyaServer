@@ -25,7 +25,7 @@ run()
     console.log('DB created successfully!')
     process.exit(0)
   })
-  .catch((err: any) => {
+  .catch ((err: any) => {
     console.log(err)
     process.exit(1)
   })

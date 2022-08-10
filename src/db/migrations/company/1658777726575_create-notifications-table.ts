@@ -12,8 +12,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
         title: { type: PgType.VARCHAR, notNull: true },
         description: { type: PgType.VARCHAR },
         trigger: { type: 'notification_status_types' },
-        created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
-        updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
+        created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
+        updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
     })
     pgm.createTrigger(COMPANIES_TABLES.NOTIFICATION, 'save_notification_update_time', {
         when: 'BEFORE',

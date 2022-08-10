@@ -18,7 +18,7 @@ const tasksHelper = {
         if ((typeof(sinceDaysAgo) !== 'number') && (sinceDaysAgo!='All') ){throw `send how many days ago tasks do you want? (int or 'ALL')`}
         if (typeof(untilDaysAgo) !== 'number'){throw 'send until how many days ago tasks do you want? (int)'}
         if (sinceDaysAgo=='All') {return taskModel.getTasksByDaysRange(schemaName, 'created_at', new Date(0).toJSON(),  new Date().toJSON())}
-        const[since, until] = globalHelper.getDaysRangeAsUtcDate(sinceDaysAgo, untilDaysAgo)
+        const [since, until] = globalHelper.getDaysRangeAsUtcDate(sinceDaysAgo, untilDaysAgo)
         return taskModel.getTasksByDaysRange(schemaName, 'created_at', since, until)
         },
 } 

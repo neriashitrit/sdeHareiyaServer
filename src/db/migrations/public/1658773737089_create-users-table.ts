@@ -19,8 +19,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
         position: { type: PgType.VARCHAR },
         last_login: { type: PgType.TIMESTAMP },
         active: { type: PgType.BOOLEAN, default: true, notNull: true },
-        created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
-        updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
+        created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
+        updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
       })
       pgm.createTrigger(TRUSTNET_TABLES.COMPANY, 'save_users_update_time', {
         when: 'BEFORE',

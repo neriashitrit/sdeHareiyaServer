@@ -14,7 +14,7 @@ export default class TaskModel {
         const returnedId = await this.db.upsertMerge(schemaName,COMPANIES_TABLES.TASK,newTask,'id')
         return returnedId
       }
-      catch(error){
+      catch (error){
       console.error(error);
       throw error
       }
@@ -25,7 +25,7 @@ export default class TaskModel {
         const task:ITask = await this.db.getOneById(schemaName, COMPANIES_TABLES.TASK, searchField, id)
         return task
       }
-      catch(error){
+      catch (error){
       console.error(error);
       throw error
       }
@@ -35,7 +35,7 @@ export default class TaskModel {
       const tasks:ITask[] = await this.db.getManyByDate(schemaName,COMPANIES_TABLES.TASK,{},searchFiled,sinceDate, untilDate)
       return tasks
     }
-    catch(error){
+    catch (error){
     console.error(error);
     throw error
     }

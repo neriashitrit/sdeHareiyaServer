@@ -18,7 +18,7 @@ run()
     console.log('run seed successfully')
     process.exit(0)
   })
-  .catch((err: any) => {
+  .catch ((err: any) => {
     console.log(err)
     process.exit(1)
   })

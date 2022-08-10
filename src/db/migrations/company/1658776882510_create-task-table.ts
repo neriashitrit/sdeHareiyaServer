@@ -20,8 +20,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
             onDelete: 'CASCADE',
             notNull: true
         },
-        created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
-        updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
+        created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
+        updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
     })
     pgm.createTrigger(COMPANIES_TABLES.TASK, 'save_task_update_time', {
         when: 'BEFORE',

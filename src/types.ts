@@ -32,6 +32,7 @@ export interface ITask {
 }
 
 export interface IInsight {
+  id:number
   title: string
   status: insightStatus
   priority?: string

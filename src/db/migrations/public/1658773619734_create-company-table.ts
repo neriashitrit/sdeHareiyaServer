@@ -13,9 +13,9 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     api_key: { type: PgType.VARCHAR, notNull: true },
     active: { type: PgType.BOOLEAN, default: true, notNull: true },
     renew_date: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()'  }, // change to date + 1 year
-    joining_date: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },// + INTERVAL 1 YEAR
-    created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
-    updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
+    joining_date: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
+    created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
+    updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
   })
   pgm.createTrigger(TRUSTNET_TABLES.COMPANY, 'save_company_update_time', {
     when: 'BEFORE',

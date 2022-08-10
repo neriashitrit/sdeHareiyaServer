@@ -14,7 +14,7 @@ export default class NotificationModel {
         const notifications:INotification[] = await this.db.getMany(schemaName, COMPANIES_TABLES.NOTIFICATION, {}, 'created_at','desc')
         return notifications
       }
-      catch(error){
+      catch (error){
       console.error(error);
       throw error
       }

@@ -33,19 +33,15 @@ export default class DbService {
   insert = (schemaName: string, tableName: string, records: Record<string, string | number | boolean | any>[]): Promise<any> =>
     this.db.withSchema(schemaName).insert(records, ['*']).into(tableName)
 
+  // TODO delete insertOne
   insertOne = (schemaName: string, tableName: string, record: Record<string, string | number | boolean|any>): Promise<any> =>
     this.insert(schemaName, tableName, [record]).then((result) => Promise.resolve(result?.[0]))
 
-  update = (tableName: string, updatedRecord: Record<string, any>, condition: Record<string, any> = {}): Promise<any> =>
-    this.db(tableName).update(updatedRecord).where(condition).returning('*')
-
-  updateOneById = async (tableName: string, updatedRecord: Record<string, any>, id: number): Promise<any> =>
-    (await this.update(tableName, updatedRecord, { id }))?.[0]
+  update = (schemaName: string, tableName: string, updatedRecord: Record<string, any>, condition: Record<string, any> = {}): Promise<any> =>
+    this.db.withSchema(schemaName).into(tableName).update(updatedRecord).where(condition).returning('*')
 
   delete = (tableName: string, condition: Record<string, any> = {}): Promise<any> =>
     this.db.delete().from(tableName).where(condition)
-
-  deleteAll = (tableName: string): Promise<any> => this.db.delete().from(tableName)
 
   upsertMerge = async (schemaName: string, tableName: string, updatedRecord: Record<string, any>, conflictField: string):Promise<string> =>{
     const returnedId = await this.db.withSchema(schemaName).into(tableName).insert(updatedRecord).onConflict(conflictField).merge().returning('id').then((returned)=>{return returned[0].id})

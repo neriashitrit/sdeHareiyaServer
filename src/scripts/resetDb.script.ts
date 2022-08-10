@@ -24,7 +24,7 @@ run()
     console.log('DB reset successfully!')
     process.exit(0)
   })
-  .catch((err: any) => {
+  .catch ((err: any) => {
     console.log(err)
     process.exit(1)
   })

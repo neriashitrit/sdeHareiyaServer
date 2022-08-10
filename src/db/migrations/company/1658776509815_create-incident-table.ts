@@ -34,8 +34,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     sla_initial_triage_minutes: { type: PgType.INT },
     sla_time_to_resolve_minutes: { type: PgType.INT },
     is_visible: { type: PgType.BOOLEAN, default: true, notNull: true },
-    created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
-    updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
+    created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
+    updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
   })
   pgm.createTrigger(COMPANIES_TABLES.INCIDENT, 'save_incident_update_time', {
       when: 'BEFORE',

@@ -14,7 +14,7 @@ export default class IncidentsModel {
       const returnedId = await this.db.upsertMerge(schemaName,COMPANIES_TABLES.INCIDENT,newIncident,'external_id')
       return returnedId
     }
-    catch(error){
+    catch (error){
     console.error(error);
     throw error
     }
@@ -25,7 +25,7 @@ export default class IncidentsModel {
       const incident:IIncident = await this.db.getOneById(schemaName,COMPANIES_TABLES.INCIDENT, searchField, id)
       return incident
     }
-    catch(error){
+    catch (error){
     console.error(error);
     throw error
     }
@@ -35,7 +35,7 @@ export default class IncidentsModel {
       const incidents:IIncident[] = await this.db.getManyByDate(schemaName,COMPANIES_TABLES.INCIDENT,{},searchFiled,sinceDate, untilDate)
       return incidents
     }
-    catch(error){
+    catch (error){
     console.error(error);
     throw error
     }

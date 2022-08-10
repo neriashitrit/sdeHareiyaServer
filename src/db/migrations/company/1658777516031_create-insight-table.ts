@@ -16,8 +16,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
         summary: { type: PgType.VARCHAR },
         description: { type: PgType.VARCHAR },
         is_relevant: { type: PgType.BOOLEAN, default: true, notNull: true },
-        created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
-        updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
+        created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
+        updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
     })
     pgm.createTrigger(COMPANIES_TABLES.INSIGHT, 'save_insight_update_time', {
         when: 'BEFORE',

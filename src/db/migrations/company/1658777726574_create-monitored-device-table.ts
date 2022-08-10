@@ -12,8 +12,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
         status: { type: 'device_status_types' },
         count: { type: PgType.INT, notNull: true },
         device_type: { type: PgType.VARCHAR, notNull: true },
-        created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
-        updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: 'NOW ()' },
+        created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
+        updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
     })
     pgm.createTrigger(COMPANIES_TABLES.MONITORED_DEVICE, 'save_monitored_device_update_time', {
         when: 'BEFORE',
