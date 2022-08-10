@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 import { IIncident } from 'types'
 import IncidentsModel from '../models/incidents.model'
 import incidentsHelper from '../helpers/incidents.helper'
+import { toInteger } from 'lodash'
 
 const incidentModel = new IncidentsModel()
 
@@ -35,8 +36,9 @@ export const getIncident = async  (req: Request, res: Response) => {
 export const getIncidentsByDaysRange = async  (req: Request, res: Response) => {
   console.log('in controller getIncidentsByDaysRange');
   const schemaName = req.headers.company_name as string
-  const sinceDaysAgo = req?.body?.sinceDaysAgo||0
-  const untilDaysAgo = req?.body?.untilDaysAgo||0
+  const sinceDaysAgo = req?.query?.sinceDaysAgo == 'All'? 'All': toInteger(req?.query?.sinceDaysAgo)
+  const untilDaysAgo = toInteger(req?.query?.untilDaysAgo)       
+
   try {
     const incidents  = await incidentsHelper.getIncidentsByDaysRange(schemaName,sinceDaysAgo, untilDaysAgo)
     return res.status(200).send(incidents)

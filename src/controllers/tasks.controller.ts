@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 import { ITask } from 'types'
 import TaskModel from '../models/tasks.model'
 import tasksHelper from '../helpers/tasks.helper'
+import { toInteger } from 'lodash'
 
 const taskModel = new TaskModel()
 
@@ -35,8 +36,9 @@ export const getTask = async (req: Request, res: Response) => {
 export const getTasksByDaysRange = async (req: Request, res: Response) => {
   console.log('in controller getTasksByDaysRange');
   const schemaName = req.headers.company_name as string
-  const sinceDaysAgo = req?.body?.sinceDaysAgo||0
-  const untilDaysAgo = req?.body?.untilDaysAgo||0
+  const sinceDaysAgo = req?.query?.sinceDaysAgo == 'All'? 'All': toInteger(req?.query?.sinceDaysAgo)
+  const untilDaysAgo = toInteger(req?.query?.untilDaysAgo)
+
   try {
     const tasks  = await tasksHelper.getTasksByDaysRange(schemaName,sinceDaysAgo, untilDaysAgo)
     return res.status(200).send(tasks)
