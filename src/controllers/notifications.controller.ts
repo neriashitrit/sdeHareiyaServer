@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { toInteger } from 'lodash';
 
 import NotificationModel from '../models/notifications.model'
 
@@ -7,7 +8,8 @@ const notificationModel = new NotificationModel()
 export const getRecentNotifications = async (req: Request, res: Response) => {
   console.log('in controller getRecentNotifications');
   const schemaName = req?.headers?.company_name as string
-  const howMany = req?.body?.howMany
+  const howMany = toInteger(req?.query?.howMany)
+
   try {
     if (typeof(howMany) !== 'number'){throw 'send the number of the notification you want'}
     const notifications = await notificationModel.getNotification(schemaName)
