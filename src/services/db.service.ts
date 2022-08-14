@@ -21,8 +21,8 @@ export default class DbService {
   getOne = (schemaName: string, tableName: string, condition: Record<string, any> = {}): Promise<any> =>
     this.db.withSchema(schemaName).select().from(tableName).where(condition).first()
 
-  getAll = (tableName: string, condition: Record<string, any> = {}): Promise<any> =>
-    this.db.select().from(tableName).where(condition)
+  getAll = (schemaName: string, tableName: string, condition: Record<string, any> = {}): Promise<any> =>
+    this.db.withSchema(schemaName).select().from(tableName).where(condition)
 
   getMany = (schemaName: string, tableName: string, condition: Record<string, any> = {}, columnName:string, order?:string): Promise<any> =>
     this.db.withSchema(schemaName).select().from(tableName).where(condition).orderBy(columnName, order)

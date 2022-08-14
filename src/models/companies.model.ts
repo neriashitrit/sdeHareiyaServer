@@ -31,4 +31,14 @@ export default class CompanyModel {
     const connectedMonitoredDeviceSum = await db.withSchema(schemaName).select().from(COMPANIES_TABLES.MONITORED_DEVICE).where({status:deviceStatus.CONNECTED}).sum('count').first()
     return connectedMonitoredDeviceSum
   }
+  
+  getAllMonitoredDevice = async (schemaName: string): Promise<any> =>{
+    const AllMonitoredDevice = await this.db.getAll(schemaName,COMPANIES_TABLES.MONITORED_DEVICE)
+    return AllMonitoredDevice
+  }
+
+  getSLA = async (schemaName: string): Promise<any> =>{
+    const SLA = await this.db.getAll(schemaName,COMPANIES_TABLES.SLA)
+    return SLA
+  }
 }

@@ -15,6 +15,8 @@ router.get('/notifications/getRecent', notificationController.getRecentNotificat
 // companies
 router.get('/company/getCompany', companiesController.getCompany)
 router.get('/company/getMonitoredDeviceNumber', companiesController.getMonitoredDeviceNumber)
+router.get('/company/getMonitoredDevice', companiesController.getAllMonitoredDevice)
+router.get('/company/getSLA', companiesController.getSLA)
 
 // incidents
 router.get('/incident/getByDays', incidentsController.getIncidentsByDaysRange)

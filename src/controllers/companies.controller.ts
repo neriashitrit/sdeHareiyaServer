@@ -7,8 +7,6 @@ import { TRUSTNET_SCHEMA } from '../constants'
 
 const companyModel = new CompanyModel()
 
-
-
 export const createCompany =  async (req: Request, res: Response) => {
   console.log('in controller createCompanies');
   const newCompany: ICompany  = req?.body
@@ -44,6 +42,30 @@ export const getMonitoredDeviceNumber =  async (req: Request, res: Response) => 
     return res.status(200).send(MonitoredDeviceNumber)
   } catch (error) {
     console.error('ERROR in companies.controller getMonitoredDeviceNumber()', error.message);
+    return res.status(400).send({message:'Something went wrong', error:error.message})
+  }
+}
+
+export const getAllMonitoredDevice =  async (req: Request, res: Response) => {
+  console.log('in controller getAllMonitoredDevice');
+  const companyName = req?.headers?.company_name as string
+  try {
+    const MonitoredDevice = await companyModel.getAllMonitoredDevice(companyName)
+    return res.status(200).send(MonitoredDevice)
+  } catch (error) {
+    console.error('ERROR in companies.controller getAllMonitoredDevice()', error.message);
+    return res.status(400).send({message:'Something went wrong', error:error.message})
+  }
+}
+
+export const getSLA =  async (req: Request, res: Response) => {
+  console.log('in controller getSLA');
+  const companyName = req?.headers?.company_name as string
+  try {
+    const SLA = await companyModel.getSLA(companyName)
+    return res.status(200).send(SLA)
+  } catch (error) {
+    console.error('ERROR in companies.controller getSLA()', error.message);
     return res.status(400).send({message:'Something went wrong', error:error.message})
   }
 }
