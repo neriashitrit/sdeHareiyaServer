@@ -8,7 +8,8 @@ export const COMPANIES_TABLES = {
   TASK: 'task',
   NOTIFICATION: 'notification',
   SLA: 'sla',
-  SOURCE_IP: 'source_ip'
+  SOURCE_IP: 'source_ip',
+  CONFIGURATION: 'configuration'
 }
 
 export const TRUSTNET_TABLES = {
