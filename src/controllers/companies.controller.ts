@@ -69,3 +69,29 @@ export const getSLA =  async (req: Request, res: Response) => {
     return res.status(400).send({message:'Something went wrong', error:error.message})
   }
 }
+
+export const updateConfiguration =  async (req: Request, res: Response) => {
+  console.log('in controller updateConfiguration');
+  const updatedConfiguration = req.body
+  const companyName = req?.headers?.company_name as string
+  try {
+    const status = await companyModel.updateConfiguration(companyName,updatedConfiguration)
+    return res.status(200).send(status)
+  } catch (error) {
+    console.error('ERROR in companies.controller updateConfiguration()', error.message);
+    return res.status(400).send({message:'Something went wrong', error:error.message})
+  }
+}
+
+
+export const getConfiguration =  async (req: Request, res: Response) => {
+  console.log('in controller getConfiguration');
+  const companyName = req?.headers?.company_name as string
+  try {
+    const companyConfiguration = await companyModel.getConfiguration(companyName)
+    return res.status(200).send(companyConfiguration)
+  } catch (error) {
+    console.error('ERROR in companies.controller getConfiguration()', error.message);
+    return res.status(400).send({message:'Something went wrong', error:error.message})
+  }
+}

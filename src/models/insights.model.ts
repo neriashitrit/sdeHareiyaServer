@@ -11,8 +11,8 @@ export default class InsightsModel {
 
   upsertInsight = async ( schemaName: string, newInsight: IInsight,): Promise<string> =>{
     try{
-      const returnedId = await this.db.upsertMerge(schemaName,COMPANIES_TABLES.INSIGHT,newInsight,'id')
-      return returnedId
+      const insight = await this.db.upsertMerge(schemaName,COMPANIES_TABLES.INSIGHT,newInsight,'id')
+      return insight[0]?.id
     }
     catch (error){
     console.error(error);
@@ -24,7 +24,7 @@ export default class InsightsModel {
     try{
       const insight = await this.db.update(schemaName,COMPANIES_TABLES.INSIGHT,newInsight, {id:newInsight.id})
       if (insight.length==0){throw 'insight with same id do not exist'}
-      return insight
+      return insight[0]
     }
     catch (error){
     console.error(error);

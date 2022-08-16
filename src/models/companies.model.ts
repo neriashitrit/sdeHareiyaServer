@@ -3,6 +3,7 @@ import { COMPANIES_TABLES, TRUSTNET_SCHEMA, TRUSTNET_TABLES, deviceStatus } from
 import { ICompany } from '../types'
 import DbConnection from '../db/dbConfig'
 
+import _ from 'lodash'
 
 export default class CompanyModel {
   db: DbService
@@ -41,4 +42,16 @@ export default class CompanyModel {
     const SLA = await this.db.getAll(schemaName,COMPANIES_TABLES.SLA)
     return SLA
   }
+  getConfiguration = async (schemaName: string): Promise<any> =>{
+    const company = await this.db.getOne(schemaName,COMPANIES_TABLES.CONFIGURATION)
+    return company
+  }
+
+  updateConfiguration = async (schemaName: string, newConfiguration: any,): Promise<any> =>{
+    const updatedConfiguration  = await this.db.update(schemaName, COMPANIES_TABLES.CONFIGURATION, newConfiguration)
+    if (_.isEmpty(updatedConfiguration)){
+      await this.db.insert(schemaName, COMPANIES_TABLES.CONFIGURATION, newConfiguration)
+    }
+    return 'company configuration updated'
+  }  
 }

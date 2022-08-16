@@ -51,7 +51,7 @@ export const updateInsight = async (req: Request, res: Response) => {
   const schemaName = req.headers.company_name as string
   try {
     const insight = await insightModel.updateInsight(schemaName,updatedInsight)
-    return res.status(200).send({status:`insight ${insight} Received successfully`,insight: insight})
+    return res.status(200).send({status:`insight updated Received successfully`,insight: insight})
   } catch (error) {
     console.error('ERROR in insights.controller updateInsight()', error);
     return res.status(400).send({message:'Something went wrong', error: error})

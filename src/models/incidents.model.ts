@@ -11,8 +11,8 @@ export default class IncidentsModel {
 
   upsertIncident = async (schemaName: string, newIncident: IIncident): Promise<string> =>{
     try{
-      const returnedId = await this.db.upsertMerge(schemaName,COMPANIES_TABLES.INCIDENT,newIncident,'external_id')
-      return returnedId
+      const incident = await this.db.upsertMerge(schemaName,COMPANIES_TABLES.INCIDENT,newIncident,'external_id')
+      return incident[0]?.id
     }
     catch (error){
     console.error(error);

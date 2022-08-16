@@ -6,7 +6,6 @@ import * as tasksController from '../controllers/tasks.controller'
 import * as incidentsController from '../controllers/incidents.controller'
 import * as insightsController from '../controllers/insights.controller'
 
-
 const router = express.Router()
 
 // notifications
@@ -23,9 +22,14 @@ router.get('/incident/getByDays', incidentsController.getIncidentsByDaysRange)
 
 // tasks
 router.get('/task/getByDays', tasksController.getTasksByDaysRange)
+router.post('/task/update', tasksController.updateTask)
 
 // insights
 router.get('/insight/getByDays', insightsController.getInsightsByDaysRange)
 router.post('/insight/update', insightsController.updateInsight)
+
+// configurations
+router.post('/configuration/updateConfiguration', companiesController.updateConfiguration)
+router.get('/configuration/getConfiguration', companiesController.getConfiguration)
 
 export default router

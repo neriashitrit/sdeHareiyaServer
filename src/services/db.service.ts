@@ -43,9 +43,9 @@ export default class DbService {
   delete = (tableName: string, condition: Record<string, any> = {}): Promise<any> =>
     this.db.delete().from(tableName).where(condition)
 
-  upsertMerge = async (schemaName: string, tableName: string, updatedRecord: Record<string, any>, conflictField: string):Promise<string> =>{
-    const returnedId = await this.db.withSchema(schemaName).into(tableName).insert(updatedRecord).onConflict(conflictField).merge().returning('id').then((returned)=>{return returned[0].id})
-    return returnedId as string
+  upsertMerge = async (schemaName: string, tableName: string, updatedRecord: Record<string, any>, conflictField: string):Promise<any> =>{
+    const returnedId = await this.db.withSchema(schemaName).into(tableName).insert(updatedRecord).onConflict(conflictField).merge().returning('*')
+    return returnedId
   }
 
   creteNewCompanySchema = async (schemaName: string,):Promise<string> =>{

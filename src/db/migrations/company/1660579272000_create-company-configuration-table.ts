@@ -6,9 +6,9 @@ export const shorthands: ColumnDefinitions | undefined = undefined
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
     pgm.createTable(COMPANIES_TABLES.CONFIGURATION, {
-        falsePositiveRateFirst: { type: PgType.VARCHAR },
-        falsePositiveRateSecond: { type: PgType.VARCHAR },
-        falsePositiveRateThird: { type: PgType.VARCHAR },
+        event_per_second_first: { type: PgType.VARCHAR },
+        event_per_second_second: { type: PgType.VARCHAR },
+        event_per_second_third: { type: PgType.VARCHAR },
         created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
         updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
     })

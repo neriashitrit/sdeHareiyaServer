@@ -48,3 +48,14 @@ export const getTasksByDaysRange = async (req: Request, res: Response) => {
   }
 }
 
+export const updateTask = async (req: Request, res: Response) => {
+  const updatedTask: ITask  = req.body
+  const schemaName = req.headers.company_name as string
+  try {
+    const Task = await taskModel.updateTask(schemaName,updatedTask)
+    return res.status(200).send({status:`task updated successfully`,task: Task})
+  } catch (error) {
+    console.error('ERROR in tasks.controller updateTask()', error);
+    return res.status(400).send({message:'Something went wrong', error: error})
+  }
+}

@@ -3,7 +3,6 @@ import express from 'express'
 import * as tasksController from '../controllers/tasks.controller'
 import * as incidentsController from '../controllers/incidents.controller'
 import * as insightsController from '../controllers/insights.controller'
-import { adminSenderAuth } from '../middlewares/auth.middleware'
 
 const router = express.Router()
 
