@@ -9,7 +9,7 @@ const taskModel = new TaskModel()
 
 export const upsertTask = async (req: Request, res: Response) => {
   console.log('in controller upsertTask');
-  const  newTask: ITask  = req.body
+  const  newTask: ITask = req.body
   const schemaName = req.headers.company_name as string
   try {
     const taskId  = await taskModel.upsertTask(schemaName,newTask)
@@ -49,7 +49,7 @@ export const getTasksByDaysRange = async (req: Request, res: Response) => {
 }
 
 export const updateTask = async (req: Request, res: Response) => {
-  const updatedTask: ITask  = req.body
+  const updatedTask: ITask = req.body
   const schemaName = req.headers.company_name as string
   try {
     const Task = await taskModel.updateTask(schemaName,updatedTask)

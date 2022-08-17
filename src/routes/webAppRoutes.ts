@@ -19,6 +19,7 @@ router.get('/company/getSLA', companiesController.getSLA)
 
 // incidents
 router.get('/incident/getByDays', incidentsController.getIncidentsByDaysRange)
+router.post('/incident/update', incidentsController.updateIncident)
 
 // tasks
 router.get('/task/getByDays', tasksController.getTasksByDaysRange)

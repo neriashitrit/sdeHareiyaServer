@@ -43,6 +43,7 @@ export interface IInsight {
 }
 
 export interface IIncident {
+  id:number
   external_id: number// for know only like jira ticket
   incident_name: string
   severity?: IncidentSeverity 

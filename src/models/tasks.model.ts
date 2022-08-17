@@ -45,7 +45,7 @@ export default class TaskModel {
   updateTask = async ( schemaName: string, newTask: ITask,): Promise<ITask> =>{
     try{
       const task = await this.db.update(schemaName, COMPANIES_TABLES.TASK, newTask, {id:newTask.id})
-      if (task.length==0){throw 'task with same id do not exist'}
+      if (task.length == 0){throw 'task with same id do not exist'}
       return task[0]
     }
     catch (error){

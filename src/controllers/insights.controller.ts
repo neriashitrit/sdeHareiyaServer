@@ -8,7 +8,7 @@ import { toInteger } from 'lodash'
 const insightModel = new InsightsModel()
 
 export const upsertInsight = async (req: Request, res: Response) => {
-  const  newInsight: IInsight  = req.body
+  const  newInsight: IInsight = req.body
   const schemaName = req.headers.company_name as string
   try {
     const insightId = await insightModel.upsertInsight(schemaName,newInsight)
@@ -47,7 +47,7 @@ export const getInsightsByDaysRange = async  (req: Request, res: Response) => {
 }
 
 export const updateInsight = async (req: Request, res: Response) => {
-  const updatedInsight: IInsight  = req.body
+  const updatedInsight: IInsight = req.body
   const schemaName = req.headers.company_name as string
   try {
     const insight = await insightModel.updateInsight(schemaName,updatedInsight)

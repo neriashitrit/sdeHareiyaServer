@@ -23,7 +23,7 @@ export default class InsightsModel {
   updateInsight = async ( schemaName: string, newInsight: IInsight,): Promise<IInsight> =>{
     try{
       const insight = await this.db.update(schemaName,COMPANIES_TABLES.INSIGHT,newInsight, {id:newInsight.id})
-      if (insight.length==0){throw 'insight with same id do not exist'}
+      if (insight.length == 0){throw 'insight with same id do not exist'}
       return insight[0]
     }
     catch (error){
