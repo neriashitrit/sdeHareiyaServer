@@ -41,7 +41,7 @@ export default class IncidentsModel {
     }
   }
   
-  updateIncident = async ( schemaName: string, newIncident: IIncident,): Promise<IIncident> =>{
+  updateIncident = async ( schemaName: string, newIncident: IIncident): Promise<IIncident> =>{
     try{
       const incident = await this.db.update(schemaName, COMPANIES_TABLES.INCIDENT, newIncident, {id:newIncident.id})
       if (incident.length == 0){throw 'incident with same id do not exist'}

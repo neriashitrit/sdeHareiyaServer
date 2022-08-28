@@ -9,7 +9,7 @@ export default class InsightsModel {
     this.db = new DbService()
   }
 
-  upsertInsight = async ( schemaName: string, newInsight: IInsight,): Promise<string> =>{
+  upsertInsight = async ( schemaName: string, newInsight: IInsight): Promise<string> =>{
     try{
       const insight = await this.db.upsertMerge(schemaName,COMPANIES_TABLES.INSIGHT,newInsight,'id')
       return insight[0]?.id
@@ -20,9 +20,33 @@ export default class InsightsModel {
     }
   }
   
-  updateInsight = async ( schemaName: string, newInsight: IInsight,): Promise<IInsight> =>{
+  updateInsight = async ( schemaName: string, newInsight: IInsight): Promise<IInsight> =>{
     try{
       const insight = await this.db.update(schemaName,COMPANIES_TABLES.INSIGHT,newInsight, {id:newInsight.id})
+      if (insight.length == 0){throw 'insight with same id do not exist'}
+      return insight[0]
+    }
+    catch (error){
+    console.error(error);
+    throw error
+    }
+  }
+
+  deleteInsight = async ( schemaName: string, id: number): Promise<IInsight> =>{
+    try{
+      const insight = await this.db.delete(schemaName,COMPANIES_TABLES.INSIGHT, {id})
+      if (insight.length == 0){throw 'insight with same id do not exist'}
+      return insight[0]
+    }
+    catch (error){
+    console.error(error);
+    throw error
+    }
+  }
+
+  createInsight = async ( schemaName: string, newInsight: any): Promise<IInsight> =>{
+    try{
+      const insight = await this.db.insert(schemaName,COMPANIES_TABLES.INSIGHT, newInsight)
       if (insight.length == 0){throw 'insight with same id do not exist'}
       return insight[0]
     }

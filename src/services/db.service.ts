@@ -40,15 +40,15 @@ export default class DbService {
   update = (schemaName: string, tableName: string, updatedRecord: Record<string, any>, condition: Record<string, any> = {}): Promise<any> =>
     this.db.withSchema(schemaName).into(tableName).update(updatedRecord).where(condition).returning('*')
 
-  delete = (tableName: string, condition: Record<string, any> = {}): Promise<any> =>
-    this.db.delete().from(tableName).where(condition)
+  delete = (schemaName: string, tableName: string, condition: Record<string, any> = {}): Promise<any> =>
+    this.db.withSchema(schemaName).delete().from(tableName).where(condition).returning('*')
 
   upsertMerge = async (schemaName: string, tableName: string, updatedRecord: Record<string, any>, conflictField: string):Promise<any> =>{
     const returnedId = await this.db.withSchema(schemaName).into(tableName).insert(updatedRecord).onConflict(conflictField).merge().returning('*')
     return returnedId
   }
 
-  creteNewCompanySchema = async (schemaName: string,):Promise<string> =>{
+  creteNewCompanySchema = async (schemaName: string):Promise<string> =>{
     const returnedId = await runMigrations({
       databaseUrl: (process.env.NODE_ENV === 'test' ? process.env.TEST_DATABASE_URL : process.env.DATABASE_URL) || '',
       dir: './dist/db/migrations/company',

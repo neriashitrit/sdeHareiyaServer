@@ -57,3 +57,27 @@ export const updateInsight = async (req: Request, res: Response) => {
     return res.status(400).send({message:'Something went wrong', error: error})
   }
 }
+
+export const deleteInsight = async (req: Request, res: Response) => {
+  const insightID = req.body?.id
+  const schemaName = req.headers.company_name as string
+  try {
+    const insight = await insightModel.deleteInsight(schemaName, insightID)
+    return res.status(200).send({status:`insight deleted successfully`,insight: insight})
+  } catch (error) {
+    console.error('ERROR in insights.controller deleteInsight()', error);
+    return res.status(400).send({message:'Something went wrong', error: error})
+  }
+}
+
+export const createInsight = async (req: Request, res: Response) => {
+  const newInsight: IInsight = req.body
+  const schemaName = req.headers.company_name as string
+  try {
+    const insight = await insightModel.createInsight(schemaName,newInsight)
+    return res.status(200).send({status:`new insight Received successfully`,insight: insight})
+  } catch (error) {
+    console.error('ERROR in insights.controller createInsight()', error);
+    return res.status(400).send({message:'Something went wrong', error: error})
+  }
+}

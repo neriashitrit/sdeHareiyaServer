@@ -28,6 +28,8 @@ router.post('/task/update', tasksController.updateTask)
 // insights
 router.get('/insight/getByDays', insightsController.getInsightsByDaysRange)
 router.post('/insight/update', insightsController.updateInsight)
+router.post('/insight/delete', insightsController.deleteInsight)
+router.post('/insight/create', insightsController.createInsight)
 
 // configurations
 router.post('/configuration/updateConfiguration', companiesController.updateConfiguration)

@@ -47,7 +47,7 @@ export default class CompanyModel {
     return company
   }
 
-  updateConfiguration = async (schemaName: string, newConfiguration: any,): Promise<any> =>{
+  updateConfiguration = async (schemaName: string, newConfiguration: any): Promise<any> =>{
     const updatedConfiguration  = await this.db.update(schemaName, COMPANIES_TABLES.CONFIGURATION, newConfiguration)
     if (_.isEmpty(updatedConfiguration)){
       await this.db.insert(schemaName, COMPANIES_TABLES.CONFIGURATION, newConfiguration)
