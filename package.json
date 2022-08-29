@@ -12,7 +12,8 @@
     "db:create": "ts-node-dev ./src/scripts/createDb.script.ts",
     "db:seed": "ts-node-dev ./src/scripts/createSeed.script.ts",
     "db:reset:test": "NODE_ENV=test ts-node-dev ./src/scripts/resetDb.script.ts",
-    "db:migrate": "node-pg-migrate --migrations-dir='./src/db/migrations/public' --tsconfig=./tsconfig.json --migrations-table='schema_migrations'"
+    "db:migrate": "node-pg-migrate --migrations-dir='./src/db/migrations/public' --tsconfig=./tsconfig.json --migrations-table='schema_migrations'",
+    "db:future:migrate": "ts-node-dev ./src/scripts/runFutureMigrate.script.ts"
   },
   "dependencies": {
     "axios": "^0.27.2",

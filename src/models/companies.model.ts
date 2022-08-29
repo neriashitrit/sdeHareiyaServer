@@ -17,9 +17,8 @@ export default class CompanyModel {
     return returnedId
   }
   
-  createCompanyTables = async (schemaName: string): Promise<any> =>{
-    const returnedId = await this.db.creteNewCompanySchema(schemaName)
-    return 
+  createCompanyTables = async (schemaName: string) =>{
+    await this.db.creteNewCompanySchema(schemaName)
   }
 
   getCompany = async (company_name: string): Promise<any> =>{

@@ -48,8 +48,8 @@ export default class DbService {
     return returnedId
   }
 
-  creteNewCompanySchema = async (schemaName: string):Promise<string> =>{
-    const returnedId = await runMigrations({
+  creteNewCompanySchema = async (schemaName: string) =>{
+    const migrations = await runMigrations({
       databaseUrl: (process.env.NODE_ENV === 'test' ? process.env.TEST_DATABASE_URL : process.env.DATABASE_URL) || '',
       dir: './dist/db/migrations/company',
       direction: 'up',
@@ -58,8 +58,7 @@ export default class DbService {
       createSchema: true,
     })
     console.log('Migrations done')
-    console.log(returnedId)
-    return "string"
+    console.log(migrations)
   }
   
   // Read more on how to use: https://knexjs.org/#Raw
