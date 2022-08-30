@@ -16,7 +16,7 @@ const run = async () => {
     try{
       await runMigrations({
       databaseUrl: (process.env.NODE_ENV === 'test' ? process.env.TEST_DATABASE_URL : process.env.DATABASE_URL) || '',
-      dir: './dist/db/migrations/company',
+      dir: './src/db/migrations/company',
       direction: 'up',
       migrationsTable: 'schema_migrations',
       schema: schema,  

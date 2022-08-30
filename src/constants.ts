@@ -44,11 +44,24 @@ export enum taskStatus {
   CLOSE = 'close'
 }
 
+export enum taskPriority {
+  HIGH = 'high',
+  MEDIUM = 'medium',
+  LOW = 'low'
+}
+
 export enum insightStatus {
+  NEW_RECOMMENDATION = 'new recommendation',
   WAITING_FOR_WORK = 'waiting for work',
-  RECOMMENDED_FOR_YOU = 'recommended for you',
   AT_WORK = 'at work',
   FINISHED = 'finished'
+}
+
+export enum insightUserPreference {
+  RECOMMENDED_FOR_YOU = 'recommended for you',
+  INTERESTED = 'interested',
+  WE_GOT_ONE = 'we got one',
+  MAYBE_LATER = 'maybe later'
 }
 
 export enum deviceStatus {

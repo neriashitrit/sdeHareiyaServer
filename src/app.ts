@@ -25,8 +25,8 @@ app.use(cookieParser()) // parses incoming cookies from request to JSON
 // Routes
 app.use('/api/company', apiStrategy, userRouter)
 app.use('/api/admin', adminSenderAuth, companiesRouter)
-app.use('/api', openRouter)
 app.use('/api/portal', webAppRouter)
+app.use('/api', openRouter)
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
