@@ -21,7 +21,7 @@ export default class CompanyModel {
     await this.db.creteNewCompanySchema(schemaName)
   }
 
-  getCompany = async (company_name: string): Promise<any> =>{
+  getCompany = async (company_name: string): Promise<ICompany> =>{
     const company = await this.db.getOne(TRUSTNET_SCHEMA,TRUSTNET_TABLES.COMPANY,{company_name})
     return company
   }

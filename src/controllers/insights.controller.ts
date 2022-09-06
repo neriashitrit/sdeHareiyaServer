@@ -1,9 +1,10 @@
 import { Request, Response } from 'express'
+import { toInteger } from 'lodash'
 
-import { IInsight } from 'types'
+import { AuthInfo, IInsight } from 'types'
 import InsightsModel from '../models/insights.model'
 import insightsHelper from '../helpers/insights.helper'
-import { toInteger } from 'lodash'
+import globalHelper from '../helpers/global.helper'
 
 const insightModel = new InsightsModel()
 
@@ -33,7 +34,8 @@ export const getInsight = async (req: Request, res: Response) => {
 
 export const getInsightsByDaysRange = async  (req: Request, res: Response) => {
   console.log('in controller getInsightsByDaysRange');
-  const schemaName = req.headers.company_name as string
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName = globalHelper.getSchemaName(authInfo)
   const sinceDaysAgo = req?.query?.sinceDaysAgo == 'All'? 'All': toInteger(req?.query?.sinceDaysAgo)
   const untilDaysAgo = toInteger(req?.query?.untilDaysAgo)
 

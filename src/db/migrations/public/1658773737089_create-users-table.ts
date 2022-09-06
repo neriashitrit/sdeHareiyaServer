@@ -17,6 +17,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
         first_name: { type: PgType.VARCHAR, notNull: true },
         last_name: { type: PgType.VARCHAR, notNull: true },
         position: { type: PgType.VARCHAR },
+        user_name: { type: PgType.VARCHAR },
         last_login: { type: PgType.TIMESTAMP },
         active: { type: PgType.BOOLEAN, default: true, notNull: true },
         created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },

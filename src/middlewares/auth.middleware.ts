@@ -1,19 +1,16 @@
 import { BearerStrategy, IBearerStrategyOptionWithRequest, ITokenPayload, VerifyCallback } from 'passport-azure-ad'
 import { Request, Response } from 'express'
 import AuthModel from '../models/auth.model'
-import DbService from '../services/db.service'
 import { TRUSTNET_SCHEMA, TRUSTNET_TABLES } from '../constants'
 import { comparePasswords } from '../services/password.service'
 
 const authModel = new AuthModel()
 
-// TODO match it to our AD
-
 // Update these four variables with values from your B2C tenant in the Azure portal
-const clientID = 'xxxxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxx-xxxxxx' // Application (client) ID of your API's application registration
-const b2cDomainHost = 'xxxxx.yyyyy.com'
-const tenantId = 'zzzzzzz.wwwwwwww.com' // Alternatively, you can use your Directory (tenant) ID (a GUID)
-const policyName = 'B2C_1A_SIGNUP_SIGNIN'
+const clientID = 'de3422ed-c92a-487b-9342-2f41d3bb5dc2' // Application (client) ID of your API's application registration 
+const b2cDomainHost = 'trustnetdev.b2clogin.com'
+const tenantId = 'trustnetdev.onmicrosoft.com' // Alternatively, you can use your Directory (tenant) ID (a GUID)
+const policyName = 'B2C_1_login2'
 
 const bearerStrategyOptions: IBearerStrategyOptionWithRequest = {
   identityMetadata: `https://${b2cDomainHost}/${tenantId}/${policyName}/v2.0/.well-known/openid-configuration/`,

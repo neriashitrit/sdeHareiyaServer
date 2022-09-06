@@ -1,3 +1,5 @@
+import { AuthInfo } from "types"
+
 const globalHelper = {
 
     getDaysRangeAsUtcDate: (sinceDaysAgo: number, untilDaysAgo:number):string[] => {  
@@ -8,5 +10,14 @@ const globalHelper = {
         const until = new Date(untilInEpoch)
         return [since.toJSON(), until.toJSON()]
         },
+    
+    getSchemaName: (authInfo: AuthInfo):string => {  
+        return authInfo?.jobTitle.split(' ')[0]||''
+        },
+    
+    getPosition: (authInfo: AuthInfo):string => {  
+        return authInfo?.jobTitle.split(' ')[1]||''
+        },
+
 } 
 export default globalHelper

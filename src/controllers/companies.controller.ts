@@ -1,9 +1,10 @@
 import { Request, Response } from 'express'
 
 import { encryptPassword } from '../services/password.service'
-import { ICompany } from 'types'
+import { AuthInfo, ICompany } from 'types'
 import CompanyModel from '../models/companies.model'
 import { TRUSTNET_SCHEMA } from '../constants'
+import globalHelper from '../helpers/global.helper'
 
 const companyModel = new CompanyModel()
 
@@ -36,9 +37,10 @@ export const getCompany =  async (req: Request, res: Response) => {
 
 export const getMonitoredDeviceNumber =  async (req: Request, res: Response) => {
   console.log('in controller getMonitoredDeviceNumber');
-  const companyName = req?.headers?.company_name as string
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName =  globalHelper.getSchemaName(authInfo)
   try {
-    const MonitoredDeviceNumber = await companyModel.getMonitoredDeviceNumber(companyName)
+    const MonitoredDeviceNumber = await companyModel.getMonitoredDeviceNumber(schemaName)
     return res.status(200).send(MonitoredDeviceNumber)
   } catch (error) {
     console.error('ERROR in companies.controller getMonitoredDeviceNumber()', error.message);
@@ -60,9 +62,10 @@ export const getAllMonitoredDevice =  async (req: Request, res: Response) => {
 
 export const getSLA =  async (req: Request, res: Response) => {
   console.log('in controller getSLA');
-  const companyName = req?.headers?.company_name as string
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName =  globalHelper.getSchemaName(authInfo)
   try {
-    const SLA = await companyModel.getSLA(companyName)
+    const SLA = await companyModel.getSLA(schemaName)
     return res.status(200).send(SLA)
   } catch (error) {
     console.error('ERROR in companies.controller getSLA()', error.message);
@@ -86,9 +89,10 @@ export const updateConfiguration =  async (req: Request, res: Response) => {
 
 export const getConfiguration =  async (req: Request, res: Response) => {
   console.log('in controller getConfiguration');
-  const companyName = req?.headers?.company_name as string
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName =  globalHelper.getSchemaName(authInfo)
   try {
-    const companyConfiguration = await companyModel.getConfiguration(companyName)
+    const companyConfiguration = await companyModel.getConfiguration(schemaName)
     return res.status(200).send(companyConfiguration)
   } catch (error) {
     console.error('ERROR in companies.controller getConfiguration()', error.message);

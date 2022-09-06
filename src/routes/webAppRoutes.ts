@@ -2,11 +2,14 @@ import express from 'express'
 
 import * as notificationController from '../controllers/notifications.controller'
 import * as companiesController from '../controllers/companies.controller'
+import * as usersController from '../controllers/users.controller'
 import * as tasksController from '../controllers/tasks.controller'
 import * as incidentsController from '../controllers/incidents.controller'
 import * as insightsController from '../controllers/insights.controller'
 
 const router = express.Router()
+// users
+router.get('/user/login', usersController.userLogin)
 
 // notifications
 router.get('/notifications/getRecent', notificationController.getRecentNotifications)

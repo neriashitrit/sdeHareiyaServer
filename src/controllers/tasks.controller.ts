@@ -1,8 +1,9 @@
 import { Request, Response } from 'express'
 
-import { ITask } from 'types'
+import { AuthInfo, ITask } from 'types'
 import TaskModel from '../models/tasks.model'
 import tasksHelper from '../helpers/tasks.helper'
+import globalHelper from '../helpers/global.helper'
 import { toInteger } from 'lodash'
 
 const taskModel = new TaskModel()
@@ -35,7 +36,8 @@ export const getTask = async (req: Request, res: Response) => {
 
 export const getTasksByDaysRange = async (req: Request, res: Response) => {
   console.log('in controller getTasksByDaysRange');
-  const schemaName = req.headers.company_name as string
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName = globalHelper.getSchemaName(authInfo)
   const sinceDaysAgo = req?.query?.sinceDaysAgo == 'All'? 'All': toInteger(req?.query?.sinceDaysAgo)
   const untilDaysAgo = toInteger(req?.query?.untilDaysAgo)
 
@@ -50,7 +52,8 @@ export const getTasksByDaysRange = async (req: Request, res: Response) => {
 
 export const updateTask = async (req: Request, res: Response) => {
   const updatedTask: ITask = req.body
-  const schemaName = req.headers.company_name as string
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName = globalHelper.getSchemaName(authInfo)
   try {
     const Task = await taskModel.updateTask(schemaName,updatedTask)
     return res.status(200).send({status:`task updated successfully`,task: Task})

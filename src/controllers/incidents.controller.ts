@@ -1,9 +1,10 @@
 import { Request, Response } from 'express'
+import { toInteger } from 'lodash'
 
-import { IIncident } from 'types'
+import { AuthInfo, IIncident } from 'types'
 import IncidentsModel from '../models/incidents.model'
 import incidentsHelper from '../helpers/incidents.helper'
-import { toInteger } from 'lodash'
+import globalHelper from '../helpers/global.helper'
 
 const incidentModel = new IncidentsModel()
 
@@ -35,7 +36,8 @@ export const getIncident = async  (req: Request, res: Response) => {
 
 export const getIncidentsByDaysRange = async  (req: Request, res: Response) => {
   console.log('in controller getIncidentsByDaysRange');
-  const schemaName = req.headers.company_name as string
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName = globalHelper.getSchemaName(authInfo)
   const sinceDaysAgo = req?.query?.sinceDaysAgo == 'All'? 'All': toInteger(req?.query?.sinceDaysAgo)
   const untilDaysAgo = toInteger(req?.query?.untilDaysAgo)       
 
@@ -50,7 +52,8 @@ export const getIncidentsByDaysRange = async  (req: Request, res: Response) => {
 
 export const updateIncident = async (req: Request, res: Response) => {
   const updatedIncident: IIncident = req.body
-  const schemaName = req.headers.company_name as string
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName = globalHelper.getSchemaName(authInfo)
   try {
     const Incident = await incidentModel.updateIncident(schemaName,updatedIncident)
     return res.status(200).send({status:`incident updated successfully`,incident: Incident})
