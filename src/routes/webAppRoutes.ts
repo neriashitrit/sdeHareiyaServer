@@ -10,6 +10,7 @@ import * as insightsController from '../controllers/insights.controller'
 const router = express.Router()
 // users
 router.get('/user/login', usersController.userLogin)
+router.get('/user/getAll', usersController.getAllCompanyUsers)
 
 // notifications
 router.get('/notifications/getRecent', notificationController.getRecentNotifications)
@@ -19,6 +20,8 @@ router.get('/company/getCompany', companiesController.getCompany)
 router.get('/company/getMonitoredDeviceNumber', companiesController.getMonitoredDeviceNumber)
 router.get('/company/getMonitoredDevice', companiesController.getAllMonitoredDevice)
 router.get('/company/getSLA', companiesController.getSLA)
+router.get('/company/getSourceIP', companiesController.getSourceIP)
+router.post('/company/updateSourceIP', companiesController.updateSourceIP)
 
 // incidents
 router.get('/incident/getByDays', incidentsController.getIncidentsByDaysRange)

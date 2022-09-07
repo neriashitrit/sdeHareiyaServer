@@ -21,4 +21,10 @@ export default class UserModel {
     const user = await this.db.insert(TRUSTNET_SCHEMA,TRUSTNET_TABLES.USERS, newUser)
     return user
   }
+
+  getAllCompanyUsers  = async (company_id: number): Promise<IUser[]> =>{
+    const users = await this.db.getAll(TRUSTNET_SCHEMA,TRUSTNET_TABLES.USERS, {company_id})
+    console.log(users)
+    return users
+  }
 }

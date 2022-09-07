@@ -75,6 +75,37 @@ export const getSLA =  async (req: Request, res: Response) => {
   }
 }
 
+export const getSourceIP =  async (req: Request, res: Response) => {
+  console.log('in controller getSourceIP');
+  // const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  // const schemaName =  globalHelper.getSchemaName(authInfo)
+  const schemaName = 'apple'
+  try {
+    const SourceIP = await companyModel.getSourceIP(schemaName)
+    return res.status(200).send(SourceIP)
+  } catch (error) {
+    console.error('ERROR in companies.controller getSourceIP()', error.message);
+    return res.status(400).send({message:'Something went wrong', error:error.message})
+  }
+}
+
+export const updateSourceIP =  async (req: Request, res: Response) => {
+  console.log('in controller updateSourceIP');
+  const updatedSourceIP = req.body
+  // const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  // const schemaName =  globalHelper.getSchemaName(authInfo)
+  const schemaName = 'apple'
+  
+  try {
+    if (typeof(updatedSourceIP?.id) !== 'number'){throw {message:'send what is the id of the SourceIP you want to update'}}
+    const SourceIP = await companyModel.updateSourceIP(schemaName,updatedSourceIP)
+    return res.status(200).send(SourceIP)
+  } catch (error) {
+    console.error('ERROR in companies.controller updateSourceIP()', error.message);
+    return res.status(400).send({message:'Something went wrong', error:error.message})
+  }
+}
+
 export const updateConfiguration =  async (req: Request, res: Response) => {
   console.log('in controller updateConfiguration');
   const updatedConfiguration = req.body
