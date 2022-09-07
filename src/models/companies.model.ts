@@ -33,16 +33,22 @@ export default class CompanyModel {
   }
   
   getAllMonitoredDevice = async (schemaName: string): Promise<any> =>{
-    const AllMonitoredDevice = await this.db.getAll(schemaName,COMPANIES_TABLES.MONITORED_DEVICE)
+    const AllMonitoredDevice = await this.db.getAll(schemaName, COMPANIES_TABLES.MONITORED_DEVICE)
     return AllMonitoredDevice
   }
 
   getSLA = async (schemaName: string): Promise<any> =>{
-    const SLA = await this.db.getAll(schemaName,COMPANIES_TABLES.SLA)
+    const SLA = await this.db.getAll(schemaName, COMPANIES_TABLES.SLA)
     return SLA
   }
+
+  getSourceIP = async (schemaName: string): Promise<any> =>{
+    const SourceIP = await this.db.getAll(schemaName, COMPANIES_TABLES.SOURCE_IP)
+    return SourceIP
+  }
+
   getConfiguration = async (schemaName: string): Promise<any> =>{
-    const company = await this.db.getOne(schemaName,COMPANIES_TABLES.CONFIGURATION)
+    const company = await this.db.getOne(schemaName, COMPANIES_TABLES.CONFIGURATION)
     return company
   }
 
@@ -52,5 +58,11 @@ export default class CompanyModel {
       await this.db.insert(schemaName, COMPANIES_TABLES.CONFIGURATION, newConfiguration)
     }
     return 'company configuration updated'
-  }  
+  }
+
+  updateSourceIP = async (schemaName: string, newSourceIP: any): Promise<any> =>{
+    const updatedSourceIP  = await this.db.update(schemaName, COMPANIES_TABLES.SOURCE_IP, newSourceIP, {id:newSourceIP.id})
+    if (_.isEmpty(updatedSourceIP)) {throw {message:'there is no sourceIP with this id'}}
+    return updatedSourceIP
+  }
 }

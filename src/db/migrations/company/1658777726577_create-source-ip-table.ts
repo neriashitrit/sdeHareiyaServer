@@ -6,8 +6,9 @@ export const shorthands: ColumnDefinitions | undefined = undefined
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
     pgm.createTable(COMPANIES_TABLES.SOURCE_IP, {
-        ip: { type: PgType.INT, notNull: true },
-        description: { type: PgType.INT, notNull: true },
+        id: 'id',
+        ip: { type: PgType.VARCHAR, notNull: true },
+        description: { type: PgType.VARCHAR, notNull: true },
         created_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
         updated_at: { type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE, default: pgm.func('current_timestamp') },
     })

@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start:dev": "rm -rf dist && tsc && ts-node-dev ./src/app.ts",
+    "start:dev": "ts-node-dev ./src/app.ts",
+    "start:prod": "rm -rf dist && tsc && node ./dist/app.js",
     "prebuild": "rm -rf dist",
     "build": "tsc",
     "start": "node ./dist/app.js",
