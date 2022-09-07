@@ -77,9 +77,8 @@ export const getSLA =  async (req: Request, res: Response) => {
 
 export const getSourceIP =  async (req: Request, res: Response) => {
   console.log('in controller getSourceIP');
-  // const authInfo:AuthInfo = req?.authInfo as AuthInfo
-  // const schemaName =  globalHelper.getSchemaName(authInfo)
-  const schemaName = 'apple'
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName =  globalHelper.getSchemaName(authInfo)
   try {
     const SourceIP = await companyModel.getSourceIP(schemaName)
     return res.status(200).send(SourceIP)
@@ -92,9 +91,8 @@ export const getSourceIP =  async (req: Request, res: Response) => {
 export const updateSourceIP =  async (req: Request, res: Response) => {
   console.log('in controller updateSourceIP');
   const updatedSourceIP = req.body
-  // const authInfo:AuthInfo = req?.authInfo as AuthInfo
-  // const schemaName =  globalHelper.getSchemaName(authInfo)
-  const schemaName = 'apple'
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName =  globalHelper.getSchemaName(authInfo)
   
   try {
     if (typeof(updatedSourceIP?.id) !== 'number'){throw {message:'send what is the id of the SourceIP you want to update'}}

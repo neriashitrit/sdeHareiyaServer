@@ -24,7 +24,7 @@ passport.use(bearerStrategy)
 // Routes
 app.use('/api/company', apiStrategy, userRouter)
 app.use('/api/admin', adminSenderAuth, companiesRouter)
-app.use('/api/portal', /*passport.authenticate(bearerStrategy, { session: false }),*/ webAppRouter)
+app.use('/api/portal', passport.authenticate(bearerStrategy, { session: false }), webAppRouter)
 app.use('/api', openRouter)
 
 const port = process.env.PORT || 3000;

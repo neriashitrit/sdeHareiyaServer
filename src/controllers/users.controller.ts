@@ -25,9 +25,8 @@ export const userLogin =  async (req: Request, res: Response) => {
 
 export const getAllCompanyUsers =  async (req: Request, res: Response) => {
   console.log('in controller getAllCompanyUsers');
-  // const authInfo:AuthInfo = req?.authInfo as AuthInfo
-  // const schemaName =  globalHelper.getSchemaName(authInfo)
-  const schemaName = 'apple'
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName =  globalHelper.getSchemaName(authInfo)
 
   try {
     const users  = await usersHelper.getAllCompanyUsers(schemaName)
