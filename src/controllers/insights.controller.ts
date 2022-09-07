@@ -50,7 +50,8 @@ export const getInsightsByDaysRange = async  (req: Request, res: Response) => {
 
 export const updateInsight = async (req: Request, res: Response) => {
   const updatedInsight: IInsight = req.body
-  const schemaName = req.headers.company_name as string
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName = globalHelper.getSchemaName(authInfo)
   try {
     const insight = await insightModel.updateInsight(schemaName,updatedInsight)
     return res.status(200).send({status:`insight updated Received successfully`,insight: insight})
@@ -62,7 +63,8 @@ export const updateInsight = async (req: Request, res: Response) => {
 
 export const deleteInsight = async (req: Request, res: Response) => {
   const insightID = req.body?.id
-  const schemaName = req.headers.company_name as string
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName = globalHelper.getSchemaName(authInfo)
   try {
     const insight = await insightModel.deleteInsight(schemaName, insightID)
     return res.status(200).send({status:`insight deleted successfully`,insight: insight})
@@ -74,7 +76,8 @@ export const deleteInsight = async (req: Request, res: Response) => {
 
 export const createInsight = async (req: Request, res: Response) => {
   const newInsight: IInsight = req.body
-  const schemaName = req.headers.company_name as string
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName = globalHelper.getSchemaName(authInfo)
   try {
     const insight = await insightModel.createInsight(schemaName,newInsight)
     return res.status(200).send({status:`new insight Received successfully`,insight: insight})

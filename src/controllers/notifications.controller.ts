@@ -1,5 +1,7 @@
 import { Request, Response } from 'express'
+import globalHelper from '../helpers/global.helper'
 import { toInteger } from 'lodash';
+import { AuthInfo } from 'types';
 
 import NotificationModel from '../models/notifications.model'
 
@@ -7,7 +9,8 @@ const notificationModel = new NotificationModel()
 
 export const getRecentNotifications = async (req: Request, res: Response) => {
   console.log('in controller getRecentNotifications');
-  const schemaName = req?.headers?.company_name as string
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName =  globalHelper.getSchemaName(authInfo)
   const howMany = toInteger(req?.query?.howMany)
 
   try {

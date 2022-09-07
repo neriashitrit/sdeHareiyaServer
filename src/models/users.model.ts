@@ -12,8 +12,9 @@ export default class UserModel {
   }
 
   getUser = async (email: string): Promise<any> =>{
-    const user = await this.db.getOne(TRUSTNET_SCHEMA,TRUSTNET_TABLES.USERS,{email})
-    return user
+    const last_login = new Date()
+    const user = await this.db.update(TRUSTNET_SCHEMA,TRUSTNET_TABLES.USERS,{last_login},{email})
+    return user?.[0]
   }
 
   createUser = async (newUser: any): Promise<IUser> =>{

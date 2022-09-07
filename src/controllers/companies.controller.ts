@@ -25,9 +25,10 @@ export const createCompany =  async (req: Request, res: Response) => {
 
 export const getCompany =  async (req: Request, res: Response) => {
   console.log('in controller getCompanies');
-  const companyName = req?.headers?.company_name as string
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName =  globalHelper.getSchemaName(authInfo)
   try {
-    const company = await companyModel.getCompany(companyName)
+    const company = await companyModel.getCompany(schemaName)
     return res.status(200).send(company)
   } catch (error) {
     console.error('ERROR in companies.controller getCompany()', error.message);
@@ -50,9 +51,10 @@ export const getMonitoredDeviceNumber =  async (req: Request, res: Response) => 
 
 export const getAllMonitoredDevice =  async (req: Request, res: Response) => {
   console.log('in controller getAllMonitoredDevice');
-  const companyName = req?.headers?.company_name as string
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName =  globalHelper.getSchemaName(authInfo)
   try {
-    const MonitoredDevice = await companyModel.getAllMonitoredDevice(companyName)
+    const MonitoredDevice = await companyModel.getAllMonitoredDevice(schemaName)
     return res.status(200).send(MonitoredDevice)
   } catch (error) {
     console.error('ERROR in companies.controller getAllMonitoredDevice()', error.message);
@@ -76,9 +78,10 @@ export const getSLA =  async (req: Request, res: Response) => {
 export const updateConfiguration =  async (req: Request, res: Response) => {
   console.log('in controller updateConfiguration');
   const updatedConfiguration = req.body
-  const companyName = req?.headers?.company_name as string
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName =  globalHelper.getSchemaName(authInfo)
   try {
-    const status = await companyModel.updateConfiguration(companyName,updatedConfiguration)
+    const status = await companyModel.updateConfiguration(schemaName,updatedConfiguration)
     return res.status(200).send(status)
   } catch (error) {
     console.error('ERROR in companies.controller updateConfiguration()', error.message);
