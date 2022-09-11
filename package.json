@@ -28,6 +28,8 @@
     "node-pg-migrate": "^6.2.1",
     "passport": "^0.6.0",
     "passport-azure-ad": "^4.3.3",
+    "azure-storage": "^2.10.4",
+    "azure-connection-parser": "^1.0.1",
     "pg": "^8.7.3"
   },
   "devDependencies": {

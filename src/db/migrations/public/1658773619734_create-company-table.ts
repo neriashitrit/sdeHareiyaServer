@@ -27,5 +27,5 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.dropTrigger(TRUSTNET_TABLES.USERS, 'save_company_update_time', { ifExists: true })
-  pgm.dropTable({ name: TRUSTNET_TABLES.COMPANY }, { ifExists: true })
+  pgm.dropTable(TRUSTNET_TABLES.COMPANY, { ifExists: true })
 }

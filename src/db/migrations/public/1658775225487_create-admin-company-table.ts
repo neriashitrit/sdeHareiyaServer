@@ -23,5 +23,5 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-    pgm.dropTable({ name: TRUSTNET_TABLES.ADMIN_COMPANY }, { ifExists: true })
+    pgm.dropTable( TRUSTNET_TABLES.ADMIN_COMPANY, { ifExists: true })
 }
