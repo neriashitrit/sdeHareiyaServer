@@ -16,9 +16,27 @@ export const userLogin =  async (req: Request, res: Response) => {
       const newUser = await usersHelper.createUser(authInfo)
       return res.status(200).send({status:`user ${authInfo.given_name} added successfully`,user:newUser})
     }
-    else return res.status(200).send({status:`found user ${user}`,user:user} )
+    else return res.status(200).send({status:`user found`, user:user} )
   } catch (error) {
     console.error('ERROR in users.controller userLogin()', error.message);
+    return res.status(400).send({message:'Something went wrong', error:error.message})
+  }
+}
+
+export const getUser =  async (req: Request, res: Response) => {
+  console.log('in controller getUser');
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  try {
+    const user  = await userModel.getUser(authInfo.emails[0])
+    if (!user){
+      return res.status(400).send({message:'Something went wrong', error:`couldn't find this user ${authInfo.emails[0]} `})
+    }
+    else {
+      const companyName =  globalHelper.getSchemaName(authInfo)
+      const userWithCompany = {...user, ...{companyName:companyName}};
+      return res.status(200).send({status:`user found`, user:userWithCompany} )}
+  } catch (error) {
+    console.error('ERROR in users.controller getUser()', error.message);
     return res.status(400).send({message:'Something went wrong', error:error.message})
   }
 }

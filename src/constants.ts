@@ -9,13 +9,15 @@ export const COMPANIES_TABLES = {
   NOTIFICATION: 'notification',
   SLA: 'sla',
   SOURCE_IP: 'source_ip',
-  CONFIGURATION: 'configuration'
+  CONFIGURATION: 'configuration',
+  IMAGE: 'image'
 }
 
 export const TRUSTNET_TABLES = {
   COMPANY: 'company',
   USERS: 'users',
-  ADMIN_COMPANY: 'admin_company'
+  ADMIN_COMPANY: 'admin_company',
+  IMAGE: 'image'
 }
 
 export enum UserRole {
