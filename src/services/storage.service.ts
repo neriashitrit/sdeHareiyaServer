@@ -3,9 +3,6 @@ import stream from 'stream';
 import _ from 'lodash';
 import { ShareServiceClient } from '@azure/storage-file-share'
 
-
-
-
 export default class FileService {
 	static instance: FileService;
     serviceClient: ShareServiceClient;
@@ -50,6 +47,7 @@ export default class FileService {
 			throw {message:'Something went wrong', error:error.message}
 		}
 	};
+	
 	getSas = (fileName: string, container: string) => {
 		const AzureService = AzureStorage.createBlobService();
 		let expiryDate = new Date();
