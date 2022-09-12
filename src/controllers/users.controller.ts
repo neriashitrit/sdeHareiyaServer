@@ -3,7 +3,7 @@ import { Request, Response } from 'express'
 import UserModel from '../models/users.model'
 import { AuthInfo } from 'types';
 import usersHelper from '../helpers/users.helper';
-import globalHelper from 'helpers/global.helper';
+import globalHelper from '../helpers/global.helper';
 
 const userModel = new UserModel()
 
