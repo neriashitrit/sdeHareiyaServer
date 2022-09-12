@@ -3,6 +3,7 @@ import express from 'express'
 import * as notificationController from '../controllers/notifications.controller'
 import * as companiesController from '../controllers/companies.controller'
 import * as usersController from '../controllers/users.controller'
+import * as globalController from '../controllers/global.controller'
 import * as tasksController from '../controllers/tasks.controller'
 import * as incidentsController from '../controllers/incidents.controller'
 import * as insightsController from '../controllers/insights.controller'
@@ -41,5 +42,9 @@ router.post('/insight/create', insightsController.createInsight)
 // configurations
 router.post('/configuration/updateConfiguration', companiesController.updateConfiguration)
 router.get('/configuration/getConfiguration', companiesController.getConfiguration)
+
+// global
+router.post('/global/uploadAvatar', globalController.uploadAvatar)
+router.get('/global/getAvatar', globalController.getAvatar)
 
 export default router

@@ -3,6 +3,7 @@ import logger from 'morgan'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import passport from 'passport'
+import fileupload from 'express-fileupload';
 
 import userRouter from './routes/routes'
 import webAppRouter from './routes/webAppRoutes'
@@ -14,6 +15,7 @@ dotenv.config()
 const app = express()
 
 app.use(cors())
+app.use(fileupload())
 app.use(express.json()) // middleware to recognize JSON
 app.use(express.urlencoded({ extended: false })) // recognize object as strings or arrays
 app.use(logger('dev')) // logger middleware
