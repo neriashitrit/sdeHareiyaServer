@@ -22,3 +22,20 @@ export const getRecentNotifications = async (req: Request, res: Response) => {
     return res.status(400).send({message:'Something went wrong', error:error})
   }
 }
+
+export const getIntervalNotifications = async (req: Request, res: Response) => {
+  console.log('in controller getIntervalNotifications');
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const schemaName =  globalHelper.getSchemaName(authInfo)
+  const nowUtc = new Date()
+  const sinceInEpoch = new Date().setMinutes(nowUtc.getMinutes()- 5)
+  const lastFive = new Date(sinceInEpoch).toJSON()
+  const now = nowUtc.toJSON()
+  try {
+    const notifications = await notificationModel.getIntervalNotifications(schemaName, lastFive, now)
+    return res.status(200).send({IntervalNotifications:notifications})
+  } catch (error) {
+    console.error('ERROR in notifications.controller getIntervalNotifications()', error);
+    return res.status(400).send({message:'Something went wrong', error:error})
+  }
+}

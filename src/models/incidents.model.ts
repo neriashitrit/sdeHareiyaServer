@@ -1,7 +1,7 @@
 import DbService from '../services/db.service'
-import { COMPANIES_TABLES } from '../constants'
+import { COMPANIES_TABLES, notificationStatus } from '../constants'
 import { IIncident } from '../types'
-
+import notificationsHelper from '../helpers/notifications.helper'
 export default class IncidentsModel {
   db: DbService
 
@@ -11,8 +11,16 @@ export default class IncidentsModel {
 
   upsertIncident = async (schemaName: string, newIncident: IIncident): Promise<string> =>{
     try{
-      const incident = await this.db.upsertMerge(schemaName,COMPANIES_TABLES.INCIDENT,newIncident,'external_id')
-      return incident[0]?.id
+      const incidentArray = await this.db.upsertMerge(schemaName,COMPANIES_TABLES.INCIDENT,newIncident,'external_id')
+      const incident = incidentArray[0]
+      const isOld =  incident.created_at < incident.updated_at
+      notificationsHelper.createNotification(schemaName,
+        incident.title,
+        incident.description,
+        isOld,
+        notificationStatus.INCIDENT_CHANGED,
+        notificationStatus.NEW_INCIDENT)
+      return incident?.id
     }
     catch (error){
     console.error(error);
@@ -52,5 +60,4 @@ export default class IncidentsModel {
     throw error
     }
   }
-
 }

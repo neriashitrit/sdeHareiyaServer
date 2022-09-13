@@ -70,7 +70,6 @@ export interface IIncident {
   owner?: string
   origin?: string
   host_name?: string
-  created?: Date
   last_update?: Date
   renew_date?: Date
   source_user?: string
@@ -86,14 +85,16 @@ export interface IIncident {
   sla_initial_triage: Date
   sla_time_to_resolve: Date
   remediation_action:number
+  created_at: Date
+  updated_at: Date
 }
 export interface INotification {
-  id: number
+  id?: number
   title: string
   description: string
   trigger: string
-  created_at: Date
-  updated_at: Date
+  created_at?: Date
+  updated_at?: Date
 }
 
 export interface AuthInfo {
