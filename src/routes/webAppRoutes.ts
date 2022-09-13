@@ -16,6 +16,7 @@ router.get('/user/getOne', usersController.getUser)
 
 // notifications
 router.get('/notifications/getRecent', notificationController.getRecentNotifications)
+router.get('/notifications/getInterval', notificationController.getIntervalNotifications)
 
 // companies
 router.get('/company/getCompany', companiesController.getCompany)

@@ -1,6 +1,7 @@
 import DbService from '../services/db.service'
-import { COMPANIES_TABLES } from '../constants'
+import { COMPANIES_TABLES, notificationStatus } from '../constants'
 import { ITask } from '../types'
+import notificationsHelper from '../helpers/notifications.helper'
 
 export default class TaskModel {
   db: DbService
@@ -11,8 +12,16 @@ export default class TaskModel {
 
   upsertTask = async (schemaName: string, newTask: ITask): Promise<string> =>{
       try{
-        const task = await this.db.upsertMerge(schemaName,COMPANIES_TABLES.TASK,newTask,'id')
-        return task[0]?.id
+        const taskArray = await this.db.upsertMerge(schemaName,COMPANIES_TABLES.TASK,newTask,'id')
+        const task = taskArray[0]
+        const isOld =  task.created_at < task.updated_at
+        notificationsHelper.createNotification(schemaName,
+        task.title,
+        task.description,
+        isOld,
+        notificationStatus.TASK_CHANGED,
+        notificationStatus.NEW_TASK)
+        return task?.id
       }
       catch (error){
       console.error(error);

@@ -5,8 +5,8 @@ import { ShareServiceClient } from '@azure/storage-file-share'
 
 export default class FileService {
 	static instance: FileService;
-    serviceClient: ShareServiceClient;
-	connectionString: string;
+    serviceClient!: ShareServiceClient;
+	connectionString!: string;
 	
 	constructor() {
 		if (FileService.instance) {

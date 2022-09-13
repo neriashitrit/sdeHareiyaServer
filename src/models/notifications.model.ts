@@ -19,4 +19,17 @@ export default class NotificationModel {
       throw error
       }
   }
+  
+  getIntervalNotifications = async (schemaName: string, lastFive: string, now: string): Promise<INotification[]> =>{
+    try{
+      const notifications:INotification[] = await this.db.getManyByDate(schemaName, COMPANIES_TABLES.NOTIFICATION, {}, 'updated_at', lastFive, now)
+      return notifications
+    }
+    catch (error){
+    console.error(error);
+    throw error
+    }
+  }
+
+
 }

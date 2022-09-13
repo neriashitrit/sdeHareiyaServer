@@ -1,6 +1,7 @@
 import DbService from '../services/db.service'
-import { COMPANIES_TABLES } from '../constants'
+import { COMPANIES_TABLES, notificationStatus } from '../constants'
 import { IInsight } from '../types'
+import notificationsHelper from '../helpers/notifications.helper'
 
 export default class InsightsModel {
   db: DbService
@@ -11,8 +12,15 @@ export default class InsightsModel {
 
   upsertInsight = async ( schemaName: string, newInsight: IInsight): Promise<string> =>{
     try{
-      const insight = await this.db.upsertMerge(schemaName,COMPANIES_TABLES.INSIGHT,newInsight,'id')
-      return insight[0]?.id
+      const insightArray = await this.db.upsertMerge(schemaName,COMPANIES_TABLES.INSIGHT,newInsight,'id')
+      const insight = insightArray[0]
+      notificationsHelper.createNotification(schemaName,
+        insight.title,
+        insight.description,
+        false,
+        notificationStatus.NEW_INSIGHT,
+        notificationStatus.NEW_INSIGHT)
+      return insight?.id
     }
     catch (error){
     console.error(error);
@@ -46,9 +54,15 @@ export default class InsightsModel {
 
   createInsight = async ( schemaName: string, newInsight: any): Promise<IInsight> =>{
     try{
-      const insight = await this.db.insert(schemaName,COMPANIES_TABLES.INSIGHT, newInsight)
-      if (insight.length == 0){throw 'insight with same id do not exist'}
-      return insight[0]
+      const insightArray = await this.db.insert(schemaName,COMPANIES_TABLES.INSIGHT, newInsight)
+      const insight = insightArray[0]
+      notificationsHelper.createNotification(schemaName,
+        insight.title,
+        insight.description,
+        false,
+        notificationStatus.NEW_INSIGHT,
+        notificationStatus.NEW_INSIGHT)
+      return insight
     }
     catch (error){
     console.error(error);
