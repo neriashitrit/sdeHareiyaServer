@@ -25,6 +25,15 @@ export default class CompanyModel {
     const company = await this.db.getOne(TRUSTNET_SCHEMA,TRUSTNET_TABLES.COMPANY,{company_name})
     return company
   }
+
+  getCompanyUsersAndImage = async (company_name: string): Promise<any[]> =>{
+    const imageWithUser = await this.db.db.withSchema(TRUSTNET_SCHEMA).select()
+    .from(TRUSTNET_TABLES.COMPANY)
+    .join(TRUSTNET_TABLES.USERS, { [`${TRUSTNET_TABLES.USERS}.company_id`]: `${TRUSTNET_TABLES.COMPANY}.id` })
+    .join(TRUSTNET_TABLES.IMAGE, { [`image.id`]: `${TRUSTNET_TABLES.USERS}.image_id` })
+    .where(`${TRUSTNET_TABLES.COMPANY}.company_name`, company_name)
+    return imageWithUser
+  }
   
   getMonitoredDeviceNumber = async (schemaName: string): Promise<any> =>{
     const db = new DbConnection().getConnection()

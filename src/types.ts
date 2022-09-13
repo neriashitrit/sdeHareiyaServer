@@ -47,6 +47,14 @@ export interface IInsight {
   created: Date
 }
 
+export interface IImage {
+  id:number
+  key: string
+  url?: string
+  created_at: Date
+  updated_at: Date
+}
+
 export interface IIncident {
   id:number
   external_id: number// for know only like jira ticket

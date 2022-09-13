@@ -30,6 +30,8 @@ export default class FileService {
 			fileStream.push(null);
 			await fileClient.create(file.data.length);
 			await fileClient.uploadRange(file.data, 0, file.data.length);
+			const url = `https://${process.env.AccountName}.file.${process.env.EndpointSuffix}/images/${directory}/${fileName}`
+			return url
 		} catch (error) {
 			throw {message:'Something went wrong', error:error.message}
 		}

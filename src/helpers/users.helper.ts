@@ -29,9 +29,8 @@ const usersHelper = {
 
     getAllCompanyUsers: async (companyName: string):Promise<IUser[]> => {  
         try {
-            const company = await companyModel.getCompany(companyName)
-            const users = await userModel.getAllCompanyUsers(company.id)
-            return users
+            const usersWithImage = await companyModel.getCompanyUsersAndImage(companyName)
+            return usersWithImage
         } catch (error) {
             console.error('ERROR in users.helper getAllCompanyUsers()', error.message);
             throw(`error while trying to getAllCompanyUsers of ${companyName} company. error: ${error.message}`)
