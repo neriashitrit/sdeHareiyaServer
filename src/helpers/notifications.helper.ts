@@ -9,7 +9,6 @@ const notificationsHelper = {
             description:description||'',
             trigger: isOld ? updated : created
         }
-        console.log('newNotification ', newNotification);
         
         try{
             const db = new DbService()
