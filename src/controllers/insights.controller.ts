@@ -5,8 +5,11 @@ import { AuthInfo, IInsight } from 'types'
 import InsightsModel from '../models/insights.model'
 import insightsHelper from '../helpers/insights.helper'
 import globalHelper from '../helpers/global.helper'
+import * as globalController from './global.controller'
+import  FileService  from '../services/storage.service'
 
 const insightModel = new InsightsModel()
+const fileService = FileService.getInstance()
 
 export const upsertInsight = async (req: Request, res: Response) => {
   const  newInsight: IInsight = req.body
@@ -75,11 +78,16 @@ export const deleteInsight = async (req: Request, res: Response) => {
 }
 
 export const createInsight = async (req: Request, res: Response) => {
-  const newInsight: IInsight = req.body
+  const newInsight = {title:req.body.title, description:req.body.description, priority:req.body.priority}
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const {avatarType, randomCode}= req.body
+  const {files}:any  = req
+  const {avatarImage} = files
   const schemaName = globalHelper.getSchemaName(authInfo)
   try {
     const insight = await insightModel.createInsight(schemaName,newInsight)
+    const ImageUrl = await fileService.insert(avatarImage, randomCode, avatarType)
+    const newImage = await globalHelper.createImage(avatarType, randomCode, authInfo, insight.id, ImageUrl)
     return res.status(200).send({status:`new insight Received successfully`,insight: insight})
   } catch (error) {
     console.error('ERROR in insights.controller createInsight()', error);
