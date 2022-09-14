@@ -22,8 +22,11 @@ export default class CompanyModel {
   }
 
   getCompany = async (company_name: string): Promise<ICompany> =>{
-    const company = await this.db.getOne(TRUSTNET_SCHEMA,TRUSTNET_TABLES.COMPANY,{company_name})
-    return company
+    const companyWithImage =  await this.db.db.withSchema(TRUSTNET_SCHEMA).select(`${TRUSTNET_TABLES.COMPANY}.id`,"company_name","sector","area_timestamp","active","renew_date","joining_date",`${TRUSTNET_TABLES.COMPANY}.created_at`,`${TRUSTNET_TABLES.COMPANY}.updated_at`,"image_id","url")
+    .from(TRUSTNET_TABLES.COMPANY)
+    .join(TRUSTNET_TABLES.IMAGE, { [`image.id`]: `${TRUSTNET_TABLES.COMPANY}.image_id` })
+    .where(`${TRUSTNET_TABLES.COMPANY}.company_name`, company_name)
+    return companyWithImage[0]
   }
 
   getCompanyUsersAndImage = async (company_name: string): Promise<any[]> =>{

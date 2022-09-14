@@ -19,6 +19,7 @@ export default class GlobalModel {
     const user = await this.db.update(schemaName,tableName, {image_id}, {id})
     return user
   }
+  
   getImage = async (schemaName:string, tableName:string, id: number): Promise<any> =>{
     const imageWithUser = await this.db.db.withSchema(schemaName).select()
     .from(tableName)
