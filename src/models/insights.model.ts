@@ -84,10 +84,10 @@ export default class InsightsModel {
     throw error
     }
   }
-
   getInsightsByDaysRange = async (schemaName: string, searchFiled: string, sinceDate: string, untilDate: string): Promise<IInsight[]> =>{
     try{
-      const insightsWithImage =  await this.db.db.withSchema(schemaName).select()
+      //pay attention - the order of the select is important
+      const insightsWithImage =  await this.db.db.withSchema(schemaName).select(`${COMPANIES_TABLES.IMAGE}.*`, `${COMPANIES_TABLES.INSIGHT}.*`)
       .from(COMPANIES_TABLES.INSIGHT)
       .leftJoin(COMPANIES_TABLES.IMAGE, { [`image.id`]: `${COMPANIES_TABLES.INSIGHT}.image_id` })
       .whereBetween(`${COMPANIES_TABLES.INSIGHT}.${searchFiled}`,[sinceDate,untilDate])
