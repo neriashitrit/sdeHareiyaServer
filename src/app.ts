@@ -4,6 +4,8 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import passport from 'passport'
 import fileupload from 'express-fileupload';
+import helmet from 'helmet'
+import emailService from './services/email.service'
 
 import userRouter from './routes/routes'
 import webAppRouter from './routes/webAppRoutes'
@@ -14,6 +16,8 @@ import { adminSenderAuth, apiStrategy, bearerStrategy } from './middlewares/auth
 dotenv.config()
 const app = express()
 
+emailService.start(process.env.SENDGRID_API_KEY || '')
+app.use(helmet())
 app.use(cors())
 app.use(fileupload())
 app.use(express.json()) // middleware to recognize JSON

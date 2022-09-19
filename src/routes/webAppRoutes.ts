@@ -13,6 +13,7 @@ const router = express.Router()
 router.get('/user/login', usersController.userLogin)
 router.get('/user/getAll', usersController.getAllCompanyUsers)
 router.get('/user/getOne', usersController.getUser)
+router.post('/user/contactUs', usersController.sendContactUs)
 
 // notifications
 router.get('/notifications/getRecent', notificationController.getRecentNotifications)

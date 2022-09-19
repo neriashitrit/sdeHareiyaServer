@@ -22,24 +22,26 @@ export default class CompanyModel {
   }
 
   getCompany = async (company_name: string): Promise<ICompany> =>{
-    const companyWithImage =  await this.db.db.withSchema(TRUSTNET_SCHEMA).select(`${TRUSTNET_TABLES.COMPANY}.id`,"company_name","sector","area_timestamp","active","renew_date","joining_date",`${TRUSTNET_TABLES.COMPANY}.created_at`,`${TRUSTNET_TABLES.COMPANY}.updated_at`,"image_id","url")
-    .from(TRUSTNET_TABLES.COMPANY)
-    .join(TRUSTNET_TABLES.IMAGE, { [`image.id`]: `${TRUSTNET_TABLES.COMPANY}.image_id` })
-    .where(`${TRUSTNET_TABLES.COMPANY}.company_name`, company_name)
+    const db = this.db.db
+    const companyWithImage =  await db.withSchema(TRUSTNET_SCHEMA).select(`${TRUSTNET_TABLES.COMPANY}.id`,"company_name","sector","area_timestamp","active","renew_date","joining_date",`${TRUSTNET_TABLES.COMPANY}.created_at`,`${TRUSTNET_TABLES.COMPANY}.updated_at`,"image_id","url")
+      .from(TRUSTNET_TABLES.COMPANY)
+      .join(TRUSTNET_TABLES.IMAGE, { [`image.id`]: `${TRUSTNET_TABLES.COMPANY}.image_id` })
+      .where(`${TRUSTNET_TABLES.COMPANY}.company_name`, company_name)
     return companyWithImage[0]
   }
 
   getCompanyUsersAndImage = async (company_name: string): Promise<any[]> =>{
-    const imageWithUser = await this.db.db.withSchema(TRUSTNET_SCHEMA).select()
-    .from(TRUSTNET_TABLES.COMPANY)
-    .join(TRUSTNET_TABLES.USERS, { [`${TRUSTNET_TABLES.USERS}.company_id`]: `${TRUSTNET_TABLES.COMPANY}.id` })
-    .join(TRUSTNET_TABLES.IMAGE, { [`image.id`]: `${TRUSTNET_TABLES.USERS}.image_id` })
-    .where(`${TRUSTNET_TABLES.COMPANY}.company_name`, company_name)
+    const db = this.db.db
+    const imageWithUser = await db.withSchema(TRUSTNET_SCHEMA).select()
+      .from(TRUSTNET_TABLES.COMPANY)
+      .join(TRUSTNET_TABLES.USERS, { [`${TRUSTNET_TABLES.USERS}.company_id`]: `${TRUSTNET_TABLES.COMPANY}.id` })
+      .join(TRUSTNET_TABLES.IMAGE, { [`image.id`]: `${TRUSTNET_TABLES.USERS}.image_id` })
+      .where(`${TRUSTNET_TABLES.COMPANY}.company_name`, company_name)
     return imageWithUser
   }
   
   getMonitoredDeviceNumber = async (schemaName: string): Promise<any> =>{
-    const db = new DbConnection().getConnection()
+    const db = this.db.db
     const connectedMonitoredDeviceSum = await db.withSchema(schemaName).select().from(COMPANIES_TABLES.MONITORED_DEVICE).where({status:deviceStatus.CONNECTED}).sum('count').first()
     return connectedMonitoredDeviceSum
   }
