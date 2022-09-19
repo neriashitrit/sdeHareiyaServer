@@ -43,6 +43,8 @@ export const getCompany =  async (req: Request, res: Response) => {
 export const getAdminCompanies =  async (req: Request, res: Response) => {
   console.log('in controller getAdminCompanies');
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  console.log(authInfo);
+  
   const userMail = authInfo.emails[0]
   
   try {
