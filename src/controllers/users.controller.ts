@@ -11,8 +11,9 @@ const userModel = new UserModel()
 export const userLogin =  async (req: Request, res: Response) => {
   console.log('in controller userLogin');
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const userMail = authInfo.emails[0]
   try {
-    const user  = await userModel.getUser(authInfo.emails[0])
+    const user  = await userModel.getUser(userMail)
     if (!user){
       const newUser = await usersHelper.createUser(authInfo)
       return res.status(200).send({status:`user ${authInfo.given_name} added successfully`,user:newUser})
@@ -27,10 +28,11 @@ export const userLogin =  async (req: Request, res: Response) => {
 export const getUser =  async (req: Request, res: Response) => {
   console.log('in controller getUser');
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const userMail = authInfo.emails[0]
   try {
-    const user  = await userModel.getUser(authInfo.emails[0])
+    const user  = await userModel.getUser(userMail)
     if (!user){
-      return res.status(400).send({message:'Something went wrong', error:`couldn't find this user ${authInfo.emails[0]} `})
+      return res.status(400).send({message:'Something went wrong', error:`couldn't find this user ${userMail} `})
     }
     else {
       const companyName =  globalHelper.getSchemaName(authInfo)

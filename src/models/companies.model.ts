@@ -40,6 +40,17 @@ export default class CompanyModel {
     return imageWithUser
   }
   
+  getAdminCompanies = async (email: string): Promise<any[]> =>{
+    const db = this.db.db
+    const AdminCompanies = await db.withSchema(TRUSTNET_SCHEMA).select(
+      `${TRUSTNET_TABLES.USERS}.id`, `${TRUSTNET_TABLES.USERS}.email`, `${TRUSTNET_TABLES.COMPANY}.id as company_id`, `${TRUSTNET_TABLES.COMPANY}.company_name`)
+    .from(TRUSTNET_TABLES.USERS)
+    .join(TRUSTNET_TABLES.ADMIN_COMPANY, { [`${TRUSTNET_TABLES.ADMIN_COMPANY}.user_id`]: `${TRUSTNET_TABLES.USERS}.id` })
+    .join(TRUSTNET_TABLES.COMPANY, { [`${TRUSTNET_TABLES.COMPANY}.id`]: `${TRUSTNET_TABLES.ADMIN_COMPANY}.company_id` })
+    .where(`${TRUSTNET_TABLES.USERS}.email`, email)
+    return AdminCompanies
+  }
+
   getMonitoredDeviceNumber = async (schemaName: string): Promise<any> =>{
     const db = this.db.db
     const connectedMonitoredDeviceSum = await db.withSchema(schemaName).select().from(COMPANIES_TABLES.MONITORED_DEVICE).where({status:deviceStatus.CONNECTED}).sum('count').first()
