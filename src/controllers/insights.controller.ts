@@ -82,11 +82,11 @@ export const createInsight = async (req: Request, res: Response) => {
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
   const {avatarType, randomCode}= req.body
   const {files}:any  = req
-  const {avatarImage} = files
+  const {insightImage} = files
   const schemaName = globalHelper.getSchemaName(authInfo)
   try {
     const insight = await insightModel.createInsight(schemaName,newInsight)
-    const ImageUrl = await fileService.insert(avatarImage, randomCode, avatarType)
+    const ImageUrl = await fileService.insert(insightImage, randomCode, avatarType)
     const newImage = await globalHelper.createImage(avatarType, randomCode, authInfo, insight.id, ImageUrl)
     return res.status(200).send({status:`new insight Received successfully`,insight: insight})
   } catch (error) {

@@ -13,14 +13,16 @@ export default class UserModel {
 
   getUser = async (email: string): Promise<any> =>{
     const last_login = new Date()
-    const user = await this.db.update(TRUSTNET_SCHEMA,TRUSTNET_TABLES.USERS,{last_login},{email})                             
-    if (user[0]) {try {
-      const userImage = await this.db.getOne(TRUSTNET_SCHEMA,TRUSTNET_TABLES.IMAGE,{id:user[0].image_id})      
-      user[0].url = userImage.url
+    try {
+      const user = await this.db.update(TRUSTNET_SCHEMA,TRUSTNET_TABLES.USERS,{last_login},{email})                             
+      if (user[0]){
+        const userImage = await this.db.getOne(TRUSTNET_SCHEMA,TRUSTNET_TABLES.IMAGE,{id:user[0].image_id})      
+        user[0].url = userImage?.url
+      }
+      return user?.[0]
     } catch (error) {
       console.error('ERROR in users.modal getUser()', error.message);
-    }}
-    return user?.[0]
+    }
   }
 
   createUser = async (newUser: any): Promise<IUser> =>{

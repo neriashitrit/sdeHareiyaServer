@@ -25,7 +25,7 @@ export default class CompanyModel {
     const db = this.db.db
     const companyWithImage =  await db.withSchema(TRUSTNET_SCHEMA).select(`${TRUSTNET_TABLES.COMPANY}.id`,"company_name","sector","area_timestamp","active","renew_date","joining_date",`${TRUSTNET_TABLES.COMPANY}.created_at`,`${TRUSTNET_TABLES.COMPANY}.updated_at`,"image_id","url")
       .from(TRUSTNET_TABLES.COMPANY)
-      .join(TRUSTNET_TABLES.IMAGE, { [`image.id`]: `${TRUSTNET_TABLES.COMPANY}.image_id` })
+      .leftJoin(TRUSTNET_TABLES.IMAGE, { [`image.id`]: `${TRUSTNET_TABLES.COMPANY}.image_id` })
       .where(`${TRUSTNET_TABLES.COMPANY}.company_name`, company_name)
     return companyWithImage[0]
   }
@@ -40,6 +40,17 @@ export default class CompanyModel {
     return imageWithUser
   }
   
+  getAdminCompanies = async (email: string): Promise<any[]> =>{
+    const db = this.db.db
+    const AdminCompanies = await db.withSchema(TRUSTNET_SCHEMA).select(
+      `${TRUSTNET_TABLES.USERS}.id`, `${TRUSTNET_TABLES.USERS}.email`, `${TRUSTNET_TABLES.COMPANY}.id as company_id`, `${TRUSTNET_TABLES.COMPANY}.company_name`)
+    .from(TRUSTNET_TABLES.USERS)
+    .join(TRUSTNET_TABLES.ADMIN_COMPANY, { [`${TRUSTNET_TABLES.ADMIN_COMPANY}.user_id`]: `${TRUSTNET_TABLES.USERS}.id` })
+    .join(TRUSTNET_TABLES.COMPANY, { [`${TRUSTNET_TABLES.COMPANY}.id`]: `${TRUSTNET_TABLES.ADMIN_COMPANY}.company_id` })
+    .where(`${TRUSTNET_TABLES.USERS}.email`, email)
+    return AdminCompanies
+  }
+
   getMonitoredDeviceNumber = async (schemaName: string): Promise<any> =>{
     const db = this.db.db
     const connectedMonitoredDeviceSum = await db.withSchema(schemaName).select().from(COMPANIES_TABLES.MONITORED_DEVICE).where({status:deviceStatus.CONNECTED}).sum('count').first()

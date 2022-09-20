@@ -24,7 +24,8 @@ export const createCompany =  async (req: Request, res: Response) => {
 }
 
 export const getCompany =  async (req: Request, res: Response) => {
-  console.log('in controller getCompanies');
+  try {
+    console.log('in controller getCompanies');
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
   const schemaName =  globalHelper.getSchemaName(authInfo)
   try {
@@ -32,6 +33,22 @@ export const getCompany =  async (req: Request, res: Response) => {
     return res.status(200).send(company)
   } catch (error) {
     console.error('ERROR in companies.controller getCompany()', error.message);
+    return res.status(400).send({message:'Something went wrong', error:error.message})
+  }
+  } catch (error) {
+   return 
+  }
+}
+
+export const getAdminCompanies =  async (req: Request, res: Response) => {
+  console.log('in controller getAdminCompanies');
+  const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const userMail = authInfo.emails[0]
+  try {
+    const AdminCompanies = await companyModel.getAdminCompanies(userMail)
+    return res.status(200).send(AdminCompanies)
+  } catch (error) {
+    console.error('ERROR in companies.controller getAdminCompanies()', error.message);
     return res.status(400).send({message:'Something went wrong', error:error.message})
   }
 }

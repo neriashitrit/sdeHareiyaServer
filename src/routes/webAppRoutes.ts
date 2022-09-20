@@ -21,6 +21,7 @@ router.get('/notifications/getInterval', notificationController.getIntervalNotif
 
 // companies
 router.get('/company/getCompany', companiesController.getCompany)
+router.post('/company/getAdminCompanies', companiesController.getAdminCompanies)
 router.get('/company/getMonitoredDeviceNumber', companiesController.getMonitoredDeviceNumber)
 router.get('/company/getMonitoredDevice', companiesController.getAllMonitoredDevice)
 router.get('/company/getSLA', companiesController.getSLA)
