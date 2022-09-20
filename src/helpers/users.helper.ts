@@ -23,7 +23,7 @@ const usersHelper = {
             return newUser
         } catch (error) {
             console.error('ERROR in users.helper createUser()', error.message);
-            throw(`error while trying to create user ${first_name} ${last_name} from ${companyName} company. error: ${error.message}`)
+            throw({message:`error while trying to create user ${first_name} ${last_name} from ${companyName} company. error: ${error.message}`})
         }
     },
 

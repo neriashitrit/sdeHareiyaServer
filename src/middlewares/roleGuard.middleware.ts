@@ -1,31 +1,34 @@
+import { UserRole } from '../constants'
 import { NextFunction, Response } from 'express'
 import _ from 'lodash'
 
 
 export const roleGuard = () =>
   async (req: any, res: Response, next: NextFunction) => {
-    console.log('roleGuard');
-
-    const { email } = req.authInfo.emails[0] || ''
+    const email = req.authInfo.emails[0] || ''
     if (!email) {
       return res.status(401).send({ success: false, message: 'Unauthorized by roleGuard' })
     }
-    try {
-      console.log('in try');
-      req.authInfo.neria = 'neria'
-      // const user = await userHelper.getUserByEmail(email.toLowerCase())
-      // attach user and pass to controller
-      // res.locals.user = user
-
-      // if (_.isEmpty(user)) {
-      //   return res.status(401).send({ success: false, message: 'Unauthorized by roleGuard' })
-      // }
-
-    } catch (error) {
-      console.log('in catch');
-      
-      return res.status(500).send({ success: false })
+    if (req.authInfo.jobTitle.includes('trustnet')){
+      req.userRole = UserRole.ADMIN
     }
-    // authentication and authorization successful
+    else{
+      req.userRole = UserRole.USER
+    }
+    const {companyName}= req.query
+    
+    if (req.userRole = UserRole.ADMIN && companyName){
+      if ( companyName=='trustnet'){
+        return res.status(400).send({ success: false, message: 'can not change to trustnet company' })
+      }
+    const jobTitle = changeAdminCompany(req.authInfo.jobTitle, companyName)
+    req.authInfo.jobTitle = jobTitle
+    }
     return next()
+  }
+
+  const changeAdminCompany = (jobTitle:string, newCompany:string) : string => {
+    const companyName = jobTitle?.split(' ')[0]
+    const newJobTitle = jobTitle?.replace(companyName, newCompany)
+    return newJobTitle
   }

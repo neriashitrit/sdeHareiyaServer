@@ -25,7 +25,7 @@ export default class CompanyModel {
     const db = this.db.db
     const companyWithImage =  await db.withSchema(TRUSTNET_SCHEMA).select(`${TRUSTNET_TABLES.COMPANY}.id`,"company_name","sector","area_timestamp","active","renew_date","joining_date",`${TRUSTNET_TABLES.COMPANY}.created_at`,`${TRUSTNET_TABLES.COMPANY}.updated_at`,"image_id","url")
       .from(TRUSTNET_TABLES.COMPANY)
-      .join(TRUSTNET_TABLES.IMAGE, { [`image.id`]: `${TRUSTNET_TABLES.COMPANY}.image_id` })
+      .leftJoin(TRUSTNET_TABLES.IMAGE, { [`image.id`]: `${TRUSTNET_TABLES.COMPANY}.image_id` })
       .where(`${TRUSTNET_TABLES.COMPANY}.company_name`, company_name)
     return companyWithImage[0]
   }
