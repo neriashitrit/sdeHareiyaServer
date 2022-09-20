@@ -15,7 +15,7 @@ export const roleGuard = () =>
     else{
       req.userRole = UserRole.USER
     }
-    const {companyName}= req.query
+    const {companyName}= req?.query
     
     if (req.userRole = UserRole.ADMIN && companyName){
       if ( companyName=='trustnet'){
