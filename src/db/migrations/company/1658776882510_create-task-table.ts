@@ -15,6 +15,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
         status: { type: 'task_status_types' },
         priority: { type: 'task_priority_types' },
         owner: { type: PgType.VARCHAR },
+        last_updating_user: { type: PgType.VARCHAR },
         is_visible: { type: PgType.BOOLEAN, default: true, notNull: true },
         incident_id: {
             type: PgType.INT,
