@@ -15,7 +15,7 @@ export const getDBConnection = () =>
       const authInfo = req?.authInfo as AuthInfo
       const companyName = globalHelper.getSchemaName(authInfo)
       const company = await companyModel.getCompanyInfo(companyName)
-      const companyInfo = getDecodedCompanyInfo(company.encoded_company_info)
+      const companyInfo = getDecodedCompanyInfo(company?.encoded_company_info)
       const connectionString = getConnectionString(companyInfo)
       const DataBaseService = new DbService()
       const db = new DbConnection().getConnection(connectionString) as any

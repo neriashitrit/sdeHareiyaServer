@@ -87,9 +87,10 @@ export default class DbService {
     console.log(`${DBuserName} WITH LOGIN`)
     await db.raw(`ALTER SCHEMA ${schemaName} OWNER TO ${DBuserName};`)
     console.log(`${DBuserName} is ${schemaName} schema OWNER`)
-     await db.raw(`GRANT ALL ON SCHEMA ${schemaName} to ${DBuserName};`)
+    await db.raw(`GRANT ALL ON SCHEMA ${schemaName} to ${DBuserName};`)
     console.log(`${DBuserName} have all privileges on ${schemaName} schema`)
     await db.raw(`GRANT ALL ON ALL TABLES IN SCHEMA ${schemaName} TO ${DBuserName};`)
     console.log(`${DBuserName} have all privileges on ${schemaName} schema tables`)
+    // await db.raw(`GRANT USAGE ON ALL SEQUENCES IN SCHEMA ${schemaName} TO ${DBuserName};`)
   }
 }
