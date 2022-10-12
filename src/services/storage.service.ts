@@ -1,4 +1,3 @@
-import AzureStorage from 'azure-storage';
 import stream from 'stream';
 import _ from 'lodash';
 import { ShareServiceClient } from '@azure/storage-file-share'
@@ -30,7 +29,7 @@ export default class FileService {
 			fileStream.push(null);
 			await fileClient.create(file.data.length);
 			await fileClient.uploadRange(file.data, 0, file.data.length);
-			const url = `https://${process.env.AccountName}.file.${process.env.EndpointSuffix}/images/${directory}/${fileName}${process.env.SAS}`
+			const url = `https://${process.env.AccountName}.file.${process.env.EndpointSuffix}/images/${directory}/${fileName}`
 			return url
 		} catch (error) {
 			throw {message:'Something went wrong', error:error.message}
@@ -50,20 +49,15 @@ export default class FileService {
 		}
 	};
 	
-	getSas = (fileName: string, container: string) => {
-		const AzureService = AzureStorage.createBlobService();
-		let expiryDate = new Date();
-		expiryDate.setHours(expiryDate.getHours() + 1);
-
-		const sharedAccessPolicy = {
-			AccessPolicy: {
-				Permissions: AzureStorage.BlobUtilities.SharedAccessPermissions.READ +
-					AzureStorage.BlobUtilities.SharedAccessPermissions.WRITE +
-					AzureStorage.BlobUtilities.SharedAccessPermissions.DELETE,
-				Expiry: expiryDate
-			}
-		};
-		return AzureService.generateSharedAccessSignature(container, fileName, sharedAccessPolicy);
+	getSas = () : string => {
+		try {
+			const sas = this.serviceClient.generateAccountSasUrl()
+			return sas?.replace(`https://${process.env.AccountName}.file.${process.env.EndpointSuffix}/`,'')			
+		
+		} catch (error) {
+			console.error('cant get sas from azure', error);
+			throw(`cant get sas error: ${error}`) 
+		}
 	};
 
 	streamToBuffer = (readableStream:NodeJS.ReadableStream) => {
