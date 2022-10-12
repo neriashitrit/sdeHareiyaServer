@@ -5,7 +5,6 @@ import globalHelper from '../helpers/global.helper'
 import GlobalModel from '../models/global.model'
 import  FileService  from '../services/storage.service'
 
-const globalModel = new GlobalModel()
 const fileService = FileService.getInstance()
 
 export const uploadAvatar =  async (req: Request, res: Response) => {
@@ -33,6 +32,17 @@ export const getAvatar =  async (req: Request, res: Response) => {
     return res.status(200).send({status:'found avatar ', avatar:Image} )
   } catch (error) {
     console.error('ERROR in global.controller getAvatar()', error.message);
+    return res.status(400).send({message:'Something went wrong', error:error.message})
+  }
+}
+
+export const getSAS =  async (req: Request, res: Response) => {
+  console.log('in controller getSAS');
+  try {
+    const SAS  = fileService.getSas()
+    return res.status(200).send(SAS)
+  } catch (error) {
+    console.error('ERROR in global.controller getSAS()', error.message);
     return res.status(400).send({message:'Something went wrong', error:error.message})
   }
 }

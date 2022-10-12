@@ -49,5 +49,6 @@ router.get('/configuration/getConfiguration', companiesController.getConfigurati
 // global
 router.post('/global/uploadAvatar', globalController.uploadAvatar)
 router.get('/global/getAvatar', globalController.getAvatar)
+router.get('/global/getSAS', globalController.getSAS)
 
 export default router
