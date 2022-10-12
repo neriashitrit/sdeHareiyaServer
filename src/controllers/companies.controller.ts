@@ -1,6 +1,6 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 
-import { encryptPassword } from '../services/password.service'
+import { hashPassword, encryptPassword } from '../services/password.service'
 import { AuthInfo, ICompany } from 'types'
 import CompanyModel from '../models/companies.model'
 import { TRUSTNET_SCHEMA } from '../constants'
@@ -10,12 +10,15 @@ const companyModel = new CompanyModel()
 
 export const createCompany =  async (req: Request, res: Response) => {
   console.log('in controller createCompanies');
-  const newCompany: ICompany  = req?.body
-  newCompany.api_key = encryptPassword(newCompany.api_key)
+  const newCompany: ICompany  = req?.body.company
+  newCompany.api_key = hashPassword(newCompany.api_key)
+  const DBuserName = req?.body?.database_user
+  const DBuserEncodedPassword = await encryptPassword(req?.body?.database_password)
+  newCompany.encoded_company_info = DBuserEncodedPassword
   try {
     // TODO run as transaction
     const companyId  = await companyModel.createCompany(TRUSTNET_SCHEMA,newCompany)
-    await companyModel.createCompanyTables(newCompany.company_name)
+    await companyModel.createCompanyTables(newCompany.company_name, DBuserName, DBuserEncodedPassword)
     return res.status(200).send({status:`company ${newCompany.company_name} added successfully`,companyId:companyId} )
   } catch (error) {
     console.error('ERROR in companies.controller createCompany()', error.message);
@@ -53,59 +56,67 @@ export const getAdminCompanies =  async (req: Request, res: Response) => {
   }
 }
 
-export const getMonitoredDeviceNumber =  async (req: Request, res: Response) => {
+export const getMonitoredDeviceNumber =  async (req: Request, res: Response, next: NextFunction) => {
   console.log('in controller getMonitoredDeviceNumber');
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
   const schemaName =  globalHelper.getSchemaName(authInfo)
   try {
     const MonitoredDeviceNumber = await companyModel.getMonitoredDeviceNumber(schemaName)
-    return res.status(200).send(MonitoredDeviceNumber)
+    res.status(200).send(MonitoredDeviceNumber)
+    return next()
   } catch (error) {
     console.error('ERROR in companies.controller getMonitoredDeviceNumber()', error.message);
-    return res.status(400).send({message:'Something went wrong', error:error.message})
+    res.status(400).send({message:'Something went wrong', error:error.message})
+    return next()
   }
 }
 
-export const getAllMonitoredDevice =  async (req: Request, res: Response) => {
+export const getAllMonitoredDevice =  async (req: Request, res: Response, next: NextFunction) => {
   console.log('in controller getAllMonitoredDevice');
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
   const schemaName =  globalHelper.getSchemaName(authInfo)
   try {
     const MonitoredDevice = await companyModel.getAllMonitoredDevice(schemaName)
-    return res.status(200).send(MonitoredDevice)
+    res.status(200).send(MonitoredDevice)
+    return next()
   } catch (error) {
     console.error('ERROR in companies.controller getAllMonitoredDevice()', error.message);
-    return res.status(400).send({message:'Something went wrong', error:error.message})
+    res.status(400).send({message:'Something went wrong', error:error.message})
+    return next()
   }
 }
 
-export const getSLA =  async (req: Request, res: Response) => {
+export const getSLA =  async (req: Request, res: Response, next: NextFunction) => {
   console.log('in controller getSLA');
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
   const schemaName =  globalHelper.getSchemaName(authInfo)
   try {
     const SLA = await companyModel.getSLA(schemaName)
-    return res.status(200).send(SLA)
+    res.status(200).send(SLA)
+    return next()
   } catch (error) {
     console.error('ERROR in companies.controller getSLA()', error.message);
-    return res.status(400).send({message:'Something went wrong', error:error.message})
+    res.status(400).send({message:'Something went wrong', error:error.message})
+    return next()
   }
 }
 
-export const getSourceIP =  async (req: Request, res: Response) => {
+export const getSourceIP =  async (req: Request, res: Response, next: NextFunction) => {
   console.log('in controller getSourceIP');
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
   const schemaName =  globalHelper.getSchemaName(authInfo)
   try {
     const SourceIP = await companyModel.getSourceIP(schemaName)
-    return res.status(200).send(SourceIP)
+    res.status(200).send(SourceIP)
+    return next()
   } catch (error) {
     console.error('ERROR in companies.controller getSourceIP()', error.message);
-    return res.status(400).send({message:'Something went wrong', error:error.message})
+    res.status(400).send({message:'Something went wrong', error:error.message})
+    return next()
   }
 }
 
-export const updateSourceIP =  async (req: Request, res: Response) => {
+export const updateSourceIP =  async (req: Request, res: Response, next: NextFunction) => {
   console.log('in controller updateSourceIP');
   const updatedSourceIP = req.body
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
@@ -114,37 +125,43 @@ export const updateSourceIP =  async (req: Request, res: Response) => {
   try {
     if (typeof(updatedSourceIP?.id) !== 'number'){throw {message:'send what is the id of the SourceIP you want to update'}}
     const SourceIP = await companyModel.updateSourceIP(schemaName,updatedSourceIP)
-    return res.status(200).send(SourceIP)
+    res.status(200).send(SourceIP)
+    return next()
   } catch (error) {
     console.error('ERROR in companies.controller updateSourceIP()', error.message);
-    return res.status(400).send({message:'Something went wrong', error:error.message})
+    res.status(400).send({message:'Something went wrong', error:error.message})
+    return next()
   }
 }
 
-export const updateConfiguration =  async (req: Request, res: Response) => {
+export const updateConfiguration =  async (req: Request, res: Response, next: NextFunction) => {
   console.log('in controller updateConfiguration');
   const updatedConfiguration = req.body
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
   const schemaName =  globalHelper.getSchemaName(authInfo)
   try {
     const status = await companyModel.updateConfiguration(schemaName,updatedConfiguration)
-    return res.status(200).send(status)
+    res.status(200).send(status)
+    return next()
   } catch (error) {
     console.error('ERROR in companies.controller updateConfiguration()', error.message);
-    return res.status(400).send({message:'Something went wrong', error:error.message})
+    res.status(400).send({message:'Something went wrong', error:error.message})
+    return next()
   }
 }
 
 
-export const getConfiguration =  async (req: Request, res: Response) => {
+export const getConfiguration =  async (req: Request, res: Response, next: NextFunction) => {
   console.log('in controller getConfiguration');
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
   const schemaName =  globalHelper.getSchemaName(authInfo)
   try {
     const companyConfiguration = await companyModel.getConfiguration(schemaName)
-    return res.status(200).send(companyConfiguration)
+    res.status(200).send(companyConfiguration)
+    return next()
   } catch (error) {
     console.error('ERROR in companies.controller getConfiguration()', error.message);
-    return res.status(400).send({message:'Something went wrong', error:error.message})
+    res.status(400).send({message:'Something went wrong', error:error.message})
+    return next()
   }
 }

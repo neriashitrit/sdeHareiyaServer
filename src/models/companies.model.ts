@@ -1,7 +1,6 @@
 import DbService from '../services/db.service'
 import { COMPANIES_TABLES, TRUSTNET_SCHEMA, TRUSTNET_TABLES, deviceStatus } from '../constants'
 import { ICompany } from '../types'
-import DbConnection from '../db/dbConfig'
 
 import _ from 'lodash'
 
@@ -17,12 +16,13 @@ export default class CompanyModel {
     return returnedId
   }
   
-  createCompanyTables = async (schemaName: string) =>{
-    await this.db.creteNewCompanySchema(schemaName)
+  createCompanyTables = async (schemaName: string, DBuserName: string, userEncodedPassword: string) =>{
+    await this.db.creteNewCompanySchema(schemaName, DBuserName, userEncodedPassword)
+    await this.db.createDatabaseUser(schemaName, DBuserName, userEncodedPassword)
   }
 
   getCompany = async (company_name: string): Promise<ICompany> =>{
-    const db = this.db.db
+    const db = this.db.trustnetDb
     const companyWithImage =  await db.withSchema(TRUSTNET_SCHEMA).select(`${TRUSTNET_TABLES.COMPANY}.id`,"company_name","sector","area_timestamp","active","renew_date","joining_date",`${TRUSTNET_TABLES.COMPANY}.created_at`,`${TRUSTNET_TABLES.COMPANY}.updated_at`,"image_id","url")
       .from(TRUSTNET_TABLES.COMPANY)
       .leftJoin(TRUSTNET_TABLES.IMAGE, { [`image.id`]: `${TRUSTNET_TABLES.COMPANY}.image_id` })
@@ -30,8 +30,13 @@ export default class CompanyModel {
     return companyWithImage[0]
   }
 
+  getCompanyInfo = async (company_name: string): Promise<ICompany> =>{
+    const company =  await this.db.getOne(TRUSTNET_SCHEMA, TRUSTNET_TABLES.COMPANY,{company_name} )
+    return company
+  }
+
   getCompanyUsersAndImage = async (company_name: string): Promise<any[]> =>{
-    const db = this.db.db
+    const db = this.db.trustnetDb
     const imageWithUser = await db.withSchema(TRUSTNET_SCHEMA).select()
       .from(TRUSTNET_TABLES.COMPANY)
       .join(TRUSTNET_TABLES.USERS, { [`${TRUSTNET_TABLES.USERS}.company_id`]: `${TRUSTNET_TABLES.COMPANY}.id` })
@@ -41,7 +46,7 @@ export default class CompanyModel {
   }
   
   getAdminCompanies = async (email: string): Promise<any[]> =>{
-    const db = this.db.db
+    const db = this.db.trustnetDb
     const AdminCompanies = await db.withSchema(TRUSTNET_SCHEMA).select(
       `${TRUSTNET_TABLES.USERS}.id`, `${TRUSTNET_TABLES.USERS}.email`, `${TRUSTNET_TABLES.COMPANY}.id as company_id`, `${TRUSTNET_TABLES.COMPANY}.company_name`)
     .from(TRUSTNET_TABLES.USERS)

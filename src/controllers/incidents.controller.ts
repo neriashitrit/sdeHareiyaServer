@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { toInteger } from 'lodash'
 
 import { AuthInfo, IIncident } from 'types'
@@ -34,7 +34,7 @@ export const getIncident = async  (req: Request, res: Response) => {
   }
 }
 
-export const getIncidentsByDaysRange = async  (req: Request, res: Response) => {
+export const getIncidentsByDaysRange = async  (req: Request, res: Response, next: NextFunction) => {
   console.log('in controller getIncidentsByDaysRange');
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
   const schemaName = globalHelper.getSchemaName(authInfo)
@@ -43,22 +43,26 @@ export const getIncidentsByDaysRange = async  (req: Request, res: Response) => {
 
   try {
     const incidents  = await incidentsHelper.getIncidentsByDaysRange(schemaName,sinceDaysAgo, untilDaysAgo)
-    return res.status(200).send(incidents)
+    res.status(200).send(incidents)
+    return next()
   } catch (error:any) {
     console.error('ERROR in incidents.controller getIncident()', error);
-    return res.status(400).send({message:'Something went wrong', error:error})
+    res.status(400).send({message:'Something went wrong', error:error})
+    return next()
   }
 }
 
-export const updateIncident = async (req: Request, res: Response) => {
+export const updateIncident = async (req: Request, res: Response, next: NextFunction) => {
   const updatedIncident: IIncident = req.body
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
   const schemaName = globalHelper.getSchemaName(authInfo)
   try {
     const Incident = await incidentModel.updateIncident(schemaName,updatedIncident)
-    return res.status(200).send({status:`incident updated successfully`,incident: Incident})
+    res.status(200).send({status:`incident updated successfully`,incident: Incident})
+    return next()
   } catch (error) {
     console.error('ERROR in incidents.controller updateIncident()', error);
-    return res.status(400).send({message:'Something went wrong', error: error})
+    res.status(400).send({message:'Something went wrong', error: error})
+    return next()
   }
 }

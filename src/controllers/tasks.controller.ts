@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 
 import { AuthInfo, ITask } from 'types'
 import TaskModel from '../models/tasks.model'
@@ -34,7 +34,7 @@ export const getTask = async (req: Request, res: Response) => {
   }
 }
 
-export const getTasksByDaysRange = async (req: Request, res: Response) => {
+export const getTasksByDaysRange = async (req: Request, res: Response, next: NextFunction) => {
   console.log('in controller getTasksByDaysRange');
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
   const schemaName = globalHelper.getSchemaName(authInfo)
@@ -43,22 +43,26 @@ export const getTasksByDaysRange = async (req: Request, res: Response) => {
 
   try {
     const tasks  = await tasksHelper.getTasksByDaysRange(schemaName,sinceDaysAgo, untilDaysAgo)
-    return res.status(200).send(tasks)
+    res.status(200).send(tasks)
+    return next()
   } catch (error) {
     console.error('ERROR in tasks.controller getTask()', error);
-    return res.status(400).send({message:'Something went wrong', error:error})
+    res.status(400).send({message:'Something went wrong', error:error})
+    return next()
   }
 }
 
-export const updateTask = async (req: Request, res: Response) => {
+export const updateTask = async (req: Request, res: Response, next: NextFunction) => {
   const updatedTask: ITask = req.body
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
   const schemaName = globalHelper.getSchemaName(authInfo)
   try {
     const Task = await taskModel.updateTask(schemaName,updatedTask)
-    return res.status(200).send({status:`task updated successfully`,task: Task})
+    res.status(200).send({status:`task updated successfully`,task: Task})
+    return next()
   } catch (error) {
     console.error('ERROR in tasks.controller updateTask()', error);
-    return res.status(400).send({message:'Something went wrong', error: error})
+    res.status(400).send({message:'Something went wrong', error: error})
+    return next()
   }
 }

@@ -1,13 +1,13 @@
-import { Request, Response } from 'express'
-import globalHelper from '../helpers/global.helper'
+import { NextFunction, Request, Response } from 'express'
 import { toInteger } from 'lodash';
-import { AuthInfo } from 'types';
 
+import { AuthInfo } from '../types';
+import globalHelper from '../helpers/global.helper'
 import NotificationModel from '../models/notifications.model'
 
 const notificationModel = new NotificationModel()
 
-export const getRecentNotifications = async (req: Request, res: Response) => {
+export const getRecentNotifications = async (req: Request, res: Response, next: NextFunction) => {
   console.log('in controller getRecentNotifications');
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
   const schemaName =  globalHelper.getSchemaName(authInfo)
@@ -16,14 +16,16 @@ export const getRecentNotifications = async (req: Request, res: Response) => {
   try {
     if (typeof(howMany) !== 'number'){throw 'send the number of the notification you want'}
     const notifications = await notificationModel.getNotification(schemaName)
-    return res.status(200).send(notifications.slice(0,howMany))
+    res.status(200).send(notifications.slice(0,howMany))
+    return next()
   } catch (error) {
     console.error('ERROR in notifications.controller getNotification()', error);
-    return res.status(400).send({message:'Something went wrong', error:error})
+    res.status(400).send({message:'Something went wrong', error:error})
+    return next()
   }
 }
 
-export const getIntervalNotifications = async (req: Request, res: Response) => {
+export const getIntervalNotifications = async (req: Request, res: Response, next: NextFunction) => {
   console.log('in controller getIntervalNotifications');
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
   const schemaName =  globalHelper.getSchemaName(authInfo)
@@ -33,7 +35,11 @@ export const getIntervalNotifications = async (req: Request, res: Response) => {
   const now = nowUtc.toJSON()
   try {
     const notifications = await notificationModel.getIntervalNotifications(schemaName, lastFive, now)
-    return res.status(200).send({IntervalNotifications:notifications})
+    
+    // return res.status(200).send({IntervalNotifications:notifications})
+    res.status(200).send({IntervalNotifications:notifications})
+    return next()
+
   } catch (error) {
     console.error('ERROR in notifications.controller getIntervalNotifications()', error);
     return res.status(400).send({message:'Something went wrong', error:error})

@@ -23,6 +23,7 @@ export interface ICompany {
   active: boolean,
   sector: string,
   country: string,
+  encoded_company_info:string,
 }
 export interface ITask {
   id:number,

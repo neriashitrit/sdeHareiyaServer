@@ -10,10 +10,10 @@ export default class DbConnection {
       (process.env.NODE_ENV === 'test' ? process.env.TEST_DATABASE_URL : process.env.DATABASE_URL) || ''
   }
 
-  getConnection = () =>
+  getConnection = (newConnectionString?:string) =>
     knex({
       client: 'pg',
-      connection: this.connectionString,
-      pool:{min:2, max:10}
-    })
+        connection: newConnectionString || this.connectionString,
+        pool:newConnectionString? {min:1, max:1}: {min:2, max:10}
+      })
 }

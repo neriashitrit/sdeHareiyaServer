@@ -2,6 +2,7 @@ import DbService from '../services/db.service'
 
 import _ from 'lodash'
 import { IImage } from 'types'
+import { TRUSTNET_SCHEMA } from '../constants'
 
 export default class GlobalModel {
   db: DbService
@@ -21,7 +22,8 @@ export default class GlobalModel {
   }
   
   getImage = async (schemaName:string, tableName:string, id: number): Promise<any> =>{
-    const imageWithUser = await this.db.db.withSchema(schemaName).select()
+    const db = schemaName === TRUSTNET_SCHEMA ? this.db.trustnetDb : this.db.db
+    const imageWithUser = await db.withSchema(schemaName).select()
     .from(tableName)
     .join('image', { [`image.id`]: `${tableName}.image_id` })
     .where(`${tableName}.id`, id)
