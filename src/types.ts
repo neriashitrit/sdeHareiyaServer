@@ -38,14 +38,14 @@ export interface ITask {
 }
 
 export interface IInsight {
-  id:number
+  id?:number
   title: string
   status: insightStatus
   priority?: string
   summary: string
   description: string
   is_relevant: boolean
-  created: Date
+  created?: Date
 }
 
 export interface IImage {

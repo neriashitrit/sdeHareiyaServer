@@ -52,11 +52,13 @@ export const getInsightsByDaysRange = async  (req: Request, res: Response, next:
 }
 
 export const updateInsight = async (req: Request, res: Response, next: NextFunction) => {
-  const updatedInsight: IInsight = req.body
+  const {title, status, priority, summary, description, is_relevant} = req.body
+  const updatedInsightId = req.body.id
+  const updatedInsight: IInsight = {title, status, priority, summary, description, is_relevant} 
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
   const schemaName = globalHelper.getSchemaName(authInfo)
   try {
-    const insight = await insightModel.updateInsight(schemaName,updatedInsight)
+    const insight = await insightModel.updateInsight(schemaName, updatedInsight, updatedInsightId)
     res.status(200).send({status:`insight updated Received successfully`,insight: insight})
     return next()
   } catch (error) {
@@ -91,7 +93,7 @@ export const createInsight = async (req: Request, res: Response, next: NextFunct
   try {
     const insight = await insightModel.createInsight(schemaName,newInsight)
     const ImageUrl = await fileService.insert(insightImage, randomCode, avatarType)
-    const newImage = await globalHelper.createImage(avatarType, randomCode, authInfo, insight.id, ImageUrl)
+    const newImage = await globalHelper.createImage(avatarType, randomCode, authInfo, insight.id!, ImageUrl)
     res.status(200).send({status:`new insight Received successfully`,insight: insight})
     return next()
   } catch (error) {

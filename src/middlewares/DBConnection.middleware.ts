@@ -34,8 +34,8 @@ export const getDBConnection = () =>
     const authInfo = req?.authInfo as AuthInfo
     const companyName =  globalHelper.getSchemaName(authInfo)
     if (!res.locals.session.client.connectionSettings.user.includes(companyName)){
-      console.error('security error database user access to wrong schema ');
-      throw ('security error contact admin - database user error')
+      console.error(`security error database user access to wrong schema connectionSettings.user:${res.locals.session.client.connectionSettings.user}, companyName:${companyName}`);
+      return 'security error contact admin - database user error'
     }else{
       await res.locals.session.context.destroy()
       return res

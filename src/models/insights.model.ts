@@ -28,9 +28,9 @@ export default class InsightsModel {
     }
   }
   
-  updateInsight = async ( schemaName: string, newInsight: IInsight): Promise<IInsight> =>{
+  updateInsight = async ( schemaName: string, newInsight: IInsight, id:number): Promise<IInsight> =>{
     try{
-      const insight = await this.db.update(schemaName,COMPANIES_TABLES.INSIGHT,newInsight, {id:newInsight.id})
+      const insight = await this.db.update(schemaName,COMPANIES_TABLES.INSIGHT,newInsight, {id})
       if (insight.length == 0){throw 'insight with same id do not exist'}
       return insight[0]
     }
