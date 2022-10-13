@@ -91,6 +91,7 @@ export default class DbService {
     console.log(`${DBuserName} have all privileges on ${schemaName} schema`)
     await db.raw(`GRANT ALL ON ALL TABLES IN SCHEMA ${schemaName} TO ${DBuserName};`)
     console.log(`${DBuserName} have all privileges on ${schemaName} schema tables`)
-    // await db.raw(`GRANT USAGE ON ALL SEQUENCES IN SCHEMA ${schemaName} TO ${DBuserName};`)
+    await db.raw(`GRANT USAGE ON ALL SEQUENCES IN SCHEMA ${schemaName} TO ${DBuserName};`)
+    console.log(`${DBuserName} have privileges to all ${schemaName} schema tables SEQUENCES`)
   }
 }

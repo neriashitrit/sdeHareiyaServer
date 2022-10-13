@@ -29,7 +29,7 @@ const globalHelper = {
             const updateObject = await globalModel.updateImageReference(schemaName, imageType, objectID, image.id)
             return {...updateObject, ...image}
         } catch (error) {
-            console.error('ERROR in companies.controller createCompany()', error.message);
+            console.error('ERROR in global.helper createImage()', error.message);
             return {message:'Something went wrong', error:error.message}
         }
     },
