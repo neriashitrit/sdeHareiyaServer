@@ -52,9 +52,9 @@ export const getInsightsByDaysRange = async  (req: Request, res: Response, next:
 }
 
 export const updateInsight = async (req: Request, res: Response, next: NextFunction) => {
-  const {title, status, priority, summary, description, is_relevant} = req.body
+  const {title, status, priority, summary, description, is_relevant, user_preference, due_date} = req.body
   const updatedInsightId = req.body.id
-  const updatedInsight: IInsight = {title, status, priority, summary, description, is_relevant} 
+  const updatedInsight: IInsight = {title, status, priority, summary, description, is_relevant, user_preference, due_date} 
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
   const schemaName = globalHelper.getSchemaName(authInfo)
   try {

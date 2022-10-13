@@ -45,9 +45,10 @@ export interface IInsight {
   summary: string
   description: string
   is_relevant: boolean
-  created?: Date
+  created?: Date,
+  user_preference:string, 
+  due_date: Date
 }
-
 export interface IImage {
   id:number
   key: string
