@@ -55,9 +55,10 @@ export const getIncidentsByDaysRange = async  (req: Request, res: Response, next
 export const updateIncident = async (req: Request, res: Response, next: NextFunction) => {
   const updatedIncident: IIncident = req.body
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const userMail = authInfo.emails[0]
   const schemaName = globalHelper.getSchemaName(authInfo)
   try {
-    const Incident = await incidentModel.updateIncident(schemaName,updatedIncident)
+    const Incident = await incidentModel.updateIncident(schemaName,updatedIncident, userMail)
     res.status(200).send({status:`incident updated successfully`,incident: Incident})
     return next()
   } catch (error) {

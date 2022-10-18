@@ -1,5 +1,5 @@
 import DbService from '../services/db.service'
-import { COMPANIES_TABLES, notificationStatus } from '../constants'
+import { COMPANIES_TABLES, notificationStatus, TRUSTNET_SCHEMA, TRUSTNET_TABLES } from '../constants'
 import { ITask } from '../types'
 import notificationsHelper from '../helpers/notifications.helper'
 
@@ -21,6 +21,7 @@ export default class TaskModel {
         isOld,
         notificationStatus.TASK_CHANGED,
         notificationStatus.NEW_TASK)
+        this.db.updateAudit(schemaName, COMPANIES_TABLES.TASK, task?.id, isOld ? 'updated' : 'created', task, null)
         return task?.id
       }
       catch (error){
@@ -51,11 +52,14 @@ export default class TaskModel {
     }
   }
   
-  updateTask = async ( schemaName: string, newTask: ITask): Promise<ITask> =>{
+  updateTask = async ( schemaName: string, newTask: ITask, email:string): Promise<ITask> =>{
     try{
-      const task = await this.db.update(schemaName, COMPANIES_TABLES.TASK, newTask, {id:newTask.id})
-      if (task.length == 0){throw 'task with same id do not exist'}
-      return task[0]
+      const taskArray = await this.db.update(schemaName, COMPANIES_TABLES.TASK, newTask, {id:newTask.id})
+      if (taskArray.length == 0){throw 'task with same id do not exist'}
+      const task = taskArray[0]
+      const user = await this.db.getOne(TRUSTNET_SCHEMA, TRUSTNET_TABLES.USERS, {email})
+      this.db.updateAudit(schemaName, COMPANIES_TABLES.TASK, task?.id, 'updated', task, user?.id)
+      return task
     }
     catch (error){
     console.error(error);

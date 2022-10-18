@@ -55,9 +55,10 @@ export const getTasksByDaysRange = async (req: Request, res: Response, next: Nex
 export const updateTask = async (req: Request, res: Response, next: NextFunction) => {
   const updatedTask: ITask = req.body
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const userMail = authInfo.emails[0]
   const schemaName = globalHelper.getSchemaName(authInfo)
   try {
-    const Task = await taskModel.updateTask(schemaName,updatedTask)
+    const Task = await taskModel.updateTask(schemaName,updatedTask, userMail)
     res.status(200).send({status:`task updated successfully`,task: Task})
     return next()
   } catch (error) {

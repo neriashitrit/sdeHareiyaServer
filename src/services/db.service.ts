@@ -1,4 +1,4 @@
-import { TRUSTNET_SCHEMA } from '../constants'
+import { COMPANIES_TABLES, TRUSTNET_SCHEMA } from '../constants'
 import { Knex } from 'knex'
 import runMigrations from 'node-pg-migrate'
 import DbConnection from '../db/dbConfig'
@@ -65,7 +65,13 @@ export default class DbService {
     return returnedId
   }
 
-  creteNewCompanySchema = async (schemaName: string, DBuserName: string, userEncodedPassword: string) =>{
+  updateAudit = async (schemaName: string, changed_table:string, changed_id:number, activity:string, object_after_change:JSON, changing_user_id:number|null):Promise<any> =>{
+    const auditObject = {changed_table, changed_id, activity, object_after_change, changing_user_id}
+    const returnedId = await this.db.withSchema(schemaName).into(COMPANIES_TABLES.AUDIT).insert(auditObject)
+    return returnedId
+  }
+
+  creteNewCompanySchema = async (schemaName: string) =>{
     const migrations = await runMigrations({
       databaseUrl: (process.env.NODE_ENV === 'test' ? process.env.TEST_DATABASE_URL : process.env.DATABASE_URL) || '',
       dir: './dist/db/migrations/company',

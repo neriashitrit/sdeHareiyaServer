@@ -75,6 +75,7 @@ export enum notificationStatus {
   NEW_INCIDENT = 'new incident',
   NEW_TASK = 'new task',
   NEW_INSIGHT = 'new insight',
+  INSIGHT_CHANGED = 'insight changed',
   INCIDENT_CHANGED = 'incident changed',
   TASK_CHANGED = 'task changed'
 }

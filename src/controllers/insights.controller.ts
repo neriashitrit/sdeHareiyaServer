@@ -56,9 +56,10 @@ export const updateInsight = async (req: Request, res: Response, next: NextFunct
   const updatedInsightId = req.body.id
   const updatedInsight: IInsight = {title, status, priority, summary, description, is_relevant, user_preference, due_date} 
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const userMail = authInfo.emails[0]
   const schemaName = globalHelper.getSchemaName(authInfo)
   try {
-    const insight = await insightModel.updateInsight(schemaName, updatedInsight, updatedInsightId)
+    const insight = await insightModel.updateInsight(schemaName, updatedInsight, updatedInsightId, userMail)
     res.status(200).send({status:`insight updated Received successfully`,insight: insight})
     return next()
   } catch (error) {
@@ -71,9 +72,10 @@ export const updateInsight = async (req: Request, res: Response, next: NextFunct
 export const deleteInsight = async (req: Request, res: Response, next: NextFunction) => {
   const insightID = req.body?.id
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const userMail = authInfo.emails[0]
   const schemaName = globalHelper.getSchemaName(authInfo)
   try {
-    const insight = await insightModel.deleteInsight(schemaName, insightID)
+    const insight = await insightModel.deleteInsight(schemaName, insightID, userMail)
     res.status(200).send({status:`insight deleted successfully`,insight: insight})
     return next()
   } catch (error) {
@@ -86,12 +88,13 @@ export const deleteInsight = async (req: Request, res: Response, next: NextFunct
 export const createInsight = async (req: Request, res: Response, next: NextFunction) => {
   const newInsight = {title:req.body.title, description:req.body.description, priority:req.body.priority}
   const authInfo:AuthInfo = req?.authInfo as AuthInfo
+  const userMail = authInfo.emails[0]
   const {avatarType, randomCode}= req.body
   const {files}:any  = req
   const {avatarImage} = files
   const schemaName = globalHelper.getSchemaName(authInfo)
   try {
-    const insight = await insightModel.createInsight(schemaName,newInsight)
+    const insight = await insightModel.createInsight(schemaName,newInsight, userMail)
     const ImageUrl = await fileService.insert(avatarImage, randomCode, avatarType)
     const newImage = await globalHelper.createImage(avatarType, randomCode, authInfo, insight.id!, ImageUrl)
     res.status(200).send({status:`new insight Received successfully`,insight: insight})

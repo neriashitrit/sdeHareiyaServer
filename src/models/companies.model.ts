@@ -17,7 +17,7 @@ export default class CompanyModel {
   }
   
   createCompanyTables = async (schemaName: string, DBuserName: string, userEncodedPassword: string) =>{
-    await this.db.creteNewCompanySchema(schemaName, DBuserName, userEncodedPassword)
+    await this.db.creteNewCompanySchema(schemaName)
     await this.db.createDatabaseUser(schemaName, DBuserName, userEncodedPassword)
   }
 

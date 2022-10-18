@@ -1,5 +1,5 @@
 import DbService from '../services/db.service'
-import { COMPANIES_TABLES, notificationStatus } from '../constants'
+import { COMPANIES_TABLES, notificationStatus, TRUSTNET_SCHEMA, TRUSTNET_TABLES } from '../constants'
 import { IIncident } from '../types'
 import notificationsHelper from '../helpers/notifications.helper'
 export default class IncidentsModel {
@@ -20,6 +20,7 @@ export default class IncidentsModel {
         isOld,
         notificationStatus.INCIDENT_CHANGED,
         notificationStatus.NEW_INCIDENT)
+        this.db.updateAudit(schemaName, COMPANIES_TABLES.INCIDENT, incident?.id, isOld ? 'updated' : 'created', incident, null)
       return incident?.id
     }
     catch (error){
@@ -49,11 +50,14 @@ export default class IncidentsModel {
     }
   }
   
-  updateIncident = async ( schemaName: string, newIncident: IIncident): Promise<IIncident> =>{
+  updateIncident = async ( schemaName: string, newIncident: IIncident, email:string): Promise<IIncident> =>{
     try{
-      const incident = await this.db.update(schemaName, COMPANIES_TABLES.INCIDENT, newIncident, {id:newIncident.id})
-      if (incident.length == 0){throw 'incident with same id do not exist'}
-      return incident[0]
+      const incidentArray = await this.db.update(schemaName, COMPANIES_TABLES.INCIDENT, newIncident, {id:newIncident.id})
+      if (incidentArray.length == 0){throw 'incident with same id do not exist'}
+      const incident = incidentArray[0]
+      const user = await this.db.getOne(TRUSTNET_SCHEMA, TRUSTNET_TABLES.USERS, {email})
+      this.db.updateAudit(schemaName, COMPANIES_TABLES.INCIDENT, incident?.id, 'updated', incident, user?.id)
+      return incident
     }
     catch (error){
     console.error(error);

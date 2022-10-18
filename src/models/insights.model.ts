@@ -1,5 +1,5 @@
 import DbService from '../services/db.service'
-import { COMPANIES_TABLES, notificationStatus } from '../constants'
+import { COMPANIES_TABLES, notificationStatus, TRUSTNET_SCHEMA, TRUSTNET_TABLES } from '../constants'
 import { IInsight } from '../types'
 import notificationsHelper from '../helpers/notifications.helper'
 
@@ -14,12 +14,14 @@ export default class InsightsModel {
     try{
       const insightArray = await this.db.upsertMerge(schemaName,COMPANIES_TABLES.INSIGHT,newInsight,'id')
       const insight = insightArray[0]
+      const isOld =  insight.created_at < insight.updated_at
       notificationsHelper.createNotification(schemaName,
         insight.title,
         insight.description,
-        false,
-        notificationStatus.NEW_INSIGHT,
+        isOld,
+        notificationStatus.INSIGHT_CHANGED,
         notificationStatus.NEW_INSIGHT)
+        this.db.updateAudit(schemaName, COMPANIES_TABLES.INSIGHT, insight?.id, isOld ? 'updated' : 'created', insight, null)
       return insight?.id
     }
     catch (error){
@@ -28,11 +30,14 @@ export default class InsightsModel {
     }
   }
   
-  updateInsight = async ( schemaName: string, newInsight: IInsight, id:number): Promise<IInsight> =>{
+  updateInsight = async ( schemaName: string, newInsight: IInsight, id:number, email:string): Promise<IInsight> =>{
     try{
-      const insight = await this.db.update(schemaName,COMPANIES_TABLES.INSIGHT,newInsight, {id})
-      if (insight.length == 0){throw 'insight with same id do not exist'}
-      return insight[0]
+      const insightArray = await this.db.update(schemaName,COMPANIES_TABLES.INSIGHT,newInsight, {id})
+      if (insightArray.length == 0){throw 'insight with same id do not exist'}
+      const insight = insightArray[0]
+      const user = await this.db.getOne(TRUSTNET_SCHEMA, TRUSTNET_TABLES.USERS, {email})
+      this.db.updateAudit(schemaName, COMPANIES_TABLES.INSIGHT, insight?.id, 'updated', insight, user?.id)
+      return insight
     }
     catch (error){
     console.error(error);
@@ -40,11 +45,14 @@ export default class InsightsModel {
     }
   }
 
-  deleteInsight = async ( schemaName: string, id: number): Promise<IInsight> =>{
+  deleteInsight = async ( schemaName: string, id: number, email:string): Promise<IInsight> =>{
     try{
-      const insight = await this.db.delete(schemaName,COMPANIES_TABLES.INSIGHT, {id})
-      if (insight.length == 0){throw 'insight with same id do not exist'}
-      return insight[0]
+      const insightArray = await this.db.delete(schemaName,COMPANIES_TABLES.INSIGHT, {id})
+      if (insightArray.length == 0){throw 'insight with same id do not exist'}
+      const insight = insightArray[0]
+      const user = await this.db.getOne(TRUSTNET_SCHEMA, TRUSTNET_TABLES.USERS, {email})
+      this.db.updateAudit(schemaName, COMPANIES_TABLES.INSIGHT, insight?.id, 'deleted', insight, user?.id)
+      return insight
     }
     catch (error){
     console.error(error);
@@ -52,7 +60,7 @@ export default class InsightsModel {
     }
   }
 
-  createInsight = async ( schemaName: string, newInsight: any): Promise<IInsight> =>{
+  createInsight = async ( schemaName: string, newInsight: any, email:string): Promise<IInsight> =>{
     try{
       const insightArray = await this.db.insert(schemaName,COMPANIES_TABLES.INSIGHT, newInsight)
       const insight = insightArray[0]
@@ -60,8 +68,10 @@ export default class InsightsModel {
         insight.title,
         insight.description,
         false,
-        notificationStatus.NEW_INSIGHT,
+        notificationStatus.INSIGHT_CHANGED,
         notificationStatus.NEW_INSIGHT)
+        const user = await this.db.getOne(TRUSTNET_SCHEMA, TRUSTNET_TABLES.USERS, {email})
+        this.db.updateAudit(schemaName, COMPANIES_TABLES.INSIGHT, insight?.id, 'created', insight, user?.id)
       return insight
     }
     catch (error){

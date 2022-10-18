@@ -6,7 +6,7 @@ export const shorthands: ColumnDefinitions | undefined = undefined
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
     pgm.createType('notification_status_types', 
-        [notificationStatus.NEW_INCIDENT, notificationStatus.NEW_TASK, notificationStatus.NEW_INSIGHT, notificationStatus.INCIDENT_CHANGED, notificationStatus.TASK_CHANGED])
+        [notificationStatus.NEW_INCIDENT, notificationStatus.NEW_TASK, notificationStatus.NEW_INSIGHT, notificationStatus.INCIDENT_CHANGED, notificationStatus.TASK_CHANGED, notificationStatus.INSIGHT_CHANGED])
     pgm.createTable(COMPANIES_TABLES.NOTIFICATION, {
         id: 'id',
         title: { type: PgType.VARCHAR, notNull: true },
