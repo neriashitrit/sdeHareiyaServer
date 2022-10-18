@@ -31,7 +31,7 @@ export default class IncidentsModel {
   
   getIncident = async (schemaName: string, searchField: string, id: number): Promise<IIncident> =>{
     try{
-      const incident:IIncident = await this.db.getOneById(schemaName,COMPANIES_TABLES.INCIDENT, searchField, id)
+      const incident:IIncident = await this.db.trustnetDb.withSchema(schemaName).select().from(COMPANIES_TABLES.INCIDENT).where(searchField, id).first()
       return incident
     }
     catch (error){

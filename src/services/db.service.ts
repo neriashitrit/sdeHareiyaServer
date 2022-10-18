@@ -61,7 +61,7 @@ export default class DbService {
   }
 
   upsertMerge = async (schemaName: string, tableName: string, updatedRecord: Record<string, any>, conflictField: string):Promise<any> =>{
-    const returnedId = await this.db.withSchema(schemaName).into(tableName).insert(updatedRecord).onConflict(conflictField).merge().returning('*')
+    const returnedId = await this.trustnetDb.withSchema(schemaName).into(tableName).insert(updatedRecord).onConflict(conflictField).merge().returning('*')
     return returnedId
   }
 

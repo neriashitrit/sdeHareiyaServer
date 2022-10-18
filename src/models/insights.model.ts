@@ -86,7 +86,7 @@ export default class InsightsModel {
       throw Error('you must provide id')
     }
     try{
-      const insight:IInsight = await this.db.getOneById(schemaName, COMPANIES_TABLES.INSIGHT, 'id', id)
+      const insight:IInsight = await this.db.trustnetDb.withSchema(schemaName).select().from(COMPANIES_TABLES.INSIGHT).where('id', id).first()
       return insight
     }
     catch (error){

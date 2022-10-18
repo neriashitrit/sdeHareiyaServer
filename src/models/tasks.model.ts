@@ -32,7 +32,7 @@ export default class TaskModel {
 
   getTask = async (schemaName: string, searchField:string, id: number): Promise<ITask> =>{
       try{
-        const task:ITask = await this.db.getOneById(schemaName, COMPANIES_TABLES.TASK, searchField, id)
+        const task:ITask = await this.db.trustnetDb.withSchema(schemaName).select().from(COMPANIES_TABLES.TASK).where(`${searchField}`, id).first()
         return task
       }
       catch (error){
