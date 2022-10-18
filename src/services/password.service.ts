@@ -27,7 +27,7 @@ export const decryptPassword = (Password: string) => {
 	const textParts = Password.split(':');
 	const IV = textParts[0];
 	const encryptedText = textParts[1];
-	const decipher = crypto.createDecipheriv(algorithm, encryptionKey, IV);
+	const decipher = crypto.createDecipheriv(algorithm, process.env.ENCRYPTION_KEY!, IV);
 	let decrypted = decipher.update(encryptedText, 'hex', 'utf8') + decipher.final('utf8');
 
 	return decrypted.toString();
