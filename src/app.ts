@@ -31,9 +31,9 @@ passport.use(bearerStrategy)
 app.use('/api/backOffice', adminSenderAuth, backOfficeRouter)
 app.use('/api/webapp', passport.authenticate(bearerStrategy, { session: false }), roleGuard(), webAppRouter)
 app.use('/api/flutterapp', passport.authenticate(bearerStrategy, { session: false }), roleGuard(), webAppRouter)
-app.use('/api', openRouter)
+app.use('/api/openRouter', openRouter)
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running in ${process.env.NODE_ENV} mode on port: ${port}`)
 })
