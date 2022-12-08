@@ -4,13 +4,12 @@ import AuthModel from '../models/auth.model'
 import { comparePasswords } from '../services/auth.service'
 
 const authModel = new AuthModel()
-	// TODO change it to safeshore
 
 // Update these four variables with values from your B2C tenant in the Azure portal
-const clientID = 'de3422ed-c92a-487b-9342-2f41d3bb5dc2' // Application (client) ID of your API's application registration 
+const clientID = '94c62aa3-bb15-4985-a47f-8fc003cb5caf' // Application (client) ID of your API's application registration 
 const b2cDomainHost = 'safeshoredev.b2clogin.com'
 const tenantId = 'safeshoredev.onmicrosoft.com' // Alternatively, you can use your Directory (tenant) ID (a GUID)
-const policyName = 'B2C_1_login2'
+const policyName = 'B2C_1_login'
 
 const bearerStrategyOptions: IBearerStrategyOptionWithRequest = {
   identityMetadata: `https://${b2cDomainHost}/${tenantId}/${policyName}/v2.0/.well-known/openid-configuration/`,
