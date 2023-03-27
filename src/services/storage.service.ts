@@ -19,31 +19,31 @@ export default class FileService {
 	}
 
 	static getInstance = () => FileService.instance || new FileService()
-	// TODO change it to safeshore
 	async insert (file: any, fileName: string, directory: string) {
 		try {
-			const directoryClient = this.serviceClient.getShareClient('images').getDirectoryClient(directory);
+			const directoryClient = this.serviceClient.getShareClient('files').getDirectoryClient(directory);
 			const fileClient = directoryClient.getFileClient(fileName);
 			const fileStream = new stream.Readable();
 			fileStream.push(file.data);
 			fileStream.push(null);
 			await fileClient.create(file.data.length);
 			await fileClient.uploadRange(file.data, 0, file.data.length);
-			const url = `https://${process.env.AccountName}.file.${process.env.EndpointSuffix}/images/${directory}/${fileName}`
+			const url = `https://${process.env.AccountName}.file.${process.env.EndpointSuffix}/files/${directory}/${fileName}`
 			return url
 		} catch (error) {
 			throw {message:'Something went wrong', error:error.message}
 		}
 	};
 
-	// TODO change it to safeshore
 	fetch = async (fileName: string, directory: string): Promise<any> => {
 		try {
-			const directoryClient = this.serviceClient.getShareClient('images').getDirectoryClient(directory);
+			const directoryClient = this.serviceClient.getShareClient('files').getDirectoryClient(directory);
 			const fileClient = directoryClient.getFileClient(fileName);
 			const downloadFileResponse = await fileClient.download();
 			const readableStream = downloadFileResponse.readableStreamBody
-			if (readableStream){ return await this.streamToBuffer(readableStream)}
+			if (readableStream){
+				 return await this.streamToBuffer(readableStream)
+			}
 		} catch (error) {
 			throw {message:'Something went wrong', error:error.message}
 		}
@@ -60,7 +60,6 @@ export default class FileService {
 		}
 	};
 
-	// TODO change it to safeshore
 	streamToBuffer = (readableStream:NodeJS.ReadableStream) => {
 		return new Promise((resolve, reject) => {
 		const chunks:any = [];
