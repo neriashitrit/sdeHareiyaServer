@@ -37,9 +37,6 @@ export default class DbService {
   delete = (tableName: string, condition: Record<string, any> = {}) =>
     this.knex.delete().from(tableName).where(condition)
 
-  deleteCollection = (tableName: string, columnName: string, values: any[] = []) =>
-    this.knex.delete().from(tableName).whereIn(columnName, values).returning('*')
-
   deleteAll = (tableName: string) => this.knex.delete().from(tableName)
 
   upsertMerge = (tableName: string, updatedRecord: Record<string, any>, conflictField: string) =>
