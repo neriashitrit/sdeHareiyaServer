@@ -10,7 +10,11 @@
     "start": "node ./dist/app.js",
     "db:create": "ts-node-dev ./src/scripts/createDb.script.ts",
     "db:seed": "ts-node-dev ./src/scripts/createSeed.script.ts",
-    "db:migrate": "node-pg-migrate --migrations-dir='./src/db/migrations/public' --tsconfig=./tsconfig.json --migrations-table='schema_migrations'"
+    "db:migrate": "node-pg-migrate --migrations-dir='./src/db/migrations' --tsconfig=./tsconfig.json --migrations-table='schema_migrations'",
+    "db:migrate:up": "node-pg-migrate up --no-check-order --migrations-dir='./src/db/migrations' --tsconfig=./tsconfig.json --migrations-table='schema_migrations'",
+    "db:migrate:create": "node-pg-migrate create --migrations-dir='./src/db/migrations' --tsconfig='./tsconfig.json' --migrations-table='schema_migrations'",
+    "db:migrate:down": "node-pg-migrate down --no-check-order --migrations-dir='./src/db/migrations' --tsconfig=./tsconfig.json --migrations-table='schema_migrations'",
+    "db:reset": "ts-node ./src/scripts/resetDb.ts"
   },
   "dependencies": {
     "@azure/storage-file-share": "^12.11.0",
@@ -20,13 +24,14 @@
     "azure-storage": "^2.10.4",
     "bcrypt-nodejs": "^0.0.3",
     "cors": "^2.8.5",
-    "helmet": "^5.1.0",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "helmet": "^5.1.0",
     "knex": "^2.1.0",
     "lodash": "^4.17.21",
     "morgan": "^1.10.0",
     "node-pg-migrate": "^6.2.1",
+    "objection": "^3.0.1",
     "passport": "^0.6.0",
     "passport-azure-ad": "^4.3.3",
     "pg": "^8.7.3"
