@@ -1,11 +1,11 @@
-import { Request, Response } from 'express'
-import { AuthInfo } from 'types'
-import globalHelper from '../helpers/global.helper'
+import { Request, Response } from 'express';
+import { AuthInfo } from 'types';
+import globalHelper from '../helpers/global.helper';
 
-import GlobalModel from '../models/global.model'
-import  FileService  from '../services/storage.service'
+import GlobalModel from '../models/global.model';
+import FileService from '../services/storage.service';
 
-const fileService = FileService.getInstance()
+const fileService = FileService.getInstance();
 
 // export const uploadAvatar =  async (req: Request, res: Response) => {
 //   console.log('in controller uploadAvatar');

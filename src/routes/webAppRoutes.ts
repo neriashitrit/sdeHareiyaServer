@@ -1,11 +1,11 @@
-import express from 'express'
+import express from 'express';
 
-import * as usersController from '../controllers/users.controller'
-import * as globalController from '../controllers/global.controller'
+import * as usersController from '../controllers/users.controller';
+import * as globalController from '../controllers/global.controller';
 
-const router = express.Router()
+const router = express.Router();
 // users
-// router.get('/user/login', usersController.userLogin)
+router.post('/user/login', usersController.userLogin);
 // router.get('/user/getAll', usersController.getAllCompanyUsers)
 // router.get('/user/getOne', usersController.getUser)
 // router.post('/user/contactUs', usersController.sendContactUs)
@@ -15,4 +15,4 @@ const router = express.Router()
 // router.get('/global/getAvatar', globalController.getAvatar)
 // router.get('/global/getSAS', globalController.getSAS)
 
-export default router
+export default router;

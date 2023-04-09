@@ -1,10 +1,8 @@
-import { UserRole } from '../constants'
-import { NextFunction, Response } from 'express'
-import _ from 'lodash'
+import { NextFunction, Response } from 'express';
+import _ from 'lodash';
 
-
-export const roleGuard = () =>
-  async (req: any, res: Response, next: NextFunction) => {
+export const roleGuard =
+  () => async (req: any, res: Response, next: NextFunction) => {
     // try {
     //   const email = req.authInfo.emails[0] || ''
     //   if (!email) {
@@ -29,4 +27,5 @@ export const roleGuard = () =>
     // } catch (error) {
     //   return res.status(400).send({ success: false, message: 'error in role guard', error: error.message })
     // }
-  }
+    next();
+  };
