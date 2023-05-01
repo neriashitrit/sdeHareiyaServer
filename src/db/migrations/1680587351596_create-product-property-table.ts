@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { PropertyType } from '../../types/productPropery';
+import { PropertyType } from 'safe-shore-common';
 import { Tables } from '../../constants';
 import { MigrationBuilder, ColumnDefinitions, PgType } from 'node-pg-migrate';
 
@@ -14,15 +14,14 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       type: PgType.INT,
       references: Tables.PRODUCT_CATEGORIES,
       onDelete: 'SET NULL',
-      notNull: false,
     },
     name: { type: PgType.VARCHAR, notNull: true },
     type: { type: 'product_property_type', notNull: true },
     label: { type: PgType.VARCHAR, notNull: true },
-    validation: { type: PgType.JSONB },
+    validation: { type: PgType.VARCHAR },
     multiple_files: { type: PgType.BOOLEAN },
     line_count_text: { type: PgType.INT },
-    select_options: { type: PgType.JSONB },
+    select_options: { type: PgType.VARCHAR },
     helperText: { type: PgType.VARCHAR },
     updated_at: {
       type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE,

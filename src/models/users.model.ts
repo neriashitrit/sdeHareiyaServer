@@ -1,27 +1,47 @@
-import { IUser } from '../types/user';
+import { IUser } from 'safe-shore-common';
 import DbService from '../services/db.service';
 
 import _ from 'lodash';
+import { Tables } from '../constants';
 
-export default class UserModel {
-  db: DbService;
+const db = new DbService();
 
-  constructor() {
-    this.db = new DbService();
-  }
-
-  getUser = async (email: string): Promise<any> => {
-    const last_login = new Date();
+export const userModel = {
+  getUser: async (email: string): Promise<IUser> => {
+    const lastActiveAt = new Date();
     try {
-      const user = await this.db.update('users', { last_login }, { email });
+      const user = await db.update(Tables.USERS, { lastActiveAt }, { email });
       return user?.[0];
     } catch (error) {
       console.error('ERROR in users.modal getUser()', error.message);
+      throw {
+        message: `error while trying to getUser. error: ${error.message}`,
+      };
     }
-  };
-
-  createUser = async (newUser: any): Promise<IUser> => {
-    const user = await this.db.insert('users', newUser);
-    return user?.[0];
-  };
-}
+  },
+  createUser: async (newUser: Record<string, any>): Promise<IUser> => {
+    try {
+      const user = await db.insert(Tables.USERS, [newUser]);
+      return user?.[0];
+    } catch (error) {
+      console.error('ERROR in users.modal createUser()', error.message);
+      throw {
+        message: `error while trying to createUser. error: ${error.message}`,
+      };
+    }
+  },
+  updateUser: async (
+    updatedUser: Record<string, any>,
+    condition: Record<string, any> | string
+  ): Promise<IUser> => {
+    try {
+      const users = await db.update(Tables.USERS, updatedUser, condition);
+      return users?.[0];
+    } catch (error) {
+      console.error('ERROR in users.modal updateUser()', error.message);
+      throw {
+        message: `error while trying to updateUser. error: ${error.message}`,
+      };
+    }
+  },
+};

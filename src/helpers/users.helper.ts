@@ -1,8 +1,6 @@
 import { AuthInfo } from 'types';
-import UserModel from '../models/users.model';
-import { IUser, UserRole } from '../types/user';
-
-const userModel = new UserModel();
+import { userModel } from '../models/index';
+import { IUser } from 'safe-shore-common';
 
 const usersHelper = {
   createUser: async (authInfo: AuthInfo): Promise<IUser> => {
@@ -14,17 +12,16 @@ const usersHelper = {
     const newsletterSubscription = true;
     const lastActiveAt = new Date();
     try {
-      const user: Partial<IUser> = {
+      const newUser = await userModel.createUser({
         firstName,
         lastName,
         email,
         activeDirectoryUuid,
-        role: UserRole.User,
         phoneNumber,
         newsletterSubscription,
         lastActiveAt,
-      };
-      const newUser = await userModel.createUser(user);
+        isActive: true,
+      });
       return newUser;
     } catch (error) {
       console.error('ERROR in users.helper createUser()', error.message);

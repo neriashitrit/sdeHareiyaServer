@@ -18,6 +18,15 @@ export default class DbConnection {
       client: 'pg',
       connection: this.connectionString,
       pool: { min: 2, max: 10 },
+      migrations: {
+        directory: __dirname + '/db/migrations',
+      },
+      seeds:
+        process.env.NODE_ENV === 'dev'
+          ? {
+              directory: __dirname + '/db/seeds',
+            }
+          : undefined,
       ...knexSnakeCaseMappers(),
     });
 }

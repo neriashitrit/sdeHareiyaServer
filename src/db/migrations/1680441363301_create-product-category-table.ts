@@ -8,13 +8,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createTable(Tables.PRODUCT_CATEGORIES, {
     id: 'id',
     name: { type: PgType.VARCHAR, notNull: true },
-    title: { type: PgType.VARCHAR, notNull: true },
-    icon_file_id: {
-      type: PgType.INT,
-      references: Tables.FILES,
-      onDelete: 'SET NULL',
-      notNull: false,
-    },
     description: { type: PgType.VARCHAR, notNull: true },
     updated_at: {
       type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE,

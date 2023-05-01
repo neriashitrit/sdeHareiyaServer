@@ -1,1 +1,1 @@
-export { AuthInfo } from './authInfo';
+export { AuthInfo } from './authInfo.types';

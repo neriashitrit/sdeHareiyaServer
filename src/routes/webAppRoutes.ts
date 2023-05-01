@@ -1,6 +1,7 @@
 import express from 'express';
 
 import * as usersController from '../controllers/users.controller';
+import * as transactionsController from '../controllers/transactions.controller';
 import * as globalController from '../controllers/global.controller';
 
 const router = express.Router();
@@ -9,6 +10,9 @@ router.post('/user/login', usersController.userLogin);
 // router.get('/user/getAll', usersController.getAllCompanyUsers)
 // router.get('/user/getOne', usersController.getUser)
 // router.post('/user/contactUs', usersController.sendContactUs)
+
+//  transactions
+router.post('/transactions', transactionsController.createTransaction);
 
 // global
 // router.post('/global/uploadAvatar', globalController.uploadAvatar)

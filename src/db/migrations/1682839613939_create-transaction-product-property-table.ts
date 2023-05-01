@@ -5,26 +5,25 @@ import { MigrationBuilder, ColumnDefinitions, PgType } from 'node-pg-migrate';
 export const shorthands: ColumnDefinitions | undefined = undefined;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
-  pgm.createTable(Tables.BANK_DETAILS, {
+  pgm.createTable(Tables.TRANSACTION_PRODUCT_PROPERTIES, {
     id: 'id',
-    account: {
+    transaction_id: {
       type: PgType.INT,
-      references: Tables.ACCOUNTS,
+      references: Tables.TRANSACTIONS,
       onDelete: 'SET NULL',
     },
-    is_active: { type: PgType.BOOLEAN },
-    bank_name: { type: PgType.VARCHAR },
-    branch_name: { type: PgType.VARCHAR },
-    branch_number: { type: PgType.INT },
-    bank_account_owner_full_name: { type: PgType.VARCHAR },
-    bank_account_owner_id_number: { type: PgType.INT },
-    bank_account_number: { type: PgType.INT },
-    created_at: {
+    product_property_id: {
+      type: PgType.INT,
+      references: Tables.PRODUCT_PROPERTIES,
+      onDelete: 'SET NULL',
+    },
+    value: { type: PgType.VARCHAR, notNull: true },
+    updated_at: {
       type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE,
       notNull: true,
       default: pgm.func('current_timestamp'),
     },
-    updated_at: {
+    created_at: {
       type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE,
       notNull: true,
       default: pgm.func('current_timestamp'),
@@ -33,5 +32,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropTable(Tables.BANK_DETAILS, { ifExists: true });
+  pgm.dropTable(Tables.PRODUCT_PROPERTIES, { ifExists: true });
+  pgm.dropType('product_property_type', { ifExists: true });
 }

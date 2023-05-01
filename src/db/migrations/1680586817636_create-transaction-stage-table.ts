@@ -2,7 +2,7 @@
 import {
   TransactionStageName,
   TransactionStageStatus,
-} from '../../types/transactionStage';
+} from 'safe-shore-common';
 import { Tables } from '../../constants';
 import { MigrationBuilder, ColumnDefinitions, PgType } from 'node-pg-migrate';
 
@@ -14,15 +14,12 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     'transaction_stage_status',
     Object.values(TransactionStageStatus)
   );
-
   pgm.createTable(Tables.TRANSACTION_STAGES, {
     id: 'id',
     transaction_id: {
       type: PgType.INT,
       references: Tables.TRANSACTIONS,
       onDelete: 'SET NULL',
-      notNull: false,
-      unique: true,
     },
     name: { type: 'transaction_stage_name', notNull: true },
     in_charge: { type: 'transaction_side', notNull: true },
@@ -30,11 +27,9 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       type: PgType.INT,
       references: Tables.USERS,
       onDelete: 'SET NULL',
-      notNull: false,
-      unique: true,
     },
-    stauts: { type: 'transaction_stage_status', notNull: true },
-    additional_data: { type: PgType.JSONB },
+    status: { type: 'transaction_stage_status', notNull: true },
+    additional_data: { type: PgType.VARCHAR },
     created_at: {
       type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE,
       notNull: true,

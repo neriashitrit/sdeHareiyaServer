@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { FundsSource } from '../../types/companyDetails';
+import { FundsSource } from 'safe-shore-common';
 import { Tables } from '../../constants';
 import { MigrationBuilder, ColumnDefinitions, PgType } from 'node-pg-migrate';
 
@@ -10,11 +10,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 
   pgm.createTable(Tables.COMPANY_DETAILS, {
     id: 'id',
-    account: {
+    account_id: {
       type: PgType.INT,
       references: Tables.ACCOUNTS,
       onDelete: 'SET NULL',
-      notNull: false,
+
       unique: true,
     },
     company_id_number: { type: PgType.INT, notNull: true },
@@ -27,7 +27,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     running_years: { type: PgType.INT, notNull: true },
     funds_source: { type: 'funds_source', notNull: true },
     funds_source_other: { type: PgType.VARCHAR },
-    contacts: { type: PgType.JSONB, notNull: true },
+    contacts: { type: PgType.VARCHAR, notNull: true },
     created_at: {
       type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE,
       notNull: true,
@@ -44,7 +44,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       type: PgType.INT,
       references: Tables.COMPANY_DETAILS,
       onDelete: 'SET NULL',
-      notNull: false,
     },
   });
 }

@@ -5,10 +5,9 @@ import {
   VerifyCallback,
 } from 'passport-azure-ad';
 import { Request, Response } from 'express';
-import AuthModel from '../models/auth.model';
+import { authModel, userModel } from '../models/index';
 import { comparePasswords } from '../services/auth.service';
-
-const authModel = new AuthModel();
+import { AuthInfo } from 'types';
 
 // Update these four variables with values from your B2C tenant in the Azure portal
 const clientID = '94c62aa3-bb15-4985-a47f-8fc003cb5caf'; // Application (client) ID of your API's application registration
@@ -30,7 +29,20 @@ const bearerStrategyOptions: IBearerStrategyOptionWithRequest = {
 
 export const bearerStrategy = new BearerStrategy(
   bearerStrategyOptions,
-  (token: ITokenPayload, done: VerifyCallback) => done(null, {}, token)
+  async (token: ITokenPayload, done: VerifyCallback) => {
+    const email = (token as AuthInfo).emails[0];
+    try {
+      const user = await userModel.getUser(email);
+      if (user) {
+        return done(null, user, token);
+      } else {
+        //  TODo check if no user exist - allow only to login
+        return done(null, null, token);
+      }
+    } catch (error) {
+      return done(error);
+    }
+  }
 );
 
 export const adminSenderAuth = async (

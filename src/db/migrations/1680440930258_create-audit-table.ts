@@ -11,7 +11,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       type: PgType.INT,
       references: Tables.USERS,
       onDelete: 'SET NULL',
-      notNull: false,
     },
     table_name: { type: PgType.VARCHAR, notNull: true },
     row_id: { type: PgType.INT, notNull: true },

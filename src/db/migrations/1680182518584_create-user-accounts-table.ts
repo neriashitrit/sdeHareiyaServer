@@ -5,19 +5,17 @@ import { MigrationBuilder, ColumnDefinitions, PgType } from 'node-pg-migrate';
 export const shorthands: ColumnDefinitions | undefined = undefined;
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
-  pgm.createTable(Tables.USERS_ACCOUNTS, {
+  pgm.createTable(Tables.USER_ACCOUNTS, {
     id: 'id',
-    user: {
+    user_id: {
       type: PgType.INT,
       references: Tables.USERS,
       onDelete: 'SET NULL',
-      notNull: false,
     },
-    account: {
+    account_id: {
       type: PgType.INT,
       references: Tables.ACCOUNTS,
       onDelete: 'SET NULL',
-      notNull: false,
     },
     created_at: {
       type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE,
@@ -33,5 +31,5 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropTable(Tables.USERS_ACCOUNTS, { ifExists: true });
+  pgm.dropTable(Tables.USER_ACCOUNTS, { ifExists: true });
 }

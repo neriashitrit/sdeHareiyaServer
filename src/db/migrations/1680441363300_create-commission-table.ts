@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { CommissionType } from '../../types/commsion';
+import { CommissionType } from 'safe-shore-common';
 import { Tables } from '../../constants';
 import { MigrationBuilder, ColumnDefinitions, PgType } from 'node-pg-migrate';
 
