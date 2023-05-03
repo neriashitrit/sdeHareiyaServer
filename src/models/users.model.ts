@@ -7,6 +7,28 @@ import { Tables } from '../constants';
 const db = new DbService();
 
 export const userModel = {
+  getAllUsers: async (): Promise<IUser[]> => {
+    try {
+      const users = await db.getAll(Tables.USERS,{ is_active: true });
+      return users;
+    } catch (error) {
+      console.error('ERROR in users.modal getAllUsers()', error.message);
+      throw {
+        message: `error while trying to getUser. error: ${error.message}`,
+      };
+    }
+  },
+  getUserById: async (id: number): Promise<IUser> => {
+    try {
+      const user = await db.getOneById(Tables.USERS, id);
+      return user;
+    } catch (error) {
+      console.error('ERROR in users.modal getUser()', error.message);
+      throw {
+        message: `error while trying to getUser. error: ${error.message}`,
+      };
+    }
+  },
   getUser: async (email: string): Promise<IUser> => {
     const lastActiveAt = new Date();
     try {

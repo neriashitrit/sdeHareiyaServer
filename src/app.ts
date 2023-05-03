@@ -10,6 +10,7 @@ import emailService from './services/email.service';
 import backOfficeRouter from './routes/backOfficeRoutes';
 import webAppRouter from './routes/webAppRoutes';
 import openRouter from './routes/openRoutes';
+import adminRouter from './routes/adminWebAppRoutes';
 import { adminSenderAuth, bearerStrategy } from './middlewares/auth.middleware';
 import { roleGuard } from './middlewares/roleGuard.middleware';
 
@@ -34,6 +35,12 @@ app.use(
   passport.authenticate(bearerStrategy, { session: false }),
   roleGuard(),
   webAppRouter
+);
+app.use(
+  '/api/admin',
+  //passport.authenticate(bearerStrategy, { session: false }),
+  //roleGuard(),
+  adminRouter
 );
 app.use(
   '/api/flutterapp',

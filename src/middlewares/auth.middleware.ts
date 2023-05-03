@@ -37,7 +37,7 @@ export const bearerStrategy = new BearerStrategy(
         return done(null, user, token);
       } else {
         //  TODo check if no user exist - allow only to login
-        return done(null, null, token);
+        return done(null, {}, token);
       }
     } catch (error) {
       return done(error);
