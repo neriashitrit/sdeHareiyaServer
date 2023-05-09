@@ -38,8 +38,8 @@ app.use(
 );
 app.use(
   '/api/admin',
-  //passport.authenticate(bearerStrategy, { session: false }),
-  //roleGuard(),
+  passport.authenticate('oauth-bearer', { session: false }),
+  roleGuard(),
   adminRouter
 );
 app.use(
