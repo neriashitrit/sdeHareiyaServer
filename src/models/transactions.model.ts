@@ -3,189 +3,148 @@ import DbService from '../services/db.service';
 import _ from 'lodash';
 import { ITransaction, IUser } from 'safe-shore-common';
 import { Tables } from '../constants';
+import { getJsonBuildObject } from '../utils/db.utils';
 
 const db = new DbService();
 
-const transactionColumns = [
-  'status',
-  'product_category_other',
-  'product_subcategory_other',
-  'creator_side',
-  'amount_currency',
-  'amount',
-  'commission_payer',
-  'commission_amount_currency',
-  'commission_amount',
-  'end_date',
-  'cancel_reason',
-  'cancel_reason_other',
-  'created_at',
-  'updated_at',
-  db.knex.raw(
-    "JSON_AGG(JSON_BUILD_OBJECT('id', ts.id, 'side', ts.side , 'created_at', ts.created_at , 'updated_at', ts.updated_at, 'user_account', JSON_BUILD_OBJECT('id', ua.id, 'user', u.*, 'account', 'account', a.*), 'bank_details', bd.*)) as sides'"
-  ),
-  db.knex.raw(
-    "JSON_AGG(JSON_BUILD_OBJECT('id', pc.id, 'name', pc.name , 'description', pc.description , 'created_at', pc.created_at , 'updated_at', pc.updated_at, 'icon_file', pcf.*)) as product_category'"
-  ),
-  db.knex.raw(
-    "JSON_AGG(JSON_BUILD_OBJECT('id', psc.id, 'name', psc.name , 'description', psc.description , 'created_at', psc.created_at , 'updated_at', psc.updated_at, 'icon_file', pscf.*)) as product_subcategory'"
-  ),
-  db.knex.raw(
-    "JSON_AGG(JSON_BUILD_OBJECT('id', c.id, 'is_active', c.is_active, 'from', c.from, 'to', c.to, 'type', c.type, 'amount', c.amount, 'created_at', c.created_at , 'updated_at', c.updated_at)) as product_subcategory'"
-  ),
-];
-
 export const transactionModel = {
-  getTransaction: async (
+  getTransactions: async (
     condition: Record<string, any> | string
-  ): Promise<ITransaction> => {
-    const transaction = await db
-      .knex(Tables.TRANSACTIONS)
-      .select(transactionColumns)
+  ): Promise<ITransaction[]> => {
+    const transaction = await db.knex
+      .queryBuilder()
+      .select([
+        't.id',
+        't.status',
+        't.product_category_other',
+        't.product_subcategory_other',
+        't.amount_currency',
+        't.amount',
+        't.commission_payer',
+        't.commission_amount_currency',
+        't.commission_amount',
+        't.end_date',
+        't.cancel_reason',
+        't.cancel_reason_other',
+        't.deposit_bank_name',
+        't.deposit_bank_number',
+        't.deposit_bank_account_owner_full_name',
+        't.deposit_transfer_date',
+        't.deposit_reference_number',
+        'drf.url as deposit_reference_file_url',
+        't.created_at',
+        't.updated_at',
+
+        db.knex.raw(
+          `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.PRODUCT_CATEGORIES, [
+            'pc',
+            'pcf',
+          ])}) as product_category`
+        ),
+        db.knex.raw(
+          `CASE WHEN psc.id IS NULL THEN null ELSE JSON_BUILD_OBJECT(${getJsonBuildObject(
+            Tables.PRODUCT_SUBCATEGORIES,
+            ['psc', 'pscf']
+          )}) END as product_subcategory`
+        ),
+        db.knex.raw(
+          `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.COMMISSIONS, [
+            'c',
+          ])})  as commission	`
+        ),
+      ])
+      .from(`${Tables.TRANSACTIONS} as t`)
       .leftJoin(
         `${Tables.PRODUCT_CATEGORIES} as pc`,
-        `${Tables.PRODUCT_CATEGORIES}.id`,
+        'pc.id',
         '=',
-        'ts.product_category_id'
+        't.product_category_id'
       )
       .leftJoin(`${Tables.FILES} as pcf`, function () {
-        this.on(`${Tables.PRODUCT_CATEGORIES}.id`, '=', 'pcf.row_id').andOn(
+        this.on('pc.id', '=', 'pcf.row_id').andOn(
           'pcf.table_name',
           '=',
-          `${Tables.PRODUCT_CATEGORIES}`
+          db.knex.raw('?', [Tables.PRODUCT_CATEGORIES])
         );
       })
       .leftJoin(
         `${Tables.PRODUCT_SUBCATEGORIES} as psc`,
-        `${Tables.PRODUCT_SUBCATEGORIES}.id`,
+        'psc.id',
         '=',
-        'psc.product_subcategory_id'
+        't.product_subcategory_id'
       )
       .leftJoin(`${Tables.FILES} as pscf`, function () {
-        this.on(`${Tables.PRODUCT_SUBCATEGORIES}.id`, '=', 'pscf.row_id').andOn(
+        this.on('psc.id', '=', 'pscf.row_id').andOn(
           'pscf.table_name',
           '=',
-          `${Tables.PRODUCT_SUBCATEGORIES}`
+          db.knex.raw('?', [Tables.PRODUCT_SUBCATEGORIES])
+        );
+      })
+      .leftJoin(`${Tables.COMMISSIONS} as c`, 't.commission_id', '=', 'c.id')
+      .leftJoin(`${Tables.FILES} as drf`, function () {
+        this.on('t.id', '=', 'drf.row_id').andOn(
+          'drf.table_name',
+          '=',
+          db.knex.raw('?', [Tables.TRANSACTIONS])
         );
       })
       .leftJoin(
-        `${Tables.PRODUCT_PROPERTIES} as pp`,
-        'pp.product_category_id',
-        '=',
-        'pc.id'
-      )
-      .leftJoin(
         `${Tables.TRANSACTION_SIDES} as ts`,
-        `${Tables.TRANSACTIONS}.id`,
+        'ts.transaction_id',
         '=',
-        'ts.transaction_id'
+        't.id'
       )
       .leftJoin(
         `${Tables.USER_ACCOUNTS} as ua`,
-        'ts.user_account_id',
+        'ua.id',
         '=',
-        'ua.id'
+        'ts.user_account_id'
       )
-      .leftJoin(
-        `${Tables.BANK_DETAILS} as bd`,
-        'ts.bank_details_id',
-        '=',
-        'bd.id'
-      )
-      .leftJoin(
-        `${Tables.COMMISSIONS} as c`,
-        `${Tables.COMMISSIONS}.id`,
-        '=',
-        'commission_id'
-      )
-      .leftJoin(`${Tables.USERS} as u`, 'ua.user_id', '=', 'u.id')
-      .leftJoin(`${Tables.ACCOUNTS} as a`, 'ua.account_id', '=', 'a.id')
+      .leftJoin(`${Tables.USERS} as u`, 'u.id', '=', 'ua.user_id')
       .where(condition)
-      .first();
+      .groupBy(
+        't.id',
+        'c.id',
+        'psc.id',
+        'pc.id',
+        'pcf.id',
+        'pscf.id',
+        'drf.id'
+      );
     return transaction;
   },
   createTransaction: async (
     newTransaction: Record<string, any>
   ): Promise<ITransaction> => {
-    const transaction = await db.insert(Tables.TRANSACTIONS, [newTransaction]);
-    return transaction?.[0];
+    try {
+      const transaction = await db.insert(Tables.TRANSACTIONS, newTransaction);
+      return transaction?.[0];
+    } catch (error) {
+      console.error(
+        'ERROR in transactions.modal createTransaction()',
+        error.message
+      );
+      throw {
+        message: `error while trying to createTransaction. error: ${error.message}`,
+      };
+    }
   },
   updateTransaction: async (
     condition: Record<string, any> | string,
     updatedTransaction: Record<string, any>
-  ): Promise<ITransaction> => {
+  ): Promise<void> => {
     try {
-      const transaction = await db
+      await db
         .knex(Tables.TRANSACTIONS)
         .where(condition)
-        .update(updatedTransaction)
-        .returning(transactionColumns)
-        .leftJoin(
-          `${Tables.PRODUCT_CATEGORIES} as pc`,
-          `${Tables.PRODUCT_CATEGORIES}.id`,
-          '=',
-          'ts.product_category_id'
-        )
-        .leftJoin(`${Tables.FILES} as pcf`, function () {
-          this.on(`${Tables.PRODUCT_CATEGORIES}.id`, '=', 'pcf.row_id').andOn(
-            'pcf.table_name',
-            '=',
-            `${Tables.PRODUCT_CATEGORIES}`
-          );
-        })
-        .leftJoin(
-          `${Tables.PRODUCT_SUBCATEGORIES} as psc`,
-          `${Tables.PRODUCT_SUBCATEGORIES}.id`,
-          '=',
-          'psc.product_subcategory_id'
-        )
-        .leftJoin(`${Tables.FILES} as pscf`, function () {
-          this.on(
-            `${Tables.PRODUCT_SUBCATEGORIES}.id`,
-            '=',
-            'pscf.row_id'
-          ).andOn('pscf.table_name', '=', `${Tables.PRODUCT_SUBCATEGORIES}`);
-        })
-        .leftJoin(
-          `${Tables.PRODUCT_PROPERTIES} as pp`,
-          'pp.product_category_id',
-          '=',
-          'pc.id'
-        )
-        .leftJoin(
-          `${Tables.TRANSACTION_SIDES} as ts`,
-          `${Tables.TRANSACTIONS}.id`,
-          '=',
-          'ts.transaction_id'
-        )
-        .leftJoin(
-          `${Tables.USER_ACCOUNTS} as ua`,
-          'ts.user_account_id',
-          '=',
-          'ua.id'
-        )
-        .leftJoin(
-          `${Tables.BANK_DETAILS} as bd`,
-          'ts.bank_details_id',
-          '=',
-          'bd.id'
-        )
-        .leftJoin(
-          `${Tables.COMMISSIONS} as c`,
-          `${Tables.COMMISSIONS}.id`,
-          '=',
-          'ts.commission_id'
-        )
-        .leftJoin(`${Tables.USERS} as u`, 'ua.user_id', '=', 'u.id')
-        .leftJoin(`${Tables.ACCOUNTS} as a`, 'ua.account_id', '=', 'a.id');
-      return transaction?.[0];
+        .update(updatedTransaction);
     } catch (error) {
       console.error(
-        'ERROR in transactions.modal updateTransactionBy()',
+        'ERROR in transactions.modal updateTransaction()',
         error.message
       );
       throw {
-        message: `error while trying to updateTransactionBy. error: ${error.message}`,
+        message: `error while trying to updateTransaction. error: ${error.message}`,
       };
     }
   },

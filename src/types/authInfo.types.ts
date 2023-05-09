@@ -2,7 +2,7 @@ import { ITokenPayload } from 'passport-azure-ad';
 
 export interface AuthInfo extends ITokenPayload {
   emails: string[];
-  extension_newsletter_subsription: boolean;
+  extension_newsletter_subscription: boolean;
   extension_account_type: 'private' | 'company';
   extension_phone_number: string;
   extension_id_number: number | null;

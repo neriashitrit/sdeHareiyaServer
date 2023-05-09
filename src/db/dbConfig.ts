@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import knex from 'knex';
 import { knexSnakeCaseMappers } from 'objection';
+import { convertKeysToCamelCase } from '../utils/db.utils';
 
 export default class DbConnection {
   connectionString: string;
@@ -21,12 +22,9 @@ export default class DbConnection {
       migrations: {
         directory: __dirname + '/db/migrations',
       },
-      seeds:
-        process.env.NODE_ENV === 'dev'
-          ? {
-              directory: __dirname + '/db/seeds',
-            }
-          : undefined,
       ...knexSnakeCaseMappers(),
+      postProcessResponse: (result) => {
+        return convertKeysToCamelCase(result);
+      },
     });
 }

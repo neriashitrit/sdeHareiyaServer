@@ -36,7 +36,7 @@
     "passport": "^0.6.0",
     "passport-azure-ad": "^4.3.3",
     "pg": "^8.7.3",
-    "safe-shore-common": "https://x-token-auth:ATCTT3xFfGN0MWpLYVzn8PcB3EIxpNJE69yA-onLv7VMnQjX9wMuRz8JNCHBGmnKCuVCdH2lVOhpvbGXKNzk-afFvHS581DzqZIwhJuoOL3LTEumCT5AvMJWGdAPBjkuj6lWifgQ7GAQ85DRRSNKTs_aJ4pCWEOGE5wMy5MfuzUUN7aSaLzEWNQ=7A8A2DEF@bitbucket.org/digitaltingz/safe-shore-common.git"
+    "safe-shore-common": "https://x-token-auth:ATCTT3xFfGN0MWpLYVzn8PcB3EIxpNJE69yA-onLv7VMnQjX9wMuRz8JNCHBGmnKCuVCdH2lVOhpvbGXKNzk-afFvHS581DzqZIwhJuoOL3LTEumCT5AvMJWGdAPBjkuj6lWifgQ7GAQ85DRRSNKTs_aJ4pCWEOGE5wMy5MfuzUUN7aSaLzEWNQ=7A8A2DEF@bitbucket.org/digitaltingz/safe-shore-common.git#SS-248/approve-stage"
   },
   "devDependencies": {
     "@types/bcrypt-nodejs": "^0.0.31",

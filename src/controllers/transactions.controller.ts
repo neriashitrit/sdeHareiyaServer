@@ -2,32 +2,83 @@ import { Request, Response } from 'express';
 
 import {
   transactionModel,
-  transactionSideModel,
   commissionModel,
-  userAccountModel,
-  userModel,
-  accountModel,
   transactionStageModel,
   transactionProductPropertyModel,
 } from '../models/index';
 
 import _ from 'lodash';
-import { failureResponse, successResponse } from '../utils/response';
 import transactionHelper from '../helpers/transaction.helper';
-import { commissionCalculate } from '../utils/helperFunctions';
+import { commissionCalculate } from '../utils/global.utils';
+import { failureResponse, successResponse } from '../utils/db.utils';
+
 import {
   TransactionSide,
   TransactionStageStatus,
   IUser,
   TransactionStageName,
   TransactionStatus,
-  AccountType,
+  ITransactionSide,
 } from 'safe-shore-common';
 import {
+  isApproveStageBody,
   isCreateTransactionBody,
+  isGetTransactionParams,
   isUpdateTransactionBody,
 } from '../utils/typeCheckers.utils';
-import { ITransactionProductProperty } from 'safe-shore-common/dist/models';
+
+import { CreateTransactionBodyProductProperty } from 'types/requestBody.types';
+import transactionSideHelper from '../helpers/transactionSide.helper';
+import transactionStageHelper from '../helpers/transactionStage.helper';
+
+export const getTransactions = async (req: Request, res: Response) => {
+  try {
+    const user = req.user as IUser;
+
+    const transactions = await transactionHelper.getTransactions({
+      userId: user.id,
+    });
+
+    return res.status(200).json(successResponse(transactions));
+  } catch (error) {
+    console.error(
+      'ERROR in transactions.controller getTransactions()',
+      error.message
+    );
+    return res.status(500).json(failureResponse(error.message));
+  }
+};
+
+export const getTransaction = async (req: Request, res: Response) => {
+  try {
+    const user = req.user as IUser;
+    const params = req.params;
+
+    if (!isGetTransactionParams(params)) {
+      return res.status(400).json(failureResponse('Invalid Parameters'));
+    }
+
+    const { transactionId } = params;
+
+    const responseTransaction = await transactionHelper.getTransaction({
+      transactionId,
+    });
+
+    if (_.isNull(responseTransaction)) {
+      return res
+        .status(400)
+        .json(failureResponse('No transaction with this id'));
+    }
+
+    return res.status(200).json(successResponse(responseTransaction));
+  } catch (error) {
+    console.error(
+      'ERROR in transactions.controller getTransaction()',
+      error.message
+    );
+    return res.status(500).send(failureResponse(error.message));
+  }
+};
 
 export const createTransaction = async (req: Request, res: Response) => {
   try {
@@ -45,12 +96,12 @@ export const createTransaction = async (req: Request, res: Response) => {
       productSubcategoryOther,
       currency,
       amount,
-      productProperties,
+      properties,
     } = body;
 
     const commissionObject = await getCommissionByAmount(amount);
 
-    const transaction = await transactionModel.createTransaction({
+    const newTransaction = await transactionModel.createTransaction({
       status: TransactionStatus.Stage,
       productCategoryId,
       productCategoryOther,
@@ -63,35 +114,41 @@ export const createTransaction = async (req: Request, res: Response) => {
       commissionAmount: commissionObject.amount,
     });
 
+    if (!newTransaction) {
+      return res
+        .status(400)
+        .json(failureResponse('Couldn`t create new transaction'));
+    }
+
     const transactionStage = await transactionStageModel.createTransactionStage(
       {
         name: TransactionStageName.Draft,
-        transactionId: transaction.id,
+        transactionId: newTransaction.id,
         inCharge: TransactionSide.SideA,
         status: TransactionStageStatus.Active,
+        userId: user.id,
       }
     );
 
-    const transactionProductProperties = await upsertProductProperties(
-      transaction.id,
-      productProperties
+    await upsertProductProperties(newTransaction.id, properties);
+
+    const transactionSides = await transactionSideHelper.createTransactionSideA(
+      newTransaction.id,
+      user.id
     );
 
-    const userAccount = await userAccountModel.getUserAccount({
-      userId: user.id,
+    const responseTransaction = await transactionHelper.getTransaction({
+      transactionId: newTransaction.id,
+      sides: transactionSides,
+      stages: transactionStage ? [transactionStage] : [],
+      disputes: [],
     });
 
-    const transactionSide = await transactionSideModel.createTransactionSide({
-      transactionId: transaction.id,
-      userAccountId: userAccount.id,
-      side: TransactionSide.SideA,
-    });
+    if (_.isNull(responseTransaction)) {
+      throw `Could not find created transaction with id ${newTransaction.id}`;
+    }
 
-    transaction.sides = [transactionSide];
-    transaction.stages = [transactionStage!];
-    transaction.properties = transactionProductProperties;
-    //  TODO add commission
-    return res.status(200).json(successResponse(transaction));
+    return res.status(200).json(successResponse(responseTransaction));
   } catch (error) {
     console.error(
       'ERROR in transactions.controller createTransaction()',
@@ -112,14 +169,13 @@ export const updateTransaction = async (req: Request, res: Response) => {
 
     const {
       transactionId,
-      completed,
       productCategoryId,
       productCategoryOther,
       productSubcategoryId,
       productSubcategoryOther,
       currency,
       amount,
-      productProperties,
+      properties,
       endDate,
       commissionPayer,
       creatorSide,
@@ -130,22 +186,18 @@ export const updateTransaction = async (req: Request, res: Response) => {
     } = body;
 
     //  Check user is one of the sides of the transaction
-    const transaction = await transactionModel.getTransaction({
-      id: transactionId,
-      'user.id': user.id,
-    });
+    let [transactionCurrentSide, transactionOtherSide] =
+      await transactionSideHelper.getTransactionSides(transactionId, user.id);
 
-    if (!transaction) {
+    if (!transactionCurrentSide) {
       return res
         .status(400)
         .send(failureResponse('cant update this transaction'));
     }
 
-    //  Check the active stage of the transaction
-    const activeStage = await transactionStageModel.getTransactionStage({
-      transaction_id: transactionId,
-      status: TransactionStageStatus.Active,
-    });
+    const activeStage = (
+      await transactionStageHelper.getActiveStage(transactionId)
+    )[0];
 
     if (
       _.isNil(activeStage) ||
@@ -169,32 +221,22 @@ export const updateTransaction = async (req: Request, res: Response) => {
       updatedFields.commissionAmount = commissionObject.amount;
     }
 
-    if (productProperties) {
-      const transactionProductProperties = await upsertProductProperties(
-        transaction.id,
-        productProperties
-      );
+    if (properties) {
+      await upsertProductProperties(transactionId, properties);
     }
 
-    if (
-      !_.isNil(firstName) ||
-      !_.isNil(lastName) ||
-      !_.isNil(email) ||
-      !_.isNil(phoneNumber)
-    ) {
-      const transactionSideB = await transactionSideModel.getTransactionSide(
-        `transaction_id = id AND user.id != ${user.id}`
-      );
-
-      if (transactionSideB) {
-        if (transactionSideB.user.isActivated) {
-          return res
-            .status(400)
-            .json(failureResponse('cant update already activated user'));
-        }
-        userModel.updateUser(
-          { firstName, lastName, email, phoneNumber },
-          { id: transactionSideB.user.id }
+    let transactionSides: ITransactionSide[] | null = null;
+    if (firstName || lastName || email || phoneNumber || creatorSide) {
+      if (transactionOtherSide) {
+        transactionSides = await transactionSideHelper.updateTransactionSideB(
+          transactionId,
+          user,
+          transactionOtherSide.user,
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          creatorSide
         );
       } else {
         if (
@@ -213,74 +255,19 @@ export const updateTransaction = async (req: Request, res: Response) => {
             );
         }
 
-        let userAccount = await userAccountModel.getUserAccount({
-          'u.email': email,
-        });
-
-        if (userAccount) {
-          if (userAccount.user.isActivated) {
-            return res
-              .status(400)
-              .json(failureResponse('cant update already activated user'));
-          }
-          //  update user if not active (means we created him)
-          await userModel.updateUser(
-            {
-              firstName: firstName,
-              lastName: lastName,
-              phoneNumber: phoneNumber,
-              lastActiveAt: new Date(),
-            },
-            {
-              email: email,
-            }
-          );
-
-          await transactionSideModel.updateTransactionSide(
-            {
-              userAccountId: userAccount.id,
-              transactionId: transactionId,
-            },
-            {
-              side:
-                creatorSide === TransactionSide.Buyer
-                  ? TransactionSide.Seller
-                  : TransactionSide.Seller,
-            }
-          );
-        } else {
-          //  create user account
-          const newUser = await userModel.createUser({
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            phoneNumber: phoneNumber,
-            lastActiveAt: new Date(),
-            isActive: false,
-          });
-
-          const newAccount = await accountModel.createAccount({
-            type: AccountType.Private,
-          });
-
-          userAccount = await userAccountModel.createUserAccount({
-            userId: newUser.id,
-            accountId: newAccount.id,
-          });
-
-          await transactionSideModel.createTransactionSide({
-            userAccountId: userAccount.id,
-            transactionId: transactionId,
-            side:
-              creatorSide === TransactionSide.Buyer
-                ? TransactionSide.Seller
-                : TransactionSide.Seller,
-          });
-        }
+        transactionSides = await transactionSideHelper.createTransactionSideB(
+          transactionId,
+          user.id,
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          creatorSide
+        );
       }
     }
 
-    const updatedTransaction = await transactionModel.updateTransaction(
+    await transactionModel.updateTransaction(
       { id: transactionId },
       {
         productCategoryId,
@@ -291,25 +278,118 @@ export const updateTransaction = async (req: Request, res: Response) => {
         commissionAmountCurrency: currency,
         endDate,
         commissionPayer,
-        creatorSide,
         ...updatedFields,
       }
     );
 
-    if (
-      completed
-      //  TODO check if actually completed
-      //  1. all neccessary transaction props
-      //  2. 2 transaction sides
-      //  3. check product props exist
-    ) {
-      await transactionHelper.nextStage(user.id, transactionId);
+    const responseTransaction = await transactionHelper.getTransaction({
+      transactionId,
+      sides:
+        transactionSides ??
+        (transactionOtherSide !== undefined
+          ? [transactionCurrentSide, transactionOtherSide]
+          : [transactionCurrentSide]),
+    });
+
+    if (_.isNull(responseTransaction)) {
+      throw `Could not find updated transaction with id ${transactionId}`;
     }
 
-    return res.status(200).json(successResponse(updatedTransaction));
+    return res.status(200).json(successResponse(responseTransaction));
   } catch (error) {
     console.error(
-      'ERROR in transactions.controller createTransaction()',
+      'ERROR in transactions.controller updateTransaction()',
+      error.message
+    );
+    return res.status(500).send(failureResponse(error.message));
+  }
+};
+
+export const approveStage = async (req: Request, res: Response) => {
+  try {
+    const user = req.user as IUser;
+    const body = {
+      ...req.body,
+      depositReferenceFile: req.files?.depositReferenceFile,
+    };
+
+    if (!isApproveStageBody(body)) {
+      return res.status(400).json(failureResponse('Invalid Parameters'));
+    }
+
+    const {
+      transactionId,
+      depositBankName,
+      depositBankNumber,
+      depositBankAccountOwnerFullName,
+      depositTransferDate,
+      depositReferenceNumber,
+      depositReferenceFile,
+      deliveryDate,
+      deliveryType,
+      deliveryNotes,
+    } = body;
+
+    const [transactionCurrentSide, transactionOtherSide] =
+      await transactionSideHelper.getTransactionSides(transactionId, user.id);
+
+    const activeStage = (
+      await transactionStageHelper.getActiveStage(transactionId)
+    )[0];
+
+    if (
+      activeStage.inCharge !== transactionCurrentSide?.side &&
+      !(
+        activeStage.inCharge === TransactionSide.SideA &&
+        transactionCurrentSide?.isCreator
+      ) &&
+      !(
+        activeStage.inCharge === TransactionSide.SideB &&
+        !transactionCurrentSide?.isCreator
+      )
+    ) {
+      return res
+        .status(400)
+        .json(failureResponse('Current user is not in charge of this stage'));
+    }
+
+    if (!transactionCurrentSide || !transactionOtherSide) {
+      throw 'transactionCurrentSide or transactionOtherSide are undefined in transactions.controller approveStage() ';
+    }
+
+    const { success, additionalData, transactionProps, errorMessage } =
+      await transactionStageHelper.isStageCompleted(
+        transactionId,
+        activeStage,
+        transactionCurrentSide,
+        transactionOtherSide,
+        depositBankName,
+        depositBankNumber,
+        depositBankAccountOwnerFullName,
+        depositTransferDate,
+        depositReferenceNumber,
+        depositReferenceFile,
+        deliveryDate,
+        deliveryType,
+        deliveryNotes
+      );
+
+    if (!success) {
+      return res.status(400).json(failureResponse(errorMessage));
+    }
+
+    const nextStage = await transactionStageHelper.nextStage(
+      transactionId,
+      transactionCurrentSide!,
+      activeStage,
+      transactionProps,
+      additionalData
+    );
+
+    return res.status(200).json(successResponse(nextStage!));
+  } catch (error) {
+    console.error(
+      'ERROR in transactions.controller approveStage()',
       error.message
     );
     return res.status(500).send(failureResponse(error.message));
@@ -328,34 +408,29 @@ const getCommissionByAmount = async (
 
 const upsertProductProperties = async (
   transactionId: number,
-  productProperties: ITransactionProductProperty[]
-): Promise<ITransactionProductProperty[]> => {
-  const transactionProductProperties: ITransactionProductProperty[] = [];
-  for (const property of productProperties) {
+  properties: CreateTransactionBodyProductProperty[]
+): Promise<void> => {
+  for (const property of properties) {
     const transactionProductProperty =
       await transactionProductPropertyModel.getTransactionProductProperty({
-        id: property.id,
+        'pp.id': property.productPropertyId,
+        'tpp.transaction_id': transactionId,
       });
     if (transactionProductProperty) {
-      transactionProductProperties.push(
-        await transactionProductPropertyModel.updateTransactionProductProperty(
-          {
-            value: property.value,
-            // TODO files
-          },
-          { transactionId, productPropertyId: property.id }
-        )
-      );
-    } else {
-      transactionProductProperties.push(
-        await transactionProductPropertyModel.createTransactionProductProperty({
-          transactionId,
-          productPropertyId: property.id,
+      await transactionProductPropertyModel.updateTransactionProductProperty(
+        {
           value: property.value,
           // TODO files
-        })
+        },
+        { transactionId, productPropertyId: property.productPropertyId }
       );
+      return;
     }
+    await transactionProductPropertyModel.createTransactionProductProperty({
+      transactionId,
+      productPropertyId: property.productPropertyId,
+      value: property.value,
+      // TODO files
+    });
   }
-  return transactionProductProperties;
 };

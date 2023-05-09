@@ -27,16 +27,28 @@ export const transactionStagePossiblePaths: {
     TransactionStageName.ConfirmationSideB,
   ],
   [TransactionStageName.AuthorizationSideA]: [
+    TransactionStageName.AuthorizationSideAConfirmation,
+  ],
+  [TransactionStageName.AuthorizationSideAConfirmation]: [
     TransactionStageName.ConfirmationSideB,
   ],
-  [TransactionStageName.ConfirmationSideB]: [TransactionStageName.BuyerDeposit],
+  [TransactionStageName.ConfirmationSideB]: [
+    TransactionStageName.AuthorizationSideB,
+    TransactionStageName.BuyerDeposit,
+  ],
+  [TransactionStageName.AuthorizationSideB]: [
+    TransactionStageName.AuthorizationSideBConfirmation,
+  ],
+  [TransactionStageName.AuthorizationSideBConfirmation]: [
+    TransactionStageName.BuyerDeposit,
+  ],
   [TransactionStageName.BuyerDeposit]: [
     TransactionStageName.DepositConfirmation,
   ],
   [TransactionStageName.DepositConfirmation]: [
-    TransactionStageName.SellerProductDelivery,
+    TransactionStageName.SellerProductTransfer,
   ],
-  [TransactionStageName.SellerProductDelivery]: [
+  [TransactionStageName.SellerProductTransfer]: [
     TransactionStageName.BuyerProductConfirmation,
   ],
   [TransactionStageName.BuyerProductConfirmation]: [
@@ -51,11 +63,14 @@ export const transactionStageInCharge: {
 } = {
   [TransactionStageName.Draft]: TransactionSide.SideA,
   [TransactionStageName.AuthorizationSideA]: TransactionSide.SideA,
+  [TransactionStageName.AuthorizationSideAConfirmation]: TransactionSide.Admin,
+  [TransactionStageName.AuthorizationSideB]: TransactionSide.SideB,
+  [TransactionStageName.AuthorizationSideBConfirmation]: TransactionSide.Admin,
   [TransactionStageName.ConfirmationSideB]: TransactionSide.SideB,
   [TransactionStageName.BuyerDeposit]: TransactionSide.Buyer,
   [TransactionStageName.DepositConfirmation]: TransactionSide.Admin,
-  [TransactionStageName.SellerProductDelivery]: TransactionSide.Seller,
+  [TransactionStageName.SellerProductTransfer]: TransactionSide.Seller,
   [TransactionStageName.BuyerProductConfirmation]: TransactionSide.Buyer,
-  [TransactionStageName.SellerPayment]: TransactionSide.Seller,
+  [TransactionStageName.SellerPayment]: TransactionSide.Admin,
   [TransactionStageName.Completed]: TransactionSide.Admin,
 };

@@ -19,13 +19,15 @@ export default class DbService {
     this.knex.select().from(tableName).where({ id }).first();
 
   getOne = (tableName: string, condition: Record<string, any> | string) =>
-    this.knex.select().from(tableName).where(condition).first();
+    this.knex.select().from(tableName).where(condition)?.first();
 
   getAll = (tableName: string, condition: Record<string, any> | string) =>
     this.knex.select().from(tableName).where(condition);
 
-  insert = (tableName: string, records: Record<string, any>[]) =>
-    this.knex.insert(records, ['*']).into(tableName);
+  insert = (
+    tableName: string,
+    records: Record<string, any> | Record<string, any>[]
+  ) => this.knex.insert(records, ['*']).into(tableName);
 
   insertOne = (tableName: string, record: Record<string, any>) =>
     this.insert(tableName, [record]);

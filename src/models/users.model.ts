@@ -9,7 +9,7 @@ const db = new DbService();
 export const userModel = {
   getAllUsers: async (): Promise<IUser[]> => {
     try {
-      const users = await db.getAll(Tables.USERS,{ is_active: true });
+      const users = await db.getAll(Tables.USERS, { is_active: true });
       return users;
     } catch (error) {
       console.error('ERROR in users.modal getAllUsers()', error.message);
@@ -43,7 +43,7 @@ export const userModel = {
   },
   createUser: async (newUser: Record<string, any>): Promise<IUser> => {
     try {
-      const user = await db.insert(Tables.USERS, [newUser]);
+      const user = await db.insert(Tables.USERS, newUser);
       return user?.[0];
     } catch (error) {
       console.error('ERROR in users.modal createUser()', error.message);

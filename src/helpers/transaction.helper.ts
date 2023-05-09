@@ -1,151 +1,175 @@
 import {
   ITransactionSide,
   ITransactionStage,
-  TransactionStageName,
-  TransactionStageStatus,
-  TransactionSide,
+  ITransaction,
+  ITransactionProductProperty,
+  ITransactionDispute,
 } from 'safe-shore-common';
 import {
   transactionStageModel,
   transactionModel,
   transactionSideModel,
+  transactionProductPropertyModel,
+  productPropertyModel,
 } from '../models/index';
 import _ from 'lodash';
-import {
-  transactionStagePossiblePaths,
-  transactionStageInCharge,
-} from '../constants';
 
 const transactionHelper = {
-  nextStage: async (
-    userId: number,
-    transactionId: number,
-    additionalData?: Record<string, any>
-  ): Promise<ITransactionStage | undefined> => {
-    try {
-      const requestingUser: ITransactionSide =
-        await transactionSideModel.getTransactionSide({
-          'ua.user_id': userId,
-        });
+  isTransactionCompleted: async (transactionId: number): Promise<boolean> => {
+    const transaction = (
+      await transactionModel.getTransactions({
+        't.id': transactionId,
+      })
+    )[0];
 
-      const activeStage = await transactionStageModel.getTransactionStage({
-        transactionId,
-        status: TransactionStageStatus.Active,
+    //  Check basic transaction props
+    if (
+      _.isNil(transaction.amountCurrency) ||
+      _.isNil(transaction.amount) ||
+      _.isNil(transaction.commissionAmountCurrency) ||
+      _.isNil(transaction.commissionAmount) ||
+      _.isNil(transaction.commission) ||
+      _.isNil(transaction.commissionPayer) ||
+      _.isNil(transaction.endDate) ||
+      _.isNil(transaction.productCategory) ||
+      (transaction.productCategory.name === 'other' &&
+        _.isNil(transaction.productCategoryOther)) ||
+      (transaction.productCategory.name === 'cars' &&
+        (_.isNil(transaction.productSubcategory) ||
+          (transaction.productSubcategory.name === 'other' &&
+            _.isNil(transaction.productSubcategoryOther))))
+    ) {
+      return false;
+    }
+    //  Check product properties
+    const productProperties =
+      await productPropertyModel.getAllProductProperties({
+        productCategoryId: transaction.productCategory.id,
+      });
+    const transactionProductProperties =
+      await transactionProductPropertyModel.getAllTransactionProductProperties({
+        productCategoryId: transaction.productCategory.id,
+        'tpp.transaction_id': transactionId,
       });
 
-      if (_.isNil(activeStage)) {
-        return setDefaultStage(transactionId, userId);
-      }
-
-      if (activeStage.inCharge !== requestingUser.side || !requestingUser) {
-        //  TODO handle as bad request 400
-        return;
-      }
-
-      const nextStages = transactionStagePossiblePaths[activeStage.name];
-
-      setPreviousStageCompleted(transactionId, activeStage);
-
-      if (nextStages.length === 1) {
-        return setNextStage(transactionId, userId, nextStages, additionalData);
-      } else if (nextStages.length > 1) {
-        return setMultiChoiceStage(
-          activeStage.name,
-          requestingUser,
-          transactionId,
-          userId,
-          nextStages,
-          additionalData
-        );
-      }
-      //  TODO handle as internal error 500
-      throw 'error!';
-    } catch (error) {
-      console.error('ERROR in transaction.helper nextStage()', error.message);
-      throw {
-        message: `error while trying to next stage. error: ${error.message}`,
-      };
+    if (
+      !productProperties.every(
+        (productProperty) =>
+          transactionProductProperties.findIndex(
+            (transactionProductProperty) =>
+              transactionProductProperty.property.id === productProperty.id
+          ) !== -1
+      )
+    ) {
+      return false;
     }
-  },
-};
+    //  Check sides
+    const transactionSides = await transactionSideModel.getTransactionSides({
+      'ts.transaction_id': transactionId,
+    });
 
-const setPreviousStageCompleted = async (
-  transactionId: number,
-  activeStage: ITransactionStage,
-  additionalData?: Record<string, any>
-) => {
-  await transactionStageModel.updateTransactionStage(
-    { transactionId, name: activeStage.name },
-    { status: TransactionStageStatus.Completed, additionalData }
-  );
-};
-//  sets one choice next stage
-const setNextStage = async (
-  transactionId: number,
-  userId: number,
-  nextStages: TransactionStageName[],
-  additionalData?: Record<string, any> | undefined
-) => {
-  return await transactionStageModel.createTransactionStage({
+    if (transactionSides.length !== 2) {
+      return false;
+    }
+    return true;
+  },
+  getTransaction: async ({
     transactionId,
-    name: nextStages[0],
-    status: TransactionStageStatus.Active,
-    additionalData,
+    properties,
+    sides,
+    stages,
+    disputes,
+  }: {
+    transactionId: number;
+    properties?: ITransactionProductProperty[];
+    sides?: ITransactionSide[];
+    stages?: ITransactionStage[];
+    disputes?: ITransactionDispute[];
+  }): Promise<ITransaction | null> => {
+    const transaction = (
+      await transactionModel.getTransactions({
+        't.id': transactionId,
+      })
+    )[0];
+
+    if (!transaction) {
+      return null;
+    }
+
+    if (!stages)
+      stages = await transactionStageModel.getTransactionStages({
+        transactionId: transaction.id,
+      });
+
+    if (!properties) {
+      properties =
+        await transactionProductPropertyModel.getAllTransactionProductProperties(
+          {
+            'tpp.transaction_id': transaction.id,
+          }
+        );
+    }
+    if (!disputes) {
+      //  TODO add disputes
+      disputes = [];
+    }
+    if (!sides) {
+      sides = await transactionSideModel.getTransactionSides({
+        'ts.transaction_id': transaction.id,
+      });
+    }
+    transaction.properties = properties;
+    transaction.sides = sides;
+    transaction.disputes = disputes;
+    transaction.stages = stages;
+    return transaction;
+  },
+  getTransactions: async ({
     userId,
-    inCharge: transactionStageInCharge[nextStages[0]],
-  });
-};
-//  sets default stage = DraftS1
-const setDefaultStage = async (
-  transactionId: number,
-  userId: number,
-  additionalData?: Record<string, any> | undefined
-) => {
-  return await transactionStageModel.createTransactionStage({
-    transactionId,
-    name: TransactionStageName.Draft,
-    status: TransactionStageStatus.Active,
-    inCharge: TransactionSide.SideA,
-    userId,
-    additionalData,
-  });
-};
-//  sets multi choice next stage with logic
-const setMultiChoiceStage = async (
-  activeStageName: string,
-  requester: ITransactionSide,
-  transactionId: number,
-  userId: number,
-  nextStages: TransactionStageName[],
-  additionalData?: Record<string, any>
-) => {
-  switch (activeStageName) {
-    case TransactionStageName.Draft:
-      const sum = await transactionModel.getTransactionsAmountSumLastHalfYear(
-        requester.account.id
+  }: {
+    userId: number;
+  }): Promise<ITransaction[]> => {
+    const transactions = await transactionModel.getTransactions({
+      'u.id': userId,
+    });
+
+    const transactionIds: number[] = transactions.map(
+      (transaction) => transaction.id
+    );
+
+    const stages = await transactionStageModel.getTransactionStages(
+      `transaction_id IN (${transactionIds})`
+    );
+
+    const properties =
+      await transactionProductPropertyModel.getAllTransactionProductProperties(
+        `tpp.transaction_id IN (${transactionIds})`
       );
-      if (sum <= 50000) {
-        return await transactionStageModel.createTransactionStage({
-          transactionId,
-          name: nextStages[1],
-          status: TransactionStageStatus.Active,
-          additionalData,
-          userId,
-          inCharge: transactionStageInCharge[nextStages[1]],
-        });
-      } else {
-        return await transactionStageModel.createTransactionStage({
-          transactionId,
-          name: nextStages[0],
-          status: TransactionStageStatus.Active,
-          additionalData,
-          userId,
-          inCharge: transactionStageInCharge[nextStages[0]],
-        });
-      }
-    default:
-      throw 'error!';
-  }
+
+    //  TODO add disputes
+    const disputes: ITransactionDispute[] = [];
+
+    const sides = await transactionSideModel.getTransactionSides(
+      `ts.transaction_id IN (${transactionIds})`
+    );
+
+    for (const transaction of transactions) {
+      transaction.properties = properties.filter(
+        (property) => property.transactionId === transaction.id
+      );
+      transaction.sides = sides.filter(
+        (side) => side.transactionId === transaction.id
+      );
+      transaction.stages = stages.filter(
+        (stage) => stage.transactionId === transaction.id
+      );
+      transaction.disputes = disputes.filter(
+        (dispute) => dispute.transactionId === transaction.id
+      );
+    }
+
+    return transactions;
+  },
 };
 
 export default transactionHelper;

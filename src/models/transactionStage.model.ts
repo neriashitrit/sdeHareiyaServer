@@ -3,55 +3,75 @@ import DbService from '../services/db.service';
 
 import _ from 'lodash';
 import { Tables } from '../constants';
+import { getJsonBuildObject } from '../utils/db.utils';
 
 const db = new DbService();
 
 export const transactionStageModel = {
-  getTransactionStageById: async (
-    id: number
-  ): Promise<ITransactionStage | undefined> => {
+  getTransactionStage: async (
+    condition: Record<string, any> | string
+  ): Promise<ITransactionStage[]> => {
     try {
-      const transactionStage = await db.getOneById(
-        Tables.TRANSACTION_STAGES,
-        id
-      );
+      const transactionStage = await db.knex
+        .queryBuilder()
+        .select(
+          'ts.id',
+          'ts.name',
+          'ts.inCharge',
+          'ts.status',
+          db.knex.raw(
+            `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.USERS, [
+              'u',
+            ])}) as user`
+          )
+        )
+        .from(`${Tables.TRANSACTION_STAGES} as ts`)
+        .leftJoin(`${Tables.USERS} as u`, 'ts.user_id', 'u.id')
+        .where(condition)
+        .groupBy('ts.id', 'u.id');
       return transactionStage;
     } catch (error) {
       console.error(
-        'ERROR in transaction_stages.modal getTransactionStageById()',
+        'ERROR in transaction_stages.modal getTransactionStage()',
         error.message
       );
       throw {
-        message: `error while trying to getTransactionStageById. error: ${error.message}`,
+        message: `error while trying to getTransactionStage. error: ${error.message}`,
       };
     }
   },
-  getTransactionStage: async (
+  getTransactionStages: async (
     condition: Record<string, any> | string
-  ): Promise<ITransactionStage | undefined> => {
+  ): Promise<ITransactionStage[]> => {
     try {
-      const transactionStage = await db.getOne(
-        Tables.TRANSACTION_STAGES,
-        condition
-      );
-      return transactionStage ?? null;
+      if (typeof condition === 'string') {
+        condition = db.knex.raw(condition);
+      }
+      const transactionStage = await db.knex
+        .queryBuilder()
+        .select('*')
+        .from(Tables.TRANSACTION_STAGES)
+        .where(condition);
+
+      return transactionStage;
     } catch (error) {
       console.error(
-        'ERROR in transaction_stages.modal getTransactionStageBy()',
+        'ERROR in transaction_stages.modal getTransactionStages()',
         error.message
       );
       throw {
-        message: `error while trying to getTransactionStageBy. error: ${error.message}`,
+        message: `error while trying to getTransactionStages. error: ${error.message}`,
       };
     }
   },
   createTransactionStage: async (
     newTransactionStage: Record<string, any>
-  ): Promise<ITransactionStage | undefined> => {
+  ): Promise<ITransactionStage> => {
     try {
-      const transactionStage = await db.insert(Tables.TRANSACTION_STAGES, [
-        newTransactionStage,
-      ]);
+      const transactionStage = await db.insert(
+        Tables.TRANSACTION_STAGES,
+        newTransactionStage
+      );
       return transactionStage?.[0];
     } catch (error) {
       console.error(
@@ -76,32 +96,11 @@ export const transactionStageModel = {
       return transactionStage?.[0];
     } catch (error) {
       console.error(
-        'ERROR in transaction_stages.modal updateTransactionStageBy()',
+        'ERROR in transaction_stages.modal updateTransactionStage()',
         error.message
       );
       throw {
         message: `error while trying to updateTransactionStage. error: ${error.message}`,
-      };
-    }
-  },
-  updateTransactionStageById: async (
-    id: number,
-    updatedTransactionStage: Record<string, string | number | boolean>
-  ): Promise<ITransactionStage | undefined> => {
-    try {
-      const transactionStage = await db.updateOneById(
-        Tables.TRANSACTION_STAGES,
-        updatedTransactionStage,
-        id
-      );
-      return transactionStage?.[0];
-    } catch (error) {
-      console.error(
-        'ERROR in transaction_stages.modal updateTransactionStageById()',
-        error.message
-      );
-      throw {
-        message: `error while trying to updateTransactionStageById. error: ${error.message}`,
       };
     }
   },

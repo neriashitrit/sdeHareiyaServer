@@ -12,7 +12,14 @@ router.post('/user/login', usersController.userLogin);
 // router.post('/user/contactUs', usersController.sendContactUs)
 
 //  transactions
-router.post('/transactions', transactionsController.createTransaction);
+router.get('/getTransactions', transactionsController.getTransactions);
+router.get(
+  '/getTransactionsById/:transactionId',
+  transactionsController.getTransaction
+);
+router.post('/createTransactions', transactionsController.createTransaction);
+router.put('/updateTransactions', transactionsController.updateTransaction);
+router.post('/transactions/approveStage', transactionsController.approveStage);
 
 // global
 // router.post('/global/uploadAvatar', globalController.uploadAvatar)

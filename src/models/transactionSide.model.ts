@@ -3,49 +3,64 @@ import DbService from '../services/db.service';
 
 import _ from 'lodash';
 import { Tables } from '../constants';
+import { getJsonBuildObject } from '../utils/db.utils';
 
 const db = new DbService();
 
 export const transactionSideModel = {
-  getTransactionSide: async (
+  getTransactionSides: async (
     condition: Record<string, any> | string
-  ): Promise<ITransactionSide> => {
+  ): Promise<ITransactionSide[]> => {
     try {
+      if (typeof condition === 'string') {
+        condition = db.knex.raw(condition);
+      }
       const result = await db.knex
+        .queryBuilder()
         .select(
-          'id',
-          'side',
-          'created_at',
-          'updated_at',
-          db.knex.raw('JSON_AGG(bd.*) as bank_details'),
-          db.knex.raw('JSON_AGG(u.*) as user'),
-          db.knex.raw('JSON_AGG(a.*) as account')
+          'ts.id',
+          'ts.side',
+          'ts.transaction_id',
+          'ts.created_at',
+          'ts.updated_at',
+          'ts.is_creator',
+          db.knex.raw(
+            `CASE WHEN bd.id IS NULL THEN null ELSE JSON_BUILD_OBJECT(${getJsonBuildObject(
+              Tables.BANK_DETAILS,
+              ['bd', 'a']
+            )}) END as bank_details`
+          ),
+          db.knex.raw(
+            `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.USERS, [
+              'u',
+            ])}) as user`
+          ),
+          db.knex.raw(
+            `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.ACCOUNTS, [
+              'a',
+            ])}) as account`
+          )
         )
-        .from(`${Tables.TRANSACTION_SIDES}`)
-        .leftJoin(`${Tables.BANK_DETAILS} as bd`, 'bank_details_id', 'bd.id')
-        .leftJoin(`${Tables.USER_ACCOUNTS} as ua`, 'user_account_id', 'ua.id')
+        .from(`${Tables.TRANSACTION_SIDES} as ts`)
+        .leftJoin(`${Tables.BANK_DETAILS} as bd`, 'ts.bank_details_id', 'bd.id')
+        .leftJoin(
+          `${Tables.USER_ACCOUNTS} as ua`,
+          'ts.user_account_id',
+          'ua.id'
+        )
         .leftJoin(`${Tables.USERS} as u`, 'ua.user_id', 'u.id')
         .leftJoin(`${Tables.ACCOUNTS} as a`, 'ua.account_id', 'a.id')
         .where(condition)
-        .groupBy('id', 'ua.id');
-      const transactionSide: ITransactionSide = {
-        id: result[0]?.id,
-        user: result[0]?.user[0],
-        account: result[0]?.account[0],
-        bankDetails: result[0]?.bankDetails[0],
-        side: result[0]?.side,
-        createdAt: result[0]?.createdAt,
-        updatedAt: result[0]?.updatedAt,
-      };
+        .groupBy('ts.id', 'ua.id', 'bd.id', 'u.id', 'a.id');
 
-      return transactionSide;
+      return result;
     } catch (error) {
       console.error(
-        'ERROR in transactionSide.modal getTransactionSide()',
+        'ERROR in transactionSide.modal getTransactionSides()',
         error.message
       );
       throw {
-        message: `error while trying to getTransactionSide. error: ${error.message}`,
+        message: `error while trying to getTransactionSides. error: ${error.message}`,
       };
     }
   },
@@ -53,9 +68,10 @@ export const transactionSideModel = {
     newTransactionSide: Record<string, any>
   ): Promise<ITransactionSide> => {
     try {
-      const transactionSide = await db.insert(Tables.TRANSACTION_SIDES, [
-        newTransactionSide,
-      ]);
+      const transactionSide = await db.insert(
+        Tables.TRANSACTION_SIDES,
+        newTransactionSide
+      );
       return transactionSide?.[0];
     } catch (error) {
       console.error(
@@ -70,7 +86,7 @@ export const transactionSideModel = {
   updateTransactionSide: async (
     condition: Record<string, any>,
     updatedTransactionSide: Record<string, any>
-  ): Promise<ITransactionSide> => {
+  ): Promise<ITransactionSide | undefined> => {
     try {
       const transactionSide = await db.update(
         Tables.TRANSACTION_SIDES,
@@ -80,32 +96,11 @@ export const transactionSideModel = {
       return transactionSide?.[0];
     } catch (error) {
       console.error(
-        'ERROR in transactionSide.modal updateTransactionSideBy()',
+        'ERROR in transactionSide.modal updateTransactionSide()',
         error.message
       );
       throw {
-        message: `error while trying to updateTransactionSideBy. error: ${error.message}`,
-      };
-    }
-  },
-  updateTransactionSideById: async (
-    id: number,
-    updatedTransactionSide: Record<string, any>
-  ): Promise<ITransactionSide> => {
-    try {
-      const transactionSide = await db.updateOneById(
-        Tables.TRANSACTION_SIDES,
-        updatedTransactionSide,
-        id
-      );
-      return transactionSide?.[0];
-    } catch (error) {
-      console.error(
-        'ERROR in transactionSide.modal updateTransactionSideById()',
-        error.message
-      );
-      throw {
-        message: `error while trying to updateTransactionSideById. error: ${error.message}`,
+        message: `error while trying to updateTransactionSide. error: ${error.message}`,
       };
     }
   },
