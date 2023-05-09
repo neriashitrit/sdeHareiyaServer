@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import {
   ApproveStageBody,
+  CreateProductCategoryBody,
   CreateTransactionBody,
   GetTransactionParams,
   UpdateTransactionBody,
@@ -109,5 +110,39 @@ export const isGetTransactionParams = (
     !_.isNil(params) &&
     (typeof params.transactionId === 'number' ||
       typeof +params.transactionId === 'number')
+  );
+};
+
+export const isCreateProductCategoryBody = (
+  body: any
+): body is CreateProductCategoryBody => {
+  return (
+    typeof body === 'object' &&
+    !_.isNil(body) &&
+    typeof body.name === 'string' &&
+    typeof body.description === 'string' &&
+    typeof body.isActive === 'boolean' &&
+    typeof body.icon === 'object' &&
+    Array.isArray(body.properties) &&
+    body.properties.every(
+      (prop: any) =>
+        typeof prop.name === 'string' &&
+        typeof prop.type === 'string' &&
+        typeof prop.label === 'string' &&
+        (_.isNil(prop.validation) || typeof prop.validation === 'object') &&
+        (_.isNil(prop.multipleFiles) ||
+          typeof prop.multipleFiles === 'boolean') &&
+        (_.isNil(prop.linesCountText) ||
+          typeof prop.linesCountText === 'number') &&
+        (_.isNil(prop.selectOptions) || Array.isArray(prop.selectOptions)) &&
+        (_.isNil(prop.helperText) || typeof prop.helperText === 'string')
+    ) &&
+    Array.isArray(body.subcategories) &&
+    body.subcategories.every(
+      (subcategory: any) =>
+        typeof subcategory.name === 'string' &&
+        typeof subcategory.isActive === 'boolean' &&
+        typeof subcategory.icon === 'object'
+    )
   );
 };
