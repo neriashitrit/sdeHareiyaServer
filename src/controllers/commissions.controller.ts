@@ -9,10 +9,10 @@ export const getActiveCommissions = async (req: Request, res: Response) => {
   try {
     const commissions = await commissionModel.getCommissions({
       isActive: true,
-    });
-    res.status(200).json(successResponse(commissions));
-  } catch (error: any) {
-    console.log(error);
-    res.status(500).json(failureResponse(error));
-  }
+    });  
+    res.status(200).json(successResponse(commissions))
+	} catch (error: any) {
+		console.log(error);
+		res.status(500).json(failureResponse(error))
+	}
 };

@@ -3,8 +3,10 @@ import DbService from '../services/db.service';
 import _ from 'lodash';
 import { ITransaction, IUser } from 'safe-shore-common';
 import { Tables } from '../constants';
-import { getJsonBuildObject } from '../utils/db.utils';
+import { getJsonBuildObject, buildRange } from '../utils/db.utils';
+import { types } from 'pg';
 
+types.setTypeParser(20, 'text', parseInt)
 const db = new DbService();
 
 export const transactionModel = {
@@ -192,4 +194,61 @@ export const transactionModel = {
       };
     }
   },
+  getTransactionsStatusAnalytics: async (startDate?:string,endDate?:string) => {
+    try {       
+      const analytics = await db.knex.select('transactions.status')
+      .from(Tables.TRANSACTIONS)
+      .count('transactions.status as total')
+      .sum('amount as amount')
+      .sum('commission_amount as commission_amount')
+      .select('transaction_stages.name as stage')
+      .leftJoin(
+        Tables.TRANSACTION_STAGES,
+        'transaction_stages.transaction_id', 'transactions.id'
+      )
+      .modify((queryBuilder) => {
+        buildRange( queryBuilder, 'transactions.updated_at', startDate, endDate)
+      })
+      .groupBy('transactions.status','transaction_stages.name');
+    return analytics;
+    } catch (error) {
+      console.error(
+        'ERROR in transactionModel.modal getTransactionsStatusAnalytics()',
+        error.message
+      );
+      throw {
+        message: `error while trying to getTransactionsStatusAnalytics. error: ${error.message}`,
+      };
+    }
+  },
+  getTransactionsProductsAnalytics: async (startDate?:string,endDate?:string) => {
+    try {       
+      const analytics = await db.knex
+      .select(
+        'transactions.product_category_id',
+        'transactions.product_category_other',
+        'product_categories.name as productName')
+      .count('transactions.id as total')
+      .from(Tables.TRANSACTIONS) 
+      .leftJoin( 
+        Tables.PRODUCT_CATEGORIES,
+        'product_categories.id','transactions.product_category_id'
+      ).modify((queryBuilder) => {
+        buildRange( queryBuilder, 'transactions.updated_at', startDate, endDate)
+      })
+      .groupBy(
+        'transactions.product_category_id',
+        'transactions.product_category_other',
+        'product_categories.name');
+    return analytics;
+    } catch (error) {
+      console.error(
+        'ERROR in transactionModel.modal getTransactionsProductsAnalytics()',
+        error.message
+      );
+      throw {
+        message: `error while trying to getTransactionsProductsAnalytics. error: ${error.message}`,
+      };
+    }
+  }
 };
