@@ -273,3 +273,16 @@ export const successResponse = (body: Record<string, any>) => {
 export const failureResponse = (error?: any) => {
   return { status: { success: false, error } };
 };
+
+export const buildRange = (queryBuilder:any,column:string,startDate?:string,endDate?:string) => {
+  if (startDate && endDate) {
+    // If both start and end dates are specified, filter by the date range
+    queryBuilder.whereBetween(column, [`${startDate} 00:00:00`, `${endDate} 23:59:59`]);
+  } else if (startDate) {
+    // If only the start date is specified, filter by that date and later
+    queryBuilder.where(column, '>=', `${startDate} 00:00:00`);
+  } else if (endDate) {
+    // If only the end date is specified, filter by that date and earlier
+    queryBuilder.where(column, '<=', `${endDate} 23:59:59`);
+  }
+}
