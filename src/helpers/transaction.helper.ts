@@ -167,7 +167,6 @@ const transactionHelper = {
         (dispute) => dispute.transactionId === transaction.id
       );
     }
-
     return transactions;
   },
 };

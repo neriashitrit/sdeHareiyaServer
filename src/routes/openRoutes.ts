@@ -1,14 +1,18 @@
 import express from 'express';
 import DbService from '../services/db.service';
+import * as commissionsController from '../controllers/commissions.controller';
+import * as globalController from '../controllers/global.controller';
 
 const router = express.Router();
-const healthCheck = async (req: express.Request, res: express.Response) => {
-  //const db = new DbService()
-  //const DBStatus = await db.getOne('healthCheck')
-  //return res.status(200).send({server:"alive", Database:DBStatus?.status})
-};
 
-// healthCheck
-router.get('/healthCheck', healthCheck);
+///////////////////////////
+//     Health Check      //
+///////////////////////////
+router.get('/healthCheck', globalController.healthCheck);
+
+///////////////////////////
+//      Commissions      //
+///////////////////////////
+router.get('/getCommissions', commissionsController.getActiveCommissions);
 
 export default router;

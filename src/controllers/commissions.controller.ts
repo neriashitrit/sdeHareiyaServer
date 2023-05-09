@@ -6,12 +6,11 @@ import _ from 'lodash';
 import { failureResponse, successResponse } from '../utils/db.utils';
 
 export const getActiveCommissions = async (req: Request, res: Response) => {
-  console.log('in controller getActiveCommissions');
   try {
     const commissions = await commissionModel.getCommissions({
       isActive: true,
     });
-    res.status(201).json(successResponse(commissions));
+    res.status(200).json(successResponse(commissions));
   } catch (error: any) {
     console.log(error);
     res.status(500).json(failureResponse(error));
