@@ -2,14 +2,14 @@ import DbService from '../services/db.service';
 
 import _ from 'lodash';
 import { Tables } from '../constants';
-import { ITransactionProductProperty } from 'safe-shore-common';
+import { IProductProperty } from 'safe-shore-common';
 
 const db = new DbService();
 
 export const productPropertyModel = {
   getAllProductProperties: async (
     condition: Record<string, any> | string
-  ): Promise<ITransactionProductProperty[]> => {
+  ): Promise<IProductProperty[]> => {
     try {
       const productProperties = await db.getAll(
         Tables.PRODUCT_PROPERTIES,
@@ -26,22 +26,22 @@ export const productPropertyModel = {
       };
     }
   },
-  createProductProperty: async (
-    newTransactionProductProperty: Record<string, any>
-  ): Promise<ITransactionProductProperty> => {
+  createProductProperties: async (
+    newTransactionProductProperties: Record<string, any>[]
+  ): Promise<IProductProperty[]> => {
     try {
-      const transactionProductProperties = await db.insert(
-        Tables.TRANSACTION_PRODUCT_PROPERTIES,
-        newTransactionProductProperty
+      const productProperties = await db.insert(
+        Tables.PRODUCT_PROPERTIES,
+        newTransactionProductProperties
       );
-      return transactionProductProperties?.[0];
+      return productProperties;
     } catch (error) {
       console.error(
-        'ERROR in productPropertyModel.modal createProductProperty()',
+        'ERROR in productPropertyModel.modal createProductProperties()',
         error.message
       );
       throw {
-        message: `error while trying to createProductProperty. error: ${error.message}`,
+        message: `error while trying to createProductProperties. error: ${error.message}`,
       };
     }
   },

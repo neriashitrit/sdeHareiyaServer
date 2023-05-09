@@ -1,7 +1,7 @@
 import express from 'express';
-import DbService from '../services/db.service';
 import * as commissionsController from '../controllers/commissions.controller';
 import * as globalController from '../controllers/global.controller';
+import * as productCategoriesController from '../controllers/productCategories.controller';
 
 const router = express.Router();
 
@@ -14,5 +14,13 @@ router.get('/healthCheck', globalController.healthCheck);
 //      Commissions      //
 ///////////////////////////
 router.get('/getCommissions', commissionsController.getActiveCommissions);
+
+///////////////////////////
+//   Product Categories  //
+///////////////////////////
+router.get(
+  '/productCategories',
+  productCategoriesController.getActiveProductCategories
+);
 
 export default router;

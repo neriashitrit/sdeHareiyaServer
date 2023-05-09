@@ -2,7 +2,7 @@ import _ from 'lodash';
 import {
   ApproveStageBody,
   CreateTransactionBody,
-  GetTransactionQuery as GetTransactionParams,
+  GetTransactionParams,
   UpdateTransactionBody,
 } from 'types/requestBody.types';
 

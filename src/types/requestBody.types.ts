@@ -3,6 +3,7 @@ import {
   TransactionSide,
   CommissionPayer,
   IFile,
+  PropertyType,
 } from 'safe-shore-common';
 
 export type CreateTransactionBodyProductProperty = {
@@ -52,6 +53,23 @@ export type ApproveStageBody = {
   deliveryNotes?: string;
 };
 
-export type GetTransactionQuery = {
+export type CreateProductCategoryBody = {
+  name: string;
+  icon: File;
+  description: string;
+  properties: {
+    name: string;
+    type: PropertyType;
+    label: string;
+    validation?: any;
+    multipleFiles?: boolean;
+    linesCountText?: number;
+    selectOptions?: string[];
+    helperText?: string;
+  }[];
+  subcategories: { name: string; description: string; icon: File }[];
+};
+
+export type GetTransactionParams = {
   transactionId: number;
 };
