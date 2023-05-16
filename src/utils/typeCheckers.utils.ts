@@ -6,6 +6,7 @@ import {
   CreateTransactionBody,
   GetTransactionParams,
   UpdateTransactionBody,
+  UpdateUserBody,
 } from 'types/requestBody.types';
 
 export const isUpdateTransactionBody = (
@@ -154,5 +155,14 @@ export const isCreateProductCategoryBody = (
         typeof subcategory.isActive === 'boolean' &&
         typeof subcategory.icon === 'object'
     )
+  );
+};
+
+export const isUpdateUserBody = (body: any): body is UpdateUserBody => {
+  return (
+    typeof body === 'object' &&
+    !_.isNil(body) &&
+    (_.isNil(body.firstName) || typeof body.firstName === 'string') &&
+    (_.isNil(body.lastName) || typeof body.lastName === 'string')
   );
 };

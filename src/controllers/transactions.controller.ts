@@ -51,7 +51,6 @@ export const getTransactions = async (req: Request, res: Response) => {
 
 export const getTransaction = async (req: Request, res: Response) => {
   try {
-    const user = req.user as IUser;
     const params = req.params;
 
     if (!isGetTransactionParams(params)) {

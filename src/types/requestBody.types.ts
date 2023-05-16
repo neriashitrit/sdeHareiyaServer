@@ -77,3 +77,8 @@ export type CreateProductCategoryBody = {
 export type GetTransactionParams = {
   transactionId: number;
 };
+
+export type UpdateUserBody = {
+  firstName: string;
+  lastName: string;
+};

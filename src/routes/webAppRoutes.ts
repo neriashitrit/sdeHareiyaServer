@@ -10,6 +10,7 @@ const router = express.Router();
 ///////////////////////////
 router.post('/user/login', usersController.userLogin);
 router.get('/getUser', usersController.getUser);
+router.put('/updateUser', usersController.updateUser);
 
 ///////////////////////////
 //     Transactions      //

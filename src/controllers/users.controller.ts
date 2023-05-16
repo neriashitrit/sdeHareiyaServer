@@ -6,6 +6,7 @@ import { AuthInfo } from 'types';
 import usersHelper from '../helpers/users.helper';
 import { failureResponse, successResponse } from '../utils/db.utils';
 import { IUser } from 'safe-shore-common';
+import { isUpdateUserBody } from '../utils/typeCheckers.utils';
 
 export const userLogin = async (req: Request, res: Response) => {
   //  TODO make it as transaction structure
@@ -33,9 +34,30 @@ export const getUser = async (req: Request, res: Response) => {
   try {
     const user = req.user as IUser;
 
-    res.status(200).json(successResponse(user));
+    return res.status(200).json(successResponse(user));
   } catch (error) {
-    console.log(error);
-    res.status(500).json(failureResponse(error));
+    return res.status(500).json(failureResponse(error));
+  }
+};
+
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const user = req.user as IUser;
+    const body = req.body;
+
+    if (!isUpdateUserBody(body)) {
+      return res.status(400).json(failureResponse('Invalid Parameters'));
+    }
+
+    const { firstName, lastName } = body;
+
+    const updatedUser = await userModel.updateUser(
+      { firstName, lastName },
+      { id: user.id }
+    );
+
+    return res.status(200).json(successResponse(updatedUser));
+  } catch (error) {
+    return res.status(500).json(failureResponse(error));
   }
 };
