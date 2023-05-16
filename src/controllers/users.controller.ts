@@ -5,10 +5,10 @@ import { userModel } from '../models/index';
 import { AuthInfo } from 'types';
 import usersHelper from '../helpers/users.helper';
 import { failureResponse, successResponse } from '../utils/db.utils';
+import { IUser } from 'safe-shore-common';
 
 export const userLogin = async (req: Request, res: Response) => {
   //  TODO make it as transaction structure
-  console.log('in controller userLogin');
   const authInfo: AuthInfo = req?.authInfo as AuthInfo;
   const userMail = authInfo.emails[0];
 
@@ -29,26 +29,12 @@ export const userLogin = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllUsers = async (req: Request, res: Response) => {
-  console.log('in controller getUser');
+export const getUser = async (req: Request, res: Response) => {
   try {
-    const users = await userModel.getAllUsers();
-    console.log(users);
-    res.status(200).json(successResponse(users));
-  } catch (error: any) {
-    console.log(error);
-    res.status(500).json(failureResponse(error));
-  }
-};
+    const user = req.user as IUser;
 
-export const getUserById = async (req: Request, res: Response) => {
-  console.log('in controller getUserById');
-  const { userId } = req.body;
-  try {
-    const user = await userModel.getUserById(Number(userId));
-    console.log(user);
     res.status(200).json(successResponse(user));
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
     res.status(500).json(failureResponse(error));
   }
