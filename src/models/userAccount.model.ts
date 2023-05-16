@@ -15,26 +15,39 @@ export const userAccountModel = {
       const userAccount = await db.knex
         .queryBuilder()
         .select(
-          'ua.id',
-          'ua.created_at',
-          'ua.updated_at',
+          `${Tables.USER_ACCOUNTS}.id`,
+          `${Tables.USER_ACCOUNTS}.created_at`,
+          `${Tables.USER_ACCOUNTS}.updated_at`,
           db.knex.raw(
             `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.USERS, [
-              'u',
+              Tables.USERS,
             ])}) as user`
           ),
           db.knex.raw(
             `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.ACCOUNTS, [
-              'a',
+              Tables.ACCOUNTS,
             ])}) as account`
           )
         )
-        .from(`${Tables.USER_ACCOUNTS} as ua`)
+        .from(Tables.USER_ACCOUNTS)
         .where(condition)
-        .leftJoin(`${Tables.ACCOUNTS} as a`, `ua.account_id`, 'a.id')
-        .leftJoin(`${Tables.USERS} as u`, `ua.user_id`, 'u.id')
-        .groupBy('ua.id', 'u.id', 'a.id')
+        .leftJoin(
+          Tables.ACCOUNTS,
+          `${Tables.USER_ACCOUNTS}.account_id`,
+          `${Tables.ACCOUNTS}.id`
+        )
+        .leftJoin(
+          Tables.USERS,
+          `${Tables.USER_ACCOUNTS}.user_id`,
+          `${Tables.USERS}.id`
+        )
+        .groupBy(
+          `${Tables.USER_ACCOUNTS}.id`,
+          `${Tables.USERS}.id`,
+          `${Tables.ACCOUNTS}.id`
+        )
         .first();
+
       return userAccount;
     } catch (error) {
       console.error(

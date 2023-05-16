@@ -14,54 +14,60 @@ export const productCategoryModel = {
       const productCategories = await db.knex
         .queryBuilder()
         .select(
-          'pc.id',
-          'pc.name',
-          'pc.description',
-          'pcf.url as icon',
-          'pc.updated_at',
-          'pc.created_at',
+          `${Tables.PRODUCT_CATEGORIES}.*`,
           db.knex.raw(
             `JSON_AGG(JSON_BUILD_OBJECT(${getJsonBuildObject(
               Tables.PRODUCT_PROPERTIES,
-              ['pp']
-            )})) as properties`
+              [Tables.PRODUCT_PROPERTIES]
+            )})) AS properties`
           ),
           db.knex
             .select(
               db.knex.raw(
                 `JSON_AGG(JSON_BUILD_OBJECT(${getJsonBuildObject(
                   Tables.PRODUCT_SUBCATEGORIES,
-                  ['psc', 'pscf']
-                )})) as subcategories`
+                  [Tables.PRODUCT_SUBCATEGORIES, 'product_subcategory_file']
+                )})) AS subcategories`
               )
             )
-            .from(`${Tables.PRODUCT_SUBCATEGORIES} as psc`)
-            .leftJoin(`${Tables.FILES} as pscf`, function () {
-              this.on('psc.id', '=', 'pscf.row_id').andOn(
-                'pscf.table_name',
-                '=',
-                db.knex.raw('?', [Tables.PRODUCT_SUBCATEGORIES])
-              );
-            })
-            .where(db.knex.raw('psc.product_category_id = pc.id'))
+            .from(Tables.PRODUCT_SUBCATEGORIES)
+            .leftJoin(
+              `${Tables.FILES} AS product_subcategory_file`,
+              function () {
+                this.on(
+                  `${Tables.PRODUCT_SUBCATEGORIES}.id`,
+                  'product_subcategory_file.row_id'
+                ).andOn(
+                  'product_subcategory_file.table_name',
+                  db.knex.raw(`'${Tables.PRODUCT_SUBCATEGORIES}'`)
+                );
+              }
+            )
+            .where(
+              db.knex.raw(
+                `${Tables.PRODUCT_SUBCATEGORIES}.product_category_id = ${Tables.PRODUCT_CATEGORIES}.id`
+              )
+            )
             .as('subcategories')
         )
-        .from(`${Tables.PRODUCT_CATEGORIES} as pc`)
+        .from(`${Tables.PRODUCT_CATEGORIES}`)
         .leftJoin(
-          `${Tables.PRODUCT_PROPERTIES} as pp`,
-          'pp.product_category_id',
-          '=',
-          'pc.id'
+          Tables.PRODUCT_PROPERTIES,
+          `${Tables.PRODUCT_PROPERTIES}.product_category_id`,
+          `${Tables.PRODUCT_CATEGORIES}.id`
         )
-        .leftJoin(`${Tables.FILES} as pcf`, function () {
-          this.on('pc.id', '=', 'pcf.row_id').andOn(
-            'pcf.table_name',
-            '=',
-            db.knex.raw('?', [Tables.PRODUCT_CATEGORIES])
+        .leftJoin(`${Tables.FILES} AS product_category_file`, function () {
+          this.on(
+            `${Tables.PRODUCT_CATEGORIES}.id`,
+            'product_category_file.row_id'
+          ).andOn(
+            'product_category_file.table_name',
+            db.knex.raw(`'${Tables.PRODUCT_CATEGORIES}'`)
           );
         })
         .where(condition)
-        .groupBy('pc.id', 'pcf.id');
+        .groupBy(`${Tables.PRODUCT_CATEGORIES}.id`, 'product_category_file.id');
+
       return productCategories;
     } catch (error) {
       console.error(

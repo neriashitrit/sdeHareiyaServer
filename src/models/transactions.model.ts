@@ -19,96 +19,118 @@ export const transactionModel = {
     const transaction = await db.knex
       .queryBuilder()
       .select([
-        't.id',
-        't.status',
-        't.product_category_other',
-        't.product_subcategory_other',
-        't.amount_currency',
-        't.amount',
-        't.commission_payer',
-        't.commission_amount_currency',
-        't.commission_amount',
-        't.end_date',
-        't.cancel_reason',
-        't.cancel_reason_other',
-        't.deposit_bank_name',
-        't.deposit_bank_number',
-        't.deposit_bank_account_owner_full_name',
-        't.deposit_transfer_date',
-        't.deposit_reference_number',
-        'drf.url as deposit_reference_file_url',
-        't.created_at',
-        't.updated_at',
-
+        `${Tables.TRANSACTIONS}.id`,
+        `${Tables.TRANSACTIONS}.status`,
+        `${Tables.TRANSACTIONS}.product_category_other`,
+        `${Tables.TRANSACTIONS}.product_subcategory_other`,
+        `${Tables.TRANSACTIONS}.amount_currency`,
+        `${Tables.TRANSACTIONS}.amount`,
+        `${Tables.TRANSACTIONS}.commission_payer`,
+        `${Tables.TRANSACTIONS}.commission_amount_currency`,
+        `${Tables.TRANSACTIONS}.commission_amount`,
+        `${Tables.TRANSACTIONS}.end_date`,
+        `${Tables.TRANSACTIONS}.cancel_reason`,
+        `${Tables.TRANSACTIONS}.cancel_reason_other`,
+        `${Tables.TRANSACTIONS}.deposit_bank_name`,
+        `${Tables.TRANSACTIONS}.deposit_bank_number`,
+        `${Tables.TRANSACTIONS}.deposit_bank_account_owner_full_name`,
+        `${Tables.TRANSACTIONS}.deposit_transfer_date`,
+        `${Tables.TRANSACTIONS}.deposit_reference_number`,
+        'deposit_reference_file_url.url AS deposit_reference_file_url',
+        `${Tables.TRANSACTIONS}.created_at`,
+        `${Tables.TRANSACTIONS}.updated_at`,
         db.knex.raw(
           `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.PRODUCT_CATEGORIES, [
-            'pc',
-            'pcf',
-          ])}) as product_category`
+            Tables.PRODUCT_CATEGORIES,
+            'product_category_file',
+          ])}) AS product_category`
         ),
         db.knex.raw(
-          `CASE WHEN psc.id IS NULL THEN null ELSE JSON_BUILD_OBJECT(${getJsonBuildObject(
+          `CASE WHEN ${
+            Tables.PRODUCT_SUBCATEGORIES
+          }.id IS NULL THEN null ELSE JSON_BUILD_OBJECT(${getJsonBuildObject(
             Tables.PRODUCT_SUBCATEGORIES,
-            ['psc', 'pscf']
-          )}) END as product_subcategory`
+            [Tables.PRODUCT_SUBCATEGORIES, 'product_subcategory_file']
+          )}) END AS product_subcategory`
         ),
         db.knex.raw(
           `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.COMMISSIONS, [
-            'c',
-          ])})  as commission	`
+            Tables.COMMISSIONS,
+          ])})  AS commission	`
         ),
       ])
-      .from(`${Tables.TRANSACTIONS} as t`)
+      .from(Tables.TRANSACTIONS)
       .leftJoin(
-        `${Tables.PRODUCT_CATEGORIES} as pc`,
-        'pc.id',
-        't.product_category_id'
+        Tables.PRODUCT_CATEGORIES,
+        `${Tables.PRODUCT_CATEGORIES}.id`,
+        `${Tables.TRANSACTIONS}.product_category_id`
       )
-      .leftJoin(`${Tables.FILES} as pcf`, function () {
-        this.on('pc.id', 'pcf.row_id').andOn(
-          'pcf.table_name',
+      .leftJoin(`${Tables.FILES} AS product_category_file`, function () {
+        this.on(
+          `${Tables.PRODUCT_CATEGORIES}.id`,
+          'product_category_file.row_id'
+        ).andOn(
+          'product_category_file.table_name',
           db.knex.raw('?', [Tables.PRODUCT_CATEGORIES])
         );
       })
       .leftJoin(
-        `${Tables.PRODUCT_SUBCATEGORIES} as psc`,
-        'psc.id',
-        't.product_subcategory_id'
+        Tables.PRODUCT_SUBCATEGORIES,
+        `${Tables.PRODUCT_SUBCATEGORIES}.id`,
+        `${Tables.TRANSACTIONS}.product_subcategory_id`
       )
-      .leftJoin(`${Tables.FILES} as pscf`, function () {
-        this.on('psc.id', 'pscf.row_id').andOn(
-          'pscf.table_name',
-          db.knex.raw('?', [Tables.PRODUCT_SUBCATEGORIES])
-        );
-      })
-      .leftJoin(`${Tables.COMMISSIONS} as c`, 't.commission_id', 'c.id')
-      .leftJoin(`${Tables.FILES} as drf`, function () {
-        this.on('t.id', 'drf.row_id').andOn(
-          'drf.table_name',
-          db.knex.raw('?', [Tables.TRANSACTIONS])
+      .leftJoin(`${Tables.FILES} AS product_subcategory_file`, function () {
+        this.on(
+          `${Tables.PRODUCT_SUBCATEGORIES}.id`,
+          'product_subcategory_file.row_id'
+        ).andOn(
+          'product_subcategory_file.table_name',
+          db.knex.raw(`'${Tables.PRODUCT_SUBCATEGORIES}'`)
         );
       })
       .leftJoin(
-        `${Tables.TRANSACTION_SIDES} as ts`,
-        'ts.transaction_id',
-        't.id'
+        Tables.COMMISSIONS,
+        `${Tables.TRANSACTIONS}.commission_id`,
+        `${Tables.COMMISSIONS}.id`
+      )
+      .leftJoin(`${Tables.FILES} AS deposit_reference_file_url`, function () {
+        this.on(
+          `${Tables.TRANSACTIONS}.id`,
+          'deposit_reference_file_url.row_id'
+        ).andOn(
+          'deposit_reference_file_url.table_name',
+          db.knex.raw(`'${Tables.TRANSACTIONS}'`)
+        );
+      })
+      .leftJoin(
+        Tables.TRANSACTION_SIDES,
+        `${Tables.TRANSACTION_SIDES}.transaction_id`,
+        `${Tables.TRANSACTIONS}.id`
       )
       .leftJoin(
-        `${Tables.TRANSACTION_STAGES} as tsg`,
-        'tsg.transaction_id',
-        't.id'
+        Tables.USER_ACCOUNTS,
+        `${Tables.USER_ACCOUNTS}.id`,
+        `${Tables.TRANSACTION_SIDES}.user_account_id`
       )
-      .leftJoin(`${Tables.USER_ACCOUNTS} as ua`, 'ua.id', 'ts.user_account_id')
-      .leftJoin(`${Tables.USERS} as u`, 'u.id', 'ua.user_id')
+      .leftJoin(
+        Tables.USERS,
+        `${Tables.USERS}.id`,
+        `${Tables.USER_ACCOUNTS}.user_id`
+      )
+      .leftJoin(
+        Tables.TRANSACTION_STAGES,
+        `${Tables.TRANSACTION_STAGES}.transaction_id`,
+        `${Tables.TRANSACTIONS}.id`
+      )
       .where(condition)
       .groupBy(
-        't.id',
-        'c.id',
-        'psc.id',
-        'pc.id',
-        'pcf.id',
-        'pscf.id',
-        'drf.id'
+        `${Tables.TRANSACTIONS}.id`,
+        `${Tables.COMMISSIONS}.id`,
+        `${Tables.PRODUCT_SUBCATEGORIES}.id`,
+        `${Tables.PRODUCT_CATEGORIES}.id`,
+        'product_category_file.id',
+        'product_subcategory_file.id',
+        'deposit_reference_file_url.id'
       );
     return transaction;
   },
@@ -153,29 +175,41 @@ export const transactionModel = {
     try {
       const sum = await db.knex
         .queryBuilder()
-        .select(db.knex.raw('SUM(t.amount) as total_amount'))
-        .from(`${Tables.TRANSACTIONS} as t`)
+        .select(
+          db.knex.raw(`SUM(${Tables.TRANSACTIONS}.amount) AS total_amount`)
+        )
+        .from(Tables.TRANSACTIONS)
         .leftJoin(
-          `${Tables.TRANSACTION_SIDES} as ts`,
-          db.knex.raw('t.id = ts.transaction_id')
+          Tables.TRANSACTION_SIDES,
+          `${Tables.TRANSACTIONS}.id`,
+
+          `${Tables.TRANSACTION_SIDES}.transaction_id`
         )
         .leftJoin(
-          `${Tables.TRANSACTION_STAGES} as tsg`,
-          db.knex.raw('t.id = tsg.transaction_id')
+          Tables.USER_ACCOUNTS,
+          `${Tables.TRANSACTION_SIDES}.user_account_id`,
+          `${Tables.USER_ACCOUNTS}.id`
         )
         .leftJoin(
-          `${Tables.USER_ACCOUNTS} as ua`,
-          db.knex.raw('ts.user_account_id = ua.id')
+          Tables.ACCOUNTS,
+          `${Tables.USER_ACCOUNTS}.account_id`,
+          `${Tables.ACCOUNTS}.id`
         )
         .leftJoin(
-          `${Tables.ACCOUNTS} as a`,
-          db.knex.raw('ua.account_id = a.id')
+          Tables.TRANSACTION_STAGES,
+          `${Tables.TRANSACTIONS}.id`,
+          `${Tables.TRANSACTION_STAGES}.transaction_id`
         )
-        .where(db.knex.raw("t.created_at > (NOW() - INTERVAL '6 months')"))
-        .andWhere(db.knex.raw("t.status != 'canceled'"))
-        .andWhere(db.knex.raw("tsg.status = 'active'"))
-        .andWhere(db.knex.raw("tsg.name != 'draft'"))
-        .andWhere(db.knex.raw(`a.id = '${accountId}'`));
+        .where(
+          db.knex.raw(
+            `${Tables.TRANSACTIONS}.created_at > (NOW() - INTERVAL '6 months')`
+          )
+        )
+        .andWhere(db.knex.raw(`${Tables.TRANSACTIONS}.status != 'canceled'`))
+        .andWhere(db.knex.raw(`${Tables.TRANSACTION_STAGES}.status = 'active'`))
+        .andWhere(db.knex.raw(`${Tables.TRANSACTION_STAGES}.name != 'draft'`))
+        .andWhere(db.knex.raw(`${Tables.ACCOUNTS}.id = '${accountId}'`));
+
       return sum[0].totalAmount as unknown as number;
     } catch (error) {
       console.error(
@@ -193,26 +227,29 @@ export const transactionModel = {
   ) => {
     try {
       const analytics = await db.knex
-        .select('transactions.status')
+        .select(`${Tables.TRANSACTIONS}.status`)
         .from(Tables.TRANSACTIONS)
-        .count('transactions.status as total')
-        .sum('amount as amount')
-        .sum('commission_amount as commission_amount')
-        .select('transaction_stages.name as stage')
+        .count(`${Tables.TRANSACTIONS}.status AS total`)
+        .sum('amount')
+        .sum('commission_amount')
+        .select(`${Tables.TRANSACTION_STAGES}.name`)
         .leftJoin(
           Tables.TRANSACTION_STAGES,
-          'transaction_stages.transaction_id',
-          'transactions.id'
+          `${Tables.TRANSACTION_STAGES}.transaction_id`,
+          `${Tables.TRANSACTIONS}.id`
         )
         .modify((queryBuilder) => {
           buildRange(
             queryBuilder,
-            'transactions.updated_at',
+            `${Tables.TRANSACTIONS}.updated_at`,
             startDate,
             endDate
           );
         })
-        .groupBy('transactions.status', 'transaction_stages.name');
+        .groupBy(
+          `${Tables.TRANSACTIONS}.status`,
+          `${Tables.TRANSACTION_STAGES}.name`
+        );
       return analytics;
     } catch (error) {
       console.error(
@@ -231,29 +268,29 @@ export const transactionModel = {
     try {
       const analytics = await db.knex
         .select(
-          'transactions.product_category_id',
-          'transactions.product_category_other',
-          'product_categories.name as productName'
+          `${Tables.TRANSACTIONS}.product_category_id`,
+          `${Tables.TRANSACTIONS}.product_category_other`,
+          `${Tables.PRODUCT_CATEGORIES}.name AS productName`
         )
-        .count('transactions.id as total')
+        .count(`${Tables.TRANSACTIONS}.id AS total`)
         .from(Tables.TRANSACTIONS)
         .leftJoin(
           Tables.PRODUCT_CATEGORIES,
-          'product_categories.id',
-          'transactions.product_category_id'
+          `${Tables.PRODUCT_CATEGORIES}.id`,
+          `${Tables.TRANSACTIONS}.product_category_id`
         )
         .modify((queryBuilder) => {
           buildRange(
             queryBuilder,
-            'transactions.updated_at',
+            `${Tables.TRANSACTIONS}.updated_at`,
             startDate,
             endDate
           );
         })
         .groupBy(
-          'transactions.product_category_id',
-          'transactions.product_category_other',
-          'product_categories.name'
+          `${Tables.TRANSACTIONS}.product_category_id`,
+          `${Tables.TRANSACTIONS}.product_category_other`,
+          `${Tables.PRODUCT_CATEGORIES}.name`
         );
       return analytics;
     } catch (error) {

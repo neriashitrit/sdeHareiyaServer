@@ -21,24 +21,24 @@ export const accountModel = {
           ),
           db.knex.raw(`JSON_AGG(${Tables.USERS}) AS users`)
         )
-        .from(`${Tables.ACCOUNTS}`)
+        .from(Tables.ACCOUNTS)
         .leftJoin(
-          `${Tables.USER_ACCOUNTS}`,
+          Tables.USER_ACCOUNTS,
           `${Tables.ACCOUNTS}.id`,
           `${Tables.USER_ACCOUNTS}.account_id`
         )
         .leftJoin(
           db.knex
             .select(`${Tables.USER_ACCOUNTS}.account_id`)
-            .count('transaction_id as active_transaction_count')
-            .from(`${Tables.USER_ACCOUNTS}`)
+            .count('transaction_id AS active_transaction_count')
+            .from(Tables.USER_ACCOUNTS)
             .leftJoin(
-              `${Tables.TRANSACTION_SIDES}`,
+              Tables.TRANSACTION_SIDES,
               `${Tables.USER_ACCOUNTS}.account_id`,
               `${Tables.TRANSACTION_SIDES}.user_account_id`
             )
             .leftJoin(
-              `${Tables.TRANSACTIONS}`,
+              Tables.TRANSACTIONS,
               `${Tables.TRANSACTIONS}.id`,
               `${Tables.TRANSACTION_SIDES}.transaction_id`
             )
@@ -49,7 +49,7 @@ export const accountModel = {
           `${Tables.ACCOUNTS}.id`
         )
         .leftJoin(
-          `${Tables.USERS}`,
+          Tables.USERS,
           `${Tables.USER_ACCOUNTS}.user_id`,
           `${Tables.USERS}.id`
         )
@@ -62,6 +62,7 @@ export const accountModel = {
           );
         })
         .groupBy(`${Tables.ACCOUNTS}.id`, 'summary.active_transaction_count');
+
       return accounts;
     } catch (error) {
       console.error(
@@ -96,23 +97,23 @@ export const accountModel = {
             )}) END as bank_details`
           )
         )
-        .from(`${Tables.ACCOUNTS}`)
+        .from(Tables.ACCOUNTS)
         .leftJoin(
-          `${Tables.USER_ACCOUNTS}`,
+          Tables.USER_ACCOUNTS,
           `${Tables.ACCOUNTS}.id`,
           `${Tables.USER_ACCOUNTS}.account_id`
         )
         .leftJoin(
-          `${Tables.USERS}`,
+          Tables.USERS,
           `${Tables.USER_ACCOUNTS}.user_id`,
           `${Tables.USERS}.id`
         )
         .leftJoin(
-          `${Tables.COMPANY_DETAILS}`,
+          Tables.COMPANY_DETAILS,
           `${Tables.COMPANY_DETAILS}.account_id`,
           `${Tables.ACCOUNTS}.id`
         )
-        .leftJoin(`${Tables.BANK_DETAILS}`, function () {
+        .leftJoin(Tables.BANK_DETAILS, function () {
           this.on(
             `${Tables.BANK_DETAILS}.account_id`,
             `${Tables.ACCOUNTS}.id`

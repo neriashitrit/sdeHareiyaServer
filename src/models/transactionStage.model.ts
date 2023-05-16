@@ -18,23 +18,25 @@ export const transactionStageModel = {
       const transactionStage = await db.knex
         .queryBuilder()
         .select(
-          'ts.id',
-          'ts.name',
-          'ts.in_charge',
-          'ts.status',
-          'ts.transaction_id',
-          'ts.created_at',
-          'ts.updated_at',
+          `${Tables.TRANSACTION_STAGES}.id`,
+          `${Tables.TRANSACTION_STAGES}.name`,
+          `${Tables.TRANSACTION_STAGES}.inCharge`,
+          `${Tables.TRANSACTION_STAGES}.status`,
           db.knex.raw(
             `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.USERS, [
-              'u',
+              Tables.USERS,
             ])}) as user`
           )
         )
-        .from(`${Tables.TRANSACTION_STAGES} as ts`)
-        .leftJoin(`${Tables.USERS} as u`, 'ts.user_id', 'u.id')
+        .from(Tables.TRANSACTION_STAGES)
+        .leftJoin(
+          Tables.USERS,
+          `${Tables.TRANSACTION_STAGES}.user_id`,
+          `${Tables.USERS}.id`
+        )
         .where(condition)
-        .groupBy('ts.id', 'u.id');
+        .groupBy(`${Tables.TRANSACTION_STAGES}.id`, `${Tables.USERS}.id`);
+
       return transactionStage;
     } catch (error) {
       console.error(

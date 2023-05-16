@@ -11,7 +11,7 @@ export const getActiveProductCategories = async (
 ) => {
   try {
     const productCategories = await productCategoryModel.getProductCategories({
-      'pc.isActive': true,
+      [`${Tables.PRODUCT_CATEGORIES}.isActive`]: true,
     });
     return res.status(200).json(successResponse(productCategories));
   } catch (error: any) {

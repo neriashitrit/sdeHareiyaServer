@@ -78,8 +78,8 @@ const transactionStageHelper = {
   },
   getActiveStage: async (transactionId: number) => {
     return await transactionStageModel.getTransactionStages({
-      'ts.transaction_id': transactionId,
-      'ts.status': TransactionStageStatus.Active,
+      [`${Tables.TRANSACTION_STAGES}.transaction_id`]: transactionId,
+      [`${Tables.TRANSACTION_STAGES}.status`]: TransactionStageStatus.Active,
     });
   },
   isStageCompleted: async (

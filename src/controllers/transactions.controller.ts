@@ -32,6 +32,7 @@ import {
 import { CreateTransactionBodyProductProperty } from '../types/requestBody.types';
 import transactionSideHelper from '../helpers/transactionSide.helper';
 import transactionStageHelper from '../helpers/transactionStage.helper';
+import { Tables } from '../constants';
 import transactionDisputeHelper from '../helpers/transactionDispute.helper';
 
 export const getTransactions = async (req: Request, res: Response) => {
@@ -485,8 +486,9 @@ const upsertProductProperties = async (
   for (const property of properties) {
     const transactionProductProperty =
       await transactionProductPropertyModel.getTransactionProductProperty({
-        'pp.id': property.productPropertyId,
-        'tpp.transaction_id': transactionId,
+        [`${Tables.PRODUCT_PROPERTIES}.id`]: property.productPropertyId,
+        [`${Tables.TRANSACTION_PRODUCT_PROPERTIES}.transaction_id`]:
+          transactionId,
       });
     if (transactionProductProperty) {
       await transactionProductPropertyModel.updateTransactionProductProperty(

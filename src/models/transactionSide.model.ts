@@ -18,40 +18,60 @@ export const transactionSideModel = {
       const result = await db.knex
         .queryBuilder()
         .select(
-          'ts.id',
-          'ts.side',
-          'ts.transaction_id',
-          'ts.created_at',
-          'ts.updated_at',
-          'ts.is_creator',
+          `${Tables.TRANSACTION_SIDES}.id`,
+          `${Tables.TRANSACTION_SIDES}.side`,
+          `${Tables.TRANSACTION_SIDES}.transaction_id`,
+          `${Tables.TRANSACTION_SIDES}.created_at`,
+          `${Tables.TRANSACTION_SIDES}.updated_at`,
+          `${Tables.TRANSACTION_SIDES}.is_creator`,
           db.knex.raw(
-            `CASE WHEN bd.id IS NULL THEN null ELSE JSON_BUILD_OBJECT(${getJsonBuildObject(
+            `CASE WHEN ${
+              Tables.BANK_DETAILS
+            }.id IS NULL THEN null ELSE JSON_BUILD_OBJECT(${getJsonBuildObject(
               Tables.BANK_DETAILS,
-              ['bd', 'a']
+              [Tables.BANK_DETAILS, Tables.ACCOUNTS]
             )}) END as bank_details`
           ),
           db.knex.raw(
             `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.USERS, [
-              'u',
+              Tables.USERS,
             ])}) as user`
           ),
           db.knex.raw(
             `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.ACCOUNTS, [
-              'a',
+              Tables.ACCOUNTS,
             ])}) as account`
           )
         )
-        .from(`${Tables.TRANSACTION_SIDES} as ts`)
-        .leftJoin(`${Tables.BANK_DETAILS} as bd`, 'ts.bank_details_id', 'bd.id')
+        .from(Tables.TRANSACTION_SIDES)
         .leftJoin(
-          `${Tables.USER_ACCOUNTS} as ua`,
-          'ts.user_account_id',
-          'ua.id'
+          Tables.BANK_DETAILS,
+          `${Tables.TRANSACTION_SIDES}.bank_details_id`,
+          `${Tables.BANK_DETAILS}.id`
         )
-        .leftJoin(`${Tables.USERS} as u`, 'ua.user_id', 'u.id')
-        .leftJoin(`${Tables.ACCOUNTS} as a`, 'ua.account_id', 'a.id')
+        .leftJoin(
+          Tables.USER_ACCOUNTS,
+          `${Tables.TRANSACTION_SIDES}.user_account_id`,
+          `${Tables.USER_ACCOUNTS}.id`
+        )
+        .leftJoin(
+          Tables.USERS,
+          `${Tables.USER_ACCOUNTS}.user_id`,
+          `${Tables.USERS}.id`
+        )
+        .leftJoin(
+          Tables.ACCOUNTS,
+          `${Tables.USER_ACCOUNTS}.account_id`,
+          `${Tables.ACCOUNTS}.id`
+        )
         .where(condition)
-        .groupBy('ts.id', 'ua.id', 'bd.id', 'u.id', 'a.id');
+        .groupBy(
+          `${Tables.TRANSACTION_SIDES}.id`,
+          `${Tables.USER_ACCOUNTS}.id`,
+          `${Tables.BANK_DETAILS}.id`,
+          `${Tables.USERS}.id`,
+          `${Tables.ACCOUNTS}.id`
+        );
 
       return result;
     } catch (error) {

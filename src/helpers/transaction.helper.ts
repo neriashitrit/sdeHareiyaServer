@@ -13,13 +13,14 @@ import {
   productPropertyModel,
 } from '../models/index';
 import _ from 'lodash';
+import { Tables } from '../constants';
 import { transactionDisputeModel } from '../models/transactionDispute.model';
 
 const transactionHelper = {
   isTransactionCompleted: async (transactionId: number): Promise<boolean> => {
     const transaction = (
       await transactionModel.getTransactions({
-        't.id': transactionId,
+        [`${Tables.TRANSACTIONS}.id`]: transactionId,
       })
     )[0];
 
@@ -50,7 +51,8 @@ const transactionHelper = {
     const transactionProductProperties =
       await transactionProductPropertyModel.getAllTransactionProductProperties({
         productCategoryId: transaction.productCategory.id,
-        'tpp.transaction_id': transactionId,
+        [`${Tables.TRANSACTION_PRODUCT_PROPERTIES}.transaction_id`]:
+          transactionId,
       });
 
     if (
@@ -66,7 +68,7 @@ const transactionHelper = {
     }
     //  Check sides
     const transactionSides = await transactionSideModel.getTransactionSides({
-      'ts.transaction_id': transactionId,
+      [`${Tables.TRANSACTION_SIDES}.transaction_id`]: transactionId,
     });
 
     if (transactionSides.length !== 2) {
@@ -89,7 +91,7 @@ const transactionHelper = {
   }): Promise<ITransaction | null> => {
     const transaction = (
       await transactionModel.getTransactions({
-        't.id': transactionId,
+        [`${Tables.TRANSACTIONS}.id`]: transactionId,
       })
     )[0];
 
@@ -99,14 +101,15 @@ const transactionHelper = {
 
     if (!stages)
       stages = await transactionStageModel.getTransactionStages({
-        'ts.transaction_id': transaction.id,
+        [`${Tables.TRANSACTION_STAGES}.transaction_id`]: transaction.id,
       });
 
     if (!properties) {
       properties =
         await transactionProductPropertyModel.getAllTransactionProductProperties(
           {
-            'tpp.transaction_id': transaction.id,
+            [`${Tables.TRANSACTION_PRODUCT_PROPERTIES}.transaction_id`]:
+              transaction.id,
           }
         );
     }
@@ -117,7 +120,7 @@ const transactionHelper = {
     }
     if (!sides) {
       sides = await transactionSideModel.getTransactionSides({
-        'ts.transaction_id': transaction.id,
+        [`${Tables.TRANSACTION_SIDES}.transaction_id`]: transaction.id,
       });
     }
     transaction.properties = properties;
@@ -133,7 +136,7 @@ const transactionHelper = {
     userId?: number;
     condition?: string;
   }): Promise<ITransaction[]> => {
-    const term = condition ? condition : { 'u.id': userId };
+    const term = condition ? condition : { [`${Tables.USERS}.id`]: userId };
     const transactions = await transactionModel.getTransactions(term);
 
     if (transactions.length === 0) {
@@ -145,12 +148,12 @@ const transactionHelper = {
     );
 
     const stages = await transactionStageModel.getTransactionStages(
-      `ts.transaction_id IN (${transactionIds})`
+      `${Tables.TRANSACTION_STAGES}.transaction_id IN (${transactionIds})`
     );
 
     const properties =
       await transactionProductPropertyModel.getAllTransactionProductProperties(
-        `tpp.transaction_id IN (${transactionIds})`
+        `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.transaction_id IN (${transactionIds})`
       );
 
     const disputes = await transactionDisputeModel.getTransactionDisputes(
@@ -158,7 +161,7 @@ const transactionHelper = {
     );
 
     const sides = await transactionSideModel.getTransactionSides(
-      `ts.transaction_id IN (${transactionIds})`
+      `${Tables.TRANSACTION_SIDES}.transaction_id IN (${transactionIds})`
     );
 
     for (const transaction of transactions) {

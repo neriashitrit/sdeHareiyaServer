@@ -5,6 +5,7 @@ import {
   userAccountModel,
 } from '../models/index';
 import usersHelper from './users.helper';
+import { Tables } from '../constants';
 
 const transactionSideHelper = {
   getTransactionSides: async (
@@ -17,7 +18,7 @@ const transactionSideHelper = {
     ]
   > => {
     const transactionSides = await transactionSideModel.getTransactionSides({
-      'ts.transaction_id': transactionId,
+      [`${Tables.TRANSACTION_SIDES}.transaction_id`]: transactionId,
     });
 
     if (transactionSides[0].user.id === currentUserId) {
@@ -31,7 +32,7 @@ const transactionSideHelper = {
     userId: number
   ): Promise<ITransactionSide[]> => {
     const sideAUserAccount = await userAccountModel.getUserAccount({
-      'u.id': userId,
+      [`${Tables.USERS}.id`]: userId,
     });
 
     if (!sideAUserAccount) {
@@ -61,11 +62,11 @@ const transactionSideHelper = {
     creatorSide: TransactionSide
   ): Promise<ITransactionSide[]> => {
     let sideAUserAccount = await userAccountModel.getUserAccount({
-      'u.id': currentUserId,
+      [`${Tables.USERS}.id`]: currentUserId,
     });
 
     let sideBUserAccount = await userAccountModel.getUserAccount({
-      'u.email': email,
+      [`${Tables.USERS}.email`]: email,
     });
 
     if (!sideBUserAccount) {
@@ -128,10 +129,10 @@ const transactionSideHelper = {
     }
     if (creatorSide) {
       let sideAUserAccount = await userAccountModel.getUserAccount({
-        'u.id': sideAUser.id,
+        [`${Tables.USERS}.id`]: sideAUser.id,
       });
       let sideBUserAccount = await userAccountModel.getUserAccount({
-        'u.id': sideBUser.id,
+        [`${Tables.USERS}.email`]: email,
       });
 
       await transactionSideModel.updateTransactionSide(

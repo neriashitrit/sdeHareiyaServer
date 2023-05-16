@@ -15,24 +15,28 @@ export const transactionProductPropertyModel = {
       const transactionProductProperties = await db.knex
         .queryBuilder()
         .select(
-          'tpp.id',
-          'tpp.value',
-          'tpp.transaction_id',
+          `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.id`,
+          `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.value`,
+          `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.transaction_id`,
           db.knex.raw(
             `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.PRODUCT_PROPERTIES, [
-              'pp',
+              Tables.PRODUCT_PROPERTIES,
             ])}) as property`
           )
         )
-        .from(`${Tables.TRANSACTION_PRODUCT_PROPERTIES} as tpp`)
+        .from(Tables.TRANSACTION_PRODUCT_PROPERTIES)
         .where(condition)
         .leftJoin(
-          `${Tables.PRODUCT_PROPERTIES} as pp`,
-          `tpp.product_property_id`,
-          'pp.id'
+          Tables.PRODUCT_PROPERTIES,
+          `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.product_property_id`,
+          `${Tables.PRODUCT_PROPERTIES}.id`
         )
-        .groupBy('tpp.id', 'pp.id')
+        .groupBy(
+          `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.id`,
+          `${Tables.PRODUCT_PROPERTIES}.id`
+        )
         .first();
+
       return transactionProductProperties;
     } catch (error) {
       console.error(
@@ -54,23 +58,27 @@ export const transactionProductPropertyModel = {
       const transactionProductProperties = await db.knex
         .queryBuilder()
         .select(
-          'tpp.id',
-          'tpp.value',
-          'tpp.transaction_id',
+          `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.id`,
+          `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.value`,
+          `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.transaction_id`,
           db.knex.raw(
             `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.PRODUCT_PROPERTIES, [
-              'pp',
+              Tables.PRODUCT_PROPERTIES,
             ])}) as property`
           )
         )
-        .from(`${Tables.TRANSACTION_PRODUCT_PROPERTIES} as tpp`)
+        .from(Tables.TRANSACTION_PRODUCT_PROPERTIES)
         .where(condition)
         .leftJoin(
-          `${Tables.PRODUCT_PROPERTIES} as pp`,
-          `tpp.product_property_id`,
-          'pp.id'
+          Tables.PRODUCT_PROPERTIES,
+          `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.product_property_id`,
+          `${Tables.PRODUCT_PROPERTIES}.id`
         )
-        .groupBy('tpp.id', 'pp.id');
+        .groupBy(
+          `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.id`,
+          `${Tables.PRODUCT_PROPERTIES}.id`
+        );
+
       return transactionProductProperties;
     } catch (error) {
       console.error(
