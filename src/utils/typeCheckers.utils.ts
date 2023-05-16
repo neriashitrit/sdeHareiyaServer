@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import {
+  AdminApproveStageBody,
   ApproveStageBody,
   CreateProductCategoryBody,
   CreateTransactionBody,
@@ -97,6 +98,17 @@ export const isApproveStageBody = (body: any): body is ApproveStageBody => {
     (_.isNil(body.deliveryNotes) || typeof body.deliveryNotes === 'string')
     // _.isNil(body.depositReferenceFile) ||
     // typeof body.depositReferenceFile === 'object'
+  );
+};
+
+export const isAdminApproveStageBody = (
+  body: any
+): body is AdminApproveStageBody => {
+  return (
+    typeof body === 'object' &&
+    !_.isNil(body) &&
+    (typeof body.transactionId === 'number' ||
+      typeof +body.transactionId === 'number')
   );
 };
 

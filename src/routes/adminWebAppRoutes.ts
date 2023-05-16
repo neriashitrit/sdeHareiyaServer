@@ -1,8 +1,8 @@
 import express from 'express';
 
 import * as usersController from '../controllers/users.controller';
-import * as accountsController from '../controllers/admin/accounts.controller';
-import * as transactionsController from '../controllers/admin/transactions.controller';
+import * as adminAccountsController from '../controllers/admin/accounts.controller';
+import * as adminTransactionsController from '../controllers/admin/transactions.controller';
 import * as commissionsController from '../controllers/commissions.controller';
 import * as productCategoriesController from '../controllers/productCategories.controller';
 
@@ -19,15 +19,25 @@ router.post('/users/getUser', usersController.getUserById);
 //      Accounts         //
 ///////////////////////////
 
-router.post('/accounts/getAllAccounts', accountsController.getAllAccounts)
-router.post('/accounts/getAccount', accountsController.getAccountById)
+router.post('/accounts/getAllAccounts', adminAccountsController.getAllAccounts);
+router.post('/accounts/getAccount', adminAccountsController.getAccountById);
 
 ///////////////////////////
 //  Transactions         //
 ///////////////////////////
 
-router.post('/transactions/getTransactionsStatusAnalytics', transactionsController.getTransactionsStatusAnalytics)
-router.post('/transactions/getTransactionsProductsAnalytics', transactionsController.getTransactionsProductsAnalytics)
+router.post(
+  '/transactions/getTransactionsStatusAnalytics',
+  adminTransactionsController.getTransactionsStatusAnalytics
+);
+router.post(
+  '/transactions/getTransactionsProductsAnalytics',
+  adminTransactionsController.getTransactionsProductsAnalytics
+);
+router.post(
+  '/transactions/approveStage',
+  adminTransactionsController.approveStage
+);
 
 ///////////////////////////
 //      Commissions      //

@@ -53,6 +53,10 @@ export type ApproveStageBody = {
   deliveryNotes?: string;
 };
 
+export type AdminApproveStageBody = {
+  transactionId: number;
+};
+
 export type CreateProductCategoryBody = {
   name: string;
   icon: File;

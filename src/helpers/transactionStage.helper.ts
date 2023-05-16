@@ -4,8 +4,14 @@ import {
   ITransactionStage,
   TransactionStageName,
   TransactionStageStatus,
+  TransactionSide,
+  TransactionStatus,
 } from 'safe-shore-common';
-import { transactionStageModel, transactionModel } from '../models/index';
+import {
+  transactionStageModel,
+  transactionModel,
+  transactionSideModel,
+} from '../models/index';
 import _ from 'lodash';
 import {
   transactionStagePossiblePaths,
@@ -16,6 +22,24 @@ import transactionHelper from './transaction.helper';
 import fileHelper from './file.helper';
 
 const transactionStageHelper = {
+  adminNextStage: async (
+    transactionId: number,
+    userId: number,
+    activeStage: ITransactionStage
+  ) => {
+    try {
+      const nextStages = transactionStagePossiblePaths[activeStage.name];
+
+      await setPreviousStageCompleted(transactionId, activeStage.id, userId);
+
+      return createNextStage(transactionId, nextStages);
+    } catch (error) {
+      console.error('ERROR in transaction.helper nextStage()', error.message);
+      throw {
+        message: `error while trying to next stage. error: ${error.message}`,
+      };
+    }
+  },
   nextStage: async (
     transactionId: number,
     requestingSide: ITransactionSide,
@@ -29,7 +53,7 @@ const transactionStageHelper = {
       await setPreviousStageCompleted(
         transactionId,
         activeStage.id,
-        requestingSide,
+        requestingSide.user.id,
         transactionProps,
         additionalData
       );
@@ -189,7 +213,7 @@ const transactionStageHelper = {
 const setPreviousStageCompleted = async (
   transactionId: number,
   activeStageId: number,
-  requestingSide: ITransactionSide,
+  userId: number,
   transactionProps?: Record<string, any>,
   additionalData?: Record<string, any>
 ) => {
@@ -203,7 +227,7 @@ const setPreviousStageCompleted = async (
     { transactionId, id: activeStageId },
     {
       status: TransactionStageStatus.Completed,
-      userId: requestingSide.user.id,
+      userId,
       additionalData,
     }
   );
@@ -213,6 +237,13 @@ const createNextStage = async (
   transactionId: number,
   nextStages: TransactionStageName[]
 ) => {
+  if (nextStages[0] === TransactionStageName.Completed) {
+    await transactionModel.updateTransaction(
+      { id: transactionId },
+      { status: TransactionStatus.Completed }
+    );
+  }
+
   return await transactionStageModel.createTransactionStage({
     transactionId,
     name: nextStages[0],
