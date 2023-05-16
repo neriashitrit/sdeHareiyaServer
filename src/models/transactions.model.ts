@@ -13,6 +13,9 @@ export const transactionModel = {
   getTransactions: async (
     condition: Record<string, any> | string
   ): Promise<ITransaction[]> => {
+    if (typeof condition === 'string') {
+      condition = db.knex.raw(condition);
+    }
     const transaction = await db.knex
       .queryBuilder()
       .select([
@@ -59,50 +62,40 @@ export const transactionModel = {
       .leftJoin(
         `${Tables.PRODUCT_CATEGORIES} as pc`,
         'pc.id',
-        '=',
         't.product_category_id'
       )
       .leftJoin(`${Tables.FILES} as pcf`, function () {
-        this.on('pc.id', '=', 'pcf.row_id').andOn(
+        this.on('pc.id', 'pcf.row_id').andOn(
           'pcf.table_name',
-          '=',
           db.knex.raw('?', [Tables.PRODUCT_CATEGORIES])
         );
       })
       .leftJoin(
         `${Tables.PRODUCT_SUBCATEGORIES} as psc`,
         'psc.id',
-        '=',
         't.product_subcategory_id'
       )
       .leftJoin(`${Tables.FILES} as pscf`, function () {
-        this.on('psc.id', '=', 'pscf.row_id').andOn(
+        this.on('psc.id', 'pscf.row_id').andOn(
           'pscf.table_name',
-          '=',
           db.knex.raw('?', [Tables.PRODUCT_SUBCATEGORIES])
         );
       })
-      .leftJoin(`${Tables.COMMISSIONS} as c`, 't.commission_id', '=', 'c.id')
+      .leftJoin(`${Tables.COMMISSIONS} as c`, 't.commission_id', 'c.id')
       .leftJoin(`${Tables.FILES} as drf`, function () {
-        this.on('t.id', '=', 'drf.row_id').andOn(
+        this.on('t.id', 'drf.row_id').andOn(
           'drf.table_name',
-          '=',
           db.knex.raw('?', [Tables.TRANSACTIONS])
         );
       })
       .leftJoin(
-        `${Tables.TRANSACTION_SIDES} as ts`,
-        'ts.transaction_id',
-        '=',
-        't.id'
-      )
+        `${Tables.TRANSACTION_SIDES} as ts`,'ts.transaction_id','t.id')
       .leftJoin(
-        `${Tables.USER_ACCOUNTS} as ua`,
-        'ua.id',
-        '=',
-        'ts.user_account_id'
-      )
-      .leftJoin(`${Tables.USERS} as u`, 'u.id', '=', 'ua.user_id')
+        `${Tables.TRANSACTION_STAGES} as tsg`,'tsg.transaction_id','t.id')
+      .leftJoin(
+        `${Tables.USER_ACCOUNTS} as ua`,'ua.id','ts.user_account_id')
+      .leftJoin(
+        `${Tables.USERS} as u`, 'u.id', 'ua.user_id')
       .where(condition)
       .groupBy(
         't.id',

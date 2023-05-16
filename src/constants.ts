@@ -1,4 +1,4 @@
-import { TransactionSide, TransactionStageName } from 'safe-shore-common';
+import { TransactionSide, TransactionStageName, TransactionStageStatus, TransactionStatus } from 'safe-shore-common';
 
 export enum Tables {
   USERS = 'users',
@@ -74,3 +74,18 @@ export const transactionStageInCharge: {
   [TransactionStageName.SellerPayment]: TransactionSide.Admin,
   [TransactionStageName.Completed]: TransactionSide.Admin,
 };
+
+export const conditionForTransactionsNeedAutorization = [
+  {
+    column:'t.status',
+    value:TransactionStatus.Stage
+  },
+  {
+    column:'tsg.in_charge',
+    value:TransactionSide.Admin
+  },
+  {
+    column:'tsg.status',
+    value:TransactionStageStatus.Active
+  },
+]

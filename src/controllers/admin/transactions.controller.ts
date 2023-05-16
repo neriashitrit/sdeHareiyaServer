@@ -3,10 +3,85 @@ import { Request, Response } from 'express';
 import { transactionModel } from '../../models/transactions.model';
 
 import _ from 'lodash';
-import { failureResponse, successResponse } from '../../utils/db.utils';
+import { buildConditionString, buildRange, failureResponse, successResponse } from '../../utils/db.utils';
 import { isAdminApproveStageBody } from '../../utils/typeCheckers.utils';
 import transactionStageHelper from '../../helpers/transactionStage.helper';
-import { IUser, TransactionSide } from 'safe-shore-common';
+import { IUser } from 'safe-shore-common';
+import DbService from '../../services/db.service';
+import { transactionSideModel } from '../../models';
+import transactionHelper from '../../helpers/transaction.helper';
+import { TransactionSide, TransactionStageStatus, TransactionStatus } from 'safe-shore-common';
+import { conditionForTransactionsNeedAutorization } from '../../constants';
+
+export const getAllTransactions = async (req: Request, res: Response) => {
+  try {
+    const { startDate, endDate } = req.body;
+    const condition = buildConditionString([
+      {
+        column:'t.updated_at',
+        operator:'>=',
+        value:startDate
+      },
+      {
+        column:'t.updated_at',
+        operator:'<=',
+        value:endDate
+      }
+    ])
+    const transactions = await transactionHelper.getTransactions({ condition});
+    res.status(200).json(successResponse(transactions))
+	} catch (error: any) {
+		console.log(error);
+    res.status(500).json(failureResponse(error))
+	}
+}
+
+export const getTransactionById = async (req: Request, res: Response) => {
+  try {
+    const { transactionId } = req.params;
+    const condition = buildConditionString([
+      {
+        column:'t.id',
+        value:transactionId
+      }
+    ])
+    const transaction = await transactionHelper.getTransactions({ condition});
+
+    if (_.isEmpty(transaction)) {
+      return res
+        .status(400)
+        .json(failureResponse('No transaction with this id'));
+    }
+    res.status(200).json(successResponse(transaction[0]))
+	} catch (error: any) {
+		console.log(error);
+    res.status(500).json(failureResponse(error))
+	}
+}
+
+export const getAutorizeTransactions = async (req: Request, res: Response) => {
+  try {
+    const { startDate, endDate } = req.body;
+    const condition = buildConditionString([
+      {
+        column:'t.updated_at',
+        operator:'>=',
+        value:startDate
+      },
+      {
+        column:'t.updated_at',
+        operator:'<=',
+        value:endDate
+      },
+      ...conditionForTransactionsNeedAutorization
+    ])
+    const transactions = await transactionHelper.getTransactions({ condition});
+    res.status(200).json(successResponse(transactions))
+	} catch (error: any) {
+		console.log(error);
+    res.status(500).json(failureResponse(error))
+	}
+}
 
 export const getTransactionsStatusAnalytics = async (
   req: Request,

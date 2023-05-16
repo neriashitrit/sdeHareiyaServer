@@ -19,8 +19,8 @@ router.post('/users/getUser', adminUsersController.getUserById);
 //      Accounts         //
 ///////////////////////////
 
-router.post('/accounts/getAllAccounts', adminAccountsController.getAllAccounts);
-router.post('/accounts/getAccount', adminAccountsController.getAccountById);
+router.post('/accounts/getAllAccounts', adminAccountsController.getAllAccounts)
+router.get('/accounts/getAccountById/:accountId', adminAccountsController.getAccountById)
 
 ///////////////////////////
 //  Transactions         //
@@ -38,6 +38,10 @@ router.post(
   '/transactions/approveStage',
   adminTransactionsController.approveStage
 );
+router.post('/transactions/getAllTransactions', adminTransactionsController.getAllTransactions)
+router.post('/transactions/getAutorizeTransactions', adminTransactionsController.getAutorizeTransactions)
+router.get('/transactions/getTransactionById/:transactionId', adminTransactionsController.getTransactionById)
+router.post('/transactions/approveStage', adminTransactionsController.approveStage)
 
 ///////////////////////////
 //      Commissions      //

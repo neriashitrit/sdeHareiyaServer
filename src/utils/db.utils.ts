@@ -293,4 +293,18 @@ export const buildRange = (
     // If only the end date is specified, filter by that date and earlier
     queryBuilder.where(column, '<=', `${endDate} 23:59:59`);
   }
-};
+}
+
+export type conditionTerm = {
+  column:string;
+  operator?:string;
+  value:string;
+}
+
+export const buildConditionString = (terms:conditionTerm[]) => {
+  let sql:string[] = []
+  terms.forEach(term => {
+    sql.push(term?.operator ? `${term.column} ${term.operator} '${term.value}'` : `${term.column} = '${term.value}'`)
+  })
+  return sql.join(' and ')
+}

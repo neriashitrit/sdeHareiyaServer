@@ -6,8 +6,7 @@ import {
   CreateTransactionBody,
   GetTransactionParams,
   UpdateTransactionBody,
-  UpdateUserBody,
-} from 'types/requestBody.types';
+} from '../types/requestBody.types';
 
 export const isUpdateTransactionBody = (
   body: any

@@ -125,13 +125,17 @@ const transactionHelper = {
     return transaction;
   },
   getTransactions: async ({
-    userId,
+    userId = 0 , condition
   }: {
-    userId: number;
+    userId?: number;
+    condition?:string;
   }): Promise<ITransaction[]> => {
-    const transactions = await transactionModel.getTransactions({
-      'u.id': userId,
-    });
+    const term = condition ? condition : {'u.id': userId }; 
+    const transactions = await transactionModel.getTransactions(term);
+
+    if(transactions.length === 0){
+      return [];
+    }
 
     const transactionIds: number[] = transactions.map(
       (transaction) => transaction.id

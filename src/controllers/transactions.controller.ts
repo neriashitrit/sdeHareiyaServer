@@ -27,7 +27,7 @@ import {
   isUpdateTransactionBody,
 } from '../utils/typeCheckers.utils';
 
-import { CreateTransactionBodyProductProperty } from 'types/requestBody.types';
+import { CreateTransactionBodyProductProperty } from '../types/requestBody.types';
 import transactionSideHelper from '../helpers/transactionSide.helper';
 import transactionStageHelper from '../helpers/transactionStage.helper';
 
