@@ -6,7 +6,7 @@ import { Tables } from '../constants';
 import { getJsonBuildObject, buildRange } from '../utils/db.utils';
 import { types } from 'pg';
 
-types.setTypeParser(20, 'text', parseInt)
+types.setTypeParser(20, 'text', parseInt);
 const db = new DbService();
 
 export const transactionModel = {
@@ -89,13 +89,17 @@ export const transactionModel = {
         );
       })
       .leftJoin(
-        `${Tables.TRANSACTION_SIDES} as ts`,'ts.transaction_id','t.id')
+        `${Tables.TRANSACTION_SIDES} as ts`,
+        'ts.transaction_id',
+        't.id'
+      )
       .leftJoin(
-        `${Tables.TRANSACTION_STAGES} as tsg`,'tsg.transaction_id','t.id')
-      .leftJoin(
-        `${Tables.USER_ACCOUNTS} as ua`,'ua.id','ts.user_account_id')
-      .leftJoin(
-        `${Tables.USERS} as u`, 'u.id', 'ua.user_id')
+        `${Tables.TRANSACTION_STAGES} as tsg`,
+        'tsg.transaction_id',
+        't.id'
+      )
+      .leftJoin(`${Tables.USER_ACCOUNTS} as ua`, 'ua.id', 'ts.user_account_id')
+      .leftJoin(`${Tables.USERS} as u`, 'u.id', 'ua.user_id')
       .where(condition)
       .groupBy(
         't.id',
@@ -147,35 +151,31 @@ export const transactionModel = {
     accountId: number
   ): Promise<number> => {
     try {
-      const sum = await db
-        .knex(Tables.TRANSACTIONS)
+      const sum = await db.knex
+        .queryBuilder()
+        .select(db.knex.raw('SUM(t.amount) as total_amount'))
+        .from(`${Tables.TRANSACTIONS} as t`)
         .leftJoin(
-          Tables.TRANSACTION_SIDES,
-          `${Tables.TRANSACTIONS}.id`,
-          '=',
-          `${Tables.TRANSACTION_SIDES}.transaction_id`
-        )
-        .leftJoin(
-          Tables.USER_ACCOUNTS,
-          `${Tables.TRANSACTION_SIDES}.user_account_id`,
-          '=',
-          `${Tables.USER_ACCOUNTS}.id`
+          `${Tables.TRANSACTION_SIDES} as ts`,
+          db.knex.raw('t.id = ts.transaction_id')
         )
         .leftJoin(
-          Tables.ACCOUNTS,
-          `${Tables.USER_ACCOUNTS}.account_id`,
-          '=',
-          `${Tables.ACCOUNTS}.id`
+          `${Tables.TRANSACTION_STAGES} as tsg`,
+          db.knex.raw('t.id = tsg.transaction_id')
         )
-        .select(
-          db.knex.raw(`SUM(${Tables.TRANSACTIONS}.amount) as total_amount`)
+        .leftJoin(
+          `${Tables.USER_ACCOUNTS} as ua`,
+          db.knex.raw('ts.user_account_id = ua.id')
         )
-        .where(
-          `${Tables.TRANSACTIONS}.created_at`,
-          '>',
-          db.knex.raw(`(NOW() - INTERVAL '6 months')`)
+        .leftJoin(
+          `${Tables.ACCOUNTS} as a`,
+          db.knex.raw('ua.account_id = a.id')
         )
-        .andWhere(`${Tables.ACCOUNTS}.id`, '=', accountId);
+        .where(db.knex.raw("t.created_at > (NOW() - INTERVAL '6 months')"))
+        .andWhere(db.knex.raw("t.status != 'canceled'"))
+        .andWhere(db.knex.raw("tsg.status = 'active'"))
+        .andWhere(db.knex.raw("tsg.name != 'draft'"))
+        .andWhere(db.knex.raw(`a.id = '${accountId}'`));
       return sum[0].totalAmount as unknown as number;
     } catch (error) {
       console.error(
@@ -187,23 +187,33 @@ export const transactionModel = {
       };
     }
   },
-  getTransactionsStatusAnalytics: async (startDate?:string,endDate?:string) => {
-    try {       
-      const analytics = await db.knex.select('transactions.status')
-      .from(Tables.TRANSACTIONS)
-      .count('transactions.status as total')
-      .sum('amount as amount')
-      .sum('commission_amount as commission_amount')
-      .select('transaction_stages.name as stage')
-      .leftJoin(
-        Tables.TRANSACTION_STAGES,
-        'transaction_stages.transaction_id', 'transactions.id'
-      )
-      .modify((queryBuilder) => {
-        buildRange( queryBuilder, 'transactions.updated_at', startDate, endDate)
-      })
-      .groupBy('transactions.status','transaction_stages.name');
-    return analytics;
+  getTransactionsStatusAnalytics: async (
+    startDate?: string,
+    endDate?: string
+  ) => {
+    try {
+      const analytics = await db.knex
+        .select('transactions.status')
+        .from(Tables.TRANSACTIONS)
+        .count('transactions.status as total')
+        .sum('amount as amount')
+        .sum('commission_amount as commission_amount')
+        .select('transaction_stages.name as stage')
+        .leftJoin(
+          Tables.TRANSACTION_STAGES,
+          'transaction_stages.transaction_id',
+          'transactions.id'
+        )
+        .modify((queryBuilder) => {
+          buildRange(
+            queryBuilder,
+            'transactions.updated_at',
+            startDate,
+            endDate
+          );
+        })
+        .groupBy('transactions.status', 'transaction_stages.name');
+      return analytics;
     } catch (error) {
       console.error(
         'ERROR in transactionModel.modal getTransactionsStatusAnalytics()',
@@ -214,26 +224,38 @@ export const transactionModel = {
       };
     }
   },
-  getTransactionsProductsAnalytics: async (startDate?:string,endDate?:string) => {
-    try {       
+  getTransactionsProductsAnalytics: async (
+    startDate?: string,
+    endDate?: string
+  ) => {
+    try {
       const analytics = await db.knex
-      .select(
-        'transactions.product_category_id',
-        'transactions.product_category_other',
-        'product_categories.name as productName')
-      .count('transactions.id as total')
-      .from(Tables.TRANSACTIONS) 
-      .leftJoin( 
-        Tables.PRODUCT_CATEGORIES,
-        'product_categories.id','transactions.product_category_id'
-      ).modify((queryBuilder) => {
-        buildRange( queryBuilder, 'transactions.updated_at', startDate, endDate)
-      })
-      .groupBy(
-        'transactions.product_category_id',
-        'transactions.product_category_other',
-        'product_categories.name');
-    return analytics;
+        .select(
+          'transactions.product_category_id',
+          'transactions.product_category_other',
+          'product_categories.name as productName'
+        )
+        .count('transactions.id as total')
+        .from(Tables.TRANSACTIONS)
+        .leftJoin(
+          Tables.PRODUCT_CATEGORIES,
+          'product_categories.id',
+          'transactions.product_category_id'
+        )
+        .modify((queryBuilder) => {
+          buildRange(
+            queryBuilder,
+            'transactions.updated_at',
+            startDate,
+            endDate
+          );
+        })
+        .groupBy(
+          'transactions.product_category_id',
+          'transactions.product_category_other',
+          'product_categories.name'
+        );
+      return analytics;
     } catch (error) {
       console.error(
         'ERROR in transactionModel.modal getTransactionsProductsAnalytics()',
@@ -243,5 +265,5 @@ export const transactionModel = {
         message: `error while trying to getTransactionsProductsAnalytics. error: ${error.message}`,
       };
     }
-  }
+  },
 };

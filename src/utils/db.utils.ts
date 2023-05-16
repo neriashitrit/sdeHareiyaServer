@@ -68,7 +68,6 @@ export const getJsonBuildObject = (
     case Tables.BANK_DETAILS:
       return (
         `'id', ${getFormattedPrefix(0, prefixes)}id,` +
-        `'account', ${getFormattedPrefix(1, prefixes)}*,` +
         `'is_active', ${getFormattedPrefix(0, prefixes)}is_active,` +
         `'bank_name', ${getFormattedPrefix(0, prefixes)}bank_name,` +
         `'branch_name', ${getFormattedPrefix(0, prefixes)}branch_name,` +
@@ -262,12 +261,42 @@ export const getJsonBuildObject = (
         `'created_at', ${getFormattedPrefix(0, prefixes)}created_at,` +
         `'updated_at', ${getFormattedPrefix(0, prefixes)}updated_at`
       );
+    case Tables.COMPANY_DETAILS:
+      return (
+        `'id', ${getFormattedPrefix(0, prefixes)}id,` +
+        `'company_identity_number', ${getFormattedPrefix(
+          0,
+          prefixes
+        )}company_identity_number,` +
+        `'incorporation_name', ${getFormattedPrefix(
+          0,
+          prefixes
+        )}incorporation_name,` +
+        `'incorporation_date', ${getFormattedPrefix(
+          0,
+          prefixes
+        )}incorporation_date,` +
+        `'incorporation_country', ${getFormattedPrefix(
+          0,
+          prefixes
+        )}incorporation_country,` +
+        `'funds_source', ${getFormattedPrefix(0, prefixes)}funds_source,` +
+        `'funds_source_other', ${getFormattedPrefix(
+          0,
+          prefixes
+        )}funds_source_other,` +
+        `'contacts', ${getFormattedPrefix(0, prefixes)}contacts,` +
+        `'active_years', ${getFormattedPrefix(0, prefixes)}active_years,` +
+        `'purpose', ${getFormattedPrefix(0, prefixes)}purpose,` +
+        `'created_at', ${getFormattedPrefix(0, prefixes)}created_at,` +
+        `'updated_at', ${getFormattedPrefix(0, prefixes)}updated_at`
+      );
     default:
       return '';
   }
 };
 
-export const successResponse = (body: Record<string, any>) => {
+export const successResponse = (body?: Record<string, any>) => {
   return { status: { success: true }, body };
 };
 export const failureResponse = (error?: any) => {

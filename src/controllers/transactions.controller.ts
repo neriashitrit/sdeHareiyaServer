@@ -35,7 +35,7 @@ export const getTransactions = async (req: Request, res: Response) => {
   try {
     const user = req.user as IUser;
 
-    const transactions = await transactionHelper.getTransactions({
+    const transactions = await transactionHelper.getFullTransactions({
       userId: user.id,
     });
 
@@ -59,7 +59,7 @@ export const getTransaction = async (req: Request, res: Response) => {
 
     const { transactionId } = params;
 
-    const responseTransaction = await transactionHelper.getTransaction({
+    const responseTransaction = await transactionHelper.getFullTransaction({
       transactionId,
     });
 
@@ -136,7 +136,7 @@ export const createTransaction = async (req: Request, res: Response) => {
       user.id
     );
 
-    const responseTransaction = await transactionHelper.getTransaction({
+    const responseTransaction = await transactionHelper.getFullTransaction({
       transactionId: newTransaction.id,
       sides: transactionSides,
       stages: transactionStage ? [transactionStage] : [],
@@ -292,7 +292,7 @@ export const updateTransaction = async (req: Request, res: Response) => {
       );
     }
 
-    const responseTransaction = await transactionHelper.getTransaction({
+    const responseTransaction = await transactionHelper.getFullTransaction({
       transactionId,
       sides:
         transactionSides ??

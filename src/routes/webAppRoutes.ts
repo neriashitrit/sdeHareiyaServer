@@ -2,11 +2,12 @@ import express from 'express';
 
 import * as usersController from '../controllers/users.controller';
 import * as transactionsController from '../controllers/transactions.controller';
+import * as accountsController from '../controllers/accounts.controller';
 
 const router = express.Router();
 
 ///////////////////////////
-//      Users            //
+//         Users         //
 ///////////////////////////
 router.post('/user/login', usersController.userLogin);
 router.get('/getUser', usersController.getUser);
@@ -23,5 +24,13 @@ router.get(
 router.post('/createTransactions', transactionsController.createTransaction);
 router.put('/updateTransactions', transactionsController.updateTransaction);
 router.post('/transactions/approveStage', transactionsController.approveStage);
+///////////////////////////
+//       Accounts        //
+///////////////////////////
+router.post(
+  '/accounts/submitAccountAuthorization',
+  accountsController.submitAccountAuthorization
+);
+router.get('/getAccount', accountsController.getAccount);
 
 export default router;

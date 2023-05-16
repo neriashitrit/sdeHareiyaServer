@@ -254,7 +254,7 @@ const createNextStage = async (
 //  sets multi choice next stage with logic
 const createNextStageFromMultiChoice = async (
   activeStageName: string,
-  requester: ITransactionSide,
+  requestingSide: ITransactionSide,
   transactionId: number,
   nextStages: TransactionStageName[]
 ) => {
@@ -262,7 +262,7 @@ const createNextStageFromMultiChoice = async (
     case TransactionStageName.Draft:
     case TransactionStageName.ConfirmationSideB:
       const sum = await transactionModel.getTransactionsAmountSumLastHalfYear(
-        requester.account.id
+        requestingSide.account.id
       );
       if (sum <= 50000) {
         return await transactionStageModel.createTransactionStage({

@@ -4,6 +4,11 @@ import {
   CommissionPayer,
   IFile,
   PropertyType,
+  AccountType,
+  Gender,
+  ICompanyContact,
+  Purpose,
+  FundsSource,
 } from 'safe-shore-common';
 
 export type CreateTransactionBodyProductProperty = {
@@ -82,3 +87,38 @@ export type UpdateUserBody = {
   firstName: string;
   lastName: string;
 };
+
+export type AccountAuthorizationBaseBody = {
+  postalCode: string;
+  country: string;
+  city: string;
+  streetName: string;
+  houseNumber: string;
+  apartmentNumber: string;
+  occupation: string;
+};
+
+export type AccountAuthorizationPrivateBody = AccountAuthorizationBaseBody & {
+  idNumberCountryOfIssue: string;
+  birthday: string;
+  gender: Gender;
+  isThirdParty: boolean;
+  isThirdPartyFullName?: string;
+  isBankAccountBlocked: boolean;
+};
+
+export type AccountAuthorizationCompanyBody = AccountAuthorizationBaseBody & {
+  companyIdentityNumber: number;
+  incorporationName: string;
+  incorporationDate: string;
+  incorporationCountry: string;
+  fundsSource: FundsSource;
+  fundsSourceOther?: string;
+  contacts: ICompanyContact[];
+  activeYears: number;
+  purpose: Purpose;
+};
+
+export type AccountAuthorizationBody =
+  | AccountAuthorizationPrivateBody
+  | AccountAuthorizationCompanyBody;

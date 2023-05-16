@@ -1,11 +1,14 @@
 import _ from 'lodash';
 import {
+  AccountAuthorizationCompanyBody,
+  AccountAuthorizationPrivateBody,
   AdminApproveStageBody,
   ApproveStageBody,
   CreateProductCategoryBody,
   CreateTransactionBody,
   GetTransactionParams,
   UpdateTransactionBody,
+  UpdateUserBody,
 } from '../types/requestBody.types';
 
 export const isUpdateTransactionBody = (
@@ -163,5 +166,62 @@ export const isUpdateUserBody = (body: any): body is UpdateUserBody => {
     !_.isNil(body) &&
     (_.isNil(body.firstName) || typeof body.firstName === 'string') &&
     (_.isNil(body.lastName) || typeof body.lastName === 'string')
+  );
+};
+
+export const isAccountAuthorizationBaseBody = (body: any): boolean => {
+  return (
+    typeof body === 'object' &&
+    !_.isNil(body) &&
+    typeof body.postalCode === 'string' &&
+    typeof body.country === 'string' &&
+    typeof body.city === 'string' &&
+    typeof body.streetName === 'string' &&
+    typeof body.houseNumber === 'string' &&
+    typeof body.apartmentNumber === 'string' &&
+    typeof body.occupation === 'string'
+  );
+};
+
+export const isAccountAuthorizationPrivateBody = (
+  body: any
+): body is AccountAuthorizationPrivateBody => {
+  return (
+    isAccountAuthorizationBaseBody(body) &&
+    typeof body.idNumberCountryOfIssue === 'string' &&
+    typeof body.birthday === 'string' &&
+    typeof body.gender === 'string' &&
+    typeof body.isThirdParty === 'boolean' &&
+    (!body.isThirdParty
+      ? _.isNil(body.isThirdPartyFullName)
+      : typeof body.isThirdPartyFullName === 'string') &&
+    typeof body.isBankAccountBlocked === 'boolean'
+  );
+};
+
+export const isAccountAuthorizationCompanyBody = (
+  body: any
+): body is AccountAuthorizationCompanyBody => {
+  return (
+    isAccountAuthorizationBaseBody(body) &&
+    typeof body.companyIdentityNumber === 'number' &&
+    typeof body.incorporationName === 'string' &&
+    typeof body.incorporationDate === 'string' &&
+    typeof body.incorporationCountry === 'string' &&
+    typeof body.fundsSource === 'string' &&
+    (body.fundsSource !== 'other'
+      ? _.isNil(body.fundsSourceOther)
+      : typeof body.fundsSourceOther === 'string') &&
+    Array.isArray(body.contacts) &&
+    body.contacts.every(
+      (contact: any) =>
+        typeof contact === 'object' &&
+        !_.isNil(contact) &&
+        typeof contact.fullName === 'string' &&
+        typeof contact.idNumber === 'string'
+    ) &&
+    body.contacts.length > 0 &&
+    typeof body.activeYears === 'number' &&
+    typeof body.purpose === 'string'
   );
 };

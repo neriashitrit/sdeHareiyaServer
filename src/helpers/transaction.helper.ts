@@ -73,7 +73,7 @@ const transactionHelper = {
     }
     return true;
   },
-  getTransaction: async ({
+  getFullTransaction: async ({
     transactionId,
     properties,
     sides,
@@ -124,16 +124,17 @@ const transactionHelper = {
     transaction.stages = stages;
     return transaction;
   },
-  getTransactions: async ({
-    userId = 0 , condition
+  getFullTransactions: async ({
+    userId = 0,
+    condition,
   }: {
     userId?: number;
-    condition?:string;
+    condition?: string;
   }): Promise<ITransaction[]> => {
-    const term = condition ? condition : {'u.id': userId }; 
+    const term = condition ? condition : { 'u.id': userId };
     const transactions = await transactionModel.getTransactions(term);
 
-    if(transactions.length === 0){
+    if (transactions.length === 0) {
       return [];
     }
 
@@ -171,6 +172,14 @@ const transactionHelper = {
         (dispute) => dispute.transactionId === transaction.id
       );
     }
+    return transactions;
+  },
+  getPendingAuthTransactions: async (
+    userId: number
+  ): Promise<ITransaction[]> => {
+    const transactions = await transactionModel.getTransactions(
+      `u.id = '${userId}' AND tsg.status = 'active' AND tsg.name IN ('authorizationSideA', 'authorizationSideB')`
+    );
     return transactions;
   },
 };
