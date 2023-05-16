@@ -4,9 +4,11 @@ import {
   AccountAuthorizationPrivateBody,
   AdminApproveStageBody,
   ApproveStageBody,
+  CancelDisputeBody,
   CreateProductCategoryBody,
   CreateTransactionBody,
   GetTransactionParams,
+  OpenDisputeBody,
   UpdateTransactionBody,
   UpdateUserBody,
 } from '../types/requestBody.types';
@@ -157,6 +159,25 @@ export const isCreateProductCategoryBody = (
         typeof subcategory.isActive === 'boolean' &&
         typeof subcategory.icon === 'object'
     )
+  );
+};
+
+export const isOpenDisputeBody = (body: any): body is OpenDisputeBody => {
+  return (
+    typeof body === 'object' &&
+    !_.isNil(body) &&
+    typeof body.transactionId === 'number' &&
+    typeof body.reason === 'string' &&
+    (_.isNil(body.reasonOther) || typeof body.reasonOther === 'string') &&
+    typeof body.notes === 'string'
+  );
+};
+
+export const isCancelDisputeBody = (body: any): body is CancelDisputeBody => {
+  return (
+    typeof body === 'object' &&
+    !_.isNil(body) &&
+    typeof body.transactionId === 'number'
   );
 };
 

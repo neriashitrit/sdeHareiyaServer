@@ -24,6 +24,11 @@ router.get(
 router.post('/createTransactions', transactionsController.createTransaction);
 router.put('/updateTransactions', transactionsController.updateTransaction);
 router.post('/transactions/approveStage', transactionsController.approveStage);
+router.post('/transactions/openDispute', transactionsController.openDispute);
+router.post(
+  '/transactions/cancelDispute',
+  transactionsController.cancelDispute
+);
 ///////////////////////////
 //       Accounts        //
 ///////////////////////////

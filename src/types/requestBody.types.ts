@@ -83,6 +83,17 @@ export type GetTransactionParams = {
   transactionId: number;
 };
 
+export type OpenDisputeBody = {
+  transactionId: number;
+  reason: string;
+  reasonOther?: string;
+  notes: string;
+};
+
+export type CancelDisputeBody = {
+  transactionId: number;
+};
+
 export type UpdateUserBody = {
   firstName: string;
   lastName: string;

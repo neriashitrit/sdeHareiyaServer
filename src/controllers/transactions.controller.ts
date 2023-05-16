@@ -22,14 +22,17 @@ import {
 } from 'safe-shore-common';
 import {
   isApproveStageBody,
+  isCancelDisputeBody,
   isCreateTransactionBody,
   isGetTransactionParams,
+  isOpenDisputeBody,
   isUpdateTransactionBody,
 } from '../utils/typeCheckers.utils';
 
 import { CreateTransactionBodyProductProperty } from '../types/requestBody.types';
 import transactionSideHelper from '../helpers/transactionSide.helper';
 import transactionStageHelper from '../helpers/transactionStage.helper';
+import transactionDisputeHelper from '../helpers/transactionDispute.helper';
 
 export const getTransactions = async (req: Request, res: Response) => {
   try {
@@ -400,6 +403,65 @@ export const approveStage = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(
       'ERROR in transactions.controller approveStage()',
+      error.message
+    );
+    return res.status(500).send(failureResponse(error.message));
+  }
+};
+
+export const openDispute = async (req: Request, res: Response) => {
+  try {
+    const user = req.user as IUser;
+    const body = req.body;
+
+    if (!isOpenDisputeBody(body)) {
+      return res.status(400).json(failureResponse('Invalid Parameters'));
+    }
+
+    const { transactionId, reason, reasonOther, notes } = body;
+
+    await transactionDisputeHelper.createTransactionDispute(
+      transactionId,
+      user.id,
+      reason,
+      reasonOther,
+      notes
+    );
+
+    return res.status(200).json(successResponse({}));
+  } catch (error) {
+    console.error(
+      'ERROR in transactions.controller openDispute()',
+      error.message
+    );
+    return res.status(500).send(failureResponse(error.message));
+  }
+};
+
+export const cancelDispute = async (req: Request, res: Response) => {
+  try {
+    const user = req.user as IUser;
+    const body = req.body;
+
+    if (!isCancelDisputeBody(body)) {
+      return res.status(400).json(failureResponse('Invalid Parameters'));
+    }
+
+    const { transactionId } = body;
+
+    const result = await transactionDisputeHelper.closeTransactionDispute(
+      transactionId,
+      user.id
+    );
+
+    if (!result) {
+      return res.status(400).json(failureResponse('Could not cancel dispute'));
+    }
+
+    return res.status(200).json(successResponse({}));
+  } catch (error) {
+    console.error(
+      'ERROR in transactions.controller cancelDispute()',
       error.message
     );
     return res.status(500).send(failureResponse(error.message));

@@ -13,6 +13,7 @@ import {
   productPropertyModel,
 } from '../models/index';
 import _ from 'lodash';
+import { transactionDisputeModel } from '../models/transactionDispute.model';
 
 const transactionHelper = {
   isTransactionCompleted: async (transactionId: number): Promise<boolean> => {
@@ -110,8 +111,9 @@ const transactionHelper = {
         );
     }
     if (!disputes) {
-      //  TODO add disputes
-      disputes = [];
+      disputes = await transactionDisputeModel.getTransactionDisputes({
+        transaction_id: transaction.id,
+      });
     }
     if (!sides) {
       sides = await transactionSideModel.getTransactionSides({
@@ -151,8 +153,9 @@ const transactionHelper = {
         `tpp.transaction_id IN (${transactionIds})`
       );
 
-    //  TODO add disputes
-    const disputes: ITransactionDispute[] = [];
+    const disputes = await transactionDisputeModel.getTransactionDisputes(
+      `transaction_id IN (${transactionIds})`
+    );
 
     const sides = await transactionSideModel.getTransactionSides(
       `ts.transaction_id IN (${transactionIds})`
