@@ -69,13 +69,13 @@ const transactionSideHelper = {
     });
 
     if (!sideBUserAccount) {
-      const [_, __, sideBUserAccount] =
-        await usersHelper.createNotActivatedUser(
-          firstName,
-          lastName,
-          email,
-          phoneNumber
-        );
+      const [_, __, userAccount] = await usersHelper.createNotActivatedUser(
+        firstName,
+        lastName,
+        email,
+        phoneNumber
+      );
+      sideBUserAccount = userAccount;
     }
 
     await transactionSideModel.createTransactionSide({
@@ -131,7 +131,7 @@ const transactionSideHelper = {
         'u.id': sideAUser.id,
       });
       let sideBUserAccount = await userAccountModel.getUserAccount({
-        'u.email': email,
+        'u.id': sideBUser.id,
       });
 
       await transactionSideModel.updateTransactionSide(

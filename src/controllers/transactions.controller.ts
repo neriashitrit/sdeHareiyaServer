@@ -266,21 +266,32 @@ export const updateTransaction = async (req: Request, res: Response) => {
         );
       }
     }
-
-    await transactionModel.updateTransaction(
-      { id: transactionId },
-      {
-        productCategoryId,
-        productCategoryOther,
-        productSubcategoryId,
-        productSubcategoryOther,
-        amountCurrency: currency,
-        commissionAmountCurrency: currency,
-        endDate,
-        commissionPayer,
-        ...updatedFields,
-      }
-    );
+    if (
+      !_.isNil(productCategoryId) ||
+      !_.isNil(productCategoryOther) ||
+      !_.isNil(productSubcategoryId) ||
+      !_.isNil(productSubcategoryOther) ||
+      !_.isNil(currency) ||
+      !_.isNil(endDate) ||
+      !_.isNil(commissionPayer) ||
+      !_.isNil(productCategoryId) ||
+      Object.keys(updatedFields).length !== 0
+    ) {
+      await transactionModel.updateTransaction(
+        { id: transactionId },
+        {
+          productCategoryId,
+          productCategoryOther,
+          productSubcategoryId,
+          productSubcategoryOther,
+          amountCurrency: currency,
+          commissionAmountCurrency: currency,
+          endDate,
+          commissionPayer,
+          ...updatedFields,
+        }
+      );
+    }
 
     const responseTransaction = await transactionHelper.getTransaction({
       transactionId,
@@ -310,7 +321,7 @@ export const approveStage = async (req: Request, res: Response) => {
     const user = req.user as IUser;
     const body = {
       ...req.body,
-      depositReferenceFile: req.files?.depositReferenceFile,
+      // depositReferenceFile: req.files?.depositReferenceFile,
     };
 
     if (!isApproveStageBody(body)) {
@@ -324,7 +335,7 @@ export const approveStage = async (req: Request, res: Response) => {
       depositBankAccountOwnerFullName,
       depositTransferDate,
       depositReferenceNumber,
-      depositReferenceFile,
+      // depositReferenceFile,
       deliveryDate,
       deliveryType,
       deliveryNotes,
@@ -368,7 +379,7 @@ export const approveStage = async (req: Request, res: Response) => {
         depositBankAccountOwnerFullName,
         depositTransferDate,
         depositReferenceNumber,
-        depositReferenceFile,
+        // depositReferenceFile,
         deliveryDate,
         deliveryType,
         deliveryNotes
@@ -422,9 +433,11 @@ const upsertProductProperties = async (
           value: property.value,
           // TODO files
         },
-        { transactionId, productPropertyId: property.productPropertyId }
+        {
+          id: transactionProductProperty.id,
+        }
       );
-      return;
+      continue;
     }
     await transactionProductPropertyModel.createTransactionProductProperty({
       transactionId,

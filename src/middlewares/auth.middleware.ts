@@ -13,7 +13,7 @@ import { AuthInfo } from 'types';
 const clientID = '94c62aa3-bb15-4985-a47f-8fc003cb5caf'; // Application (client) ID of your API's application registration
 const b2cDomainHost = 'safeshoredev.b2clogin.com';
 const tenantId = 'safeshoredev.onmicrosoft.com'; // Alternatively, you can use your Directory (tenant) ID (a GUID)
-const policyName = 'B2C_1_phone_login';
+const policyName = 'B2C_1_phone_signin';
 
 const bearerStrategyOptions: IBearerStrategyOptionWithRequest = {
   identityMetadata: `https://${b2cDomainHost}/${tenantId}/${policyName}/v2.0/.well-known/openid-configuration/`,
@@ -30,8 +30,8 @@ const bearerStrategyOptions: IBearerStrategyOptionWithRequest = {
 export const bearerStrategy = new BearerStrategy(
   bearerStrategyOptions,
   async (token: ITokenPayload, done: VerifyCallback) => {
-    const email = (token as AuthInfo).emails[0];
     try {
+      const email = (token as AuthInfo).emails[0];
       const user = await userModel.getUser(email);
       if (user) {
         return done(null, user, token);

@@ -17,6 +17,7 @@ export const productCategoryModel = {
           'pc.id',
           'pc.name',
           'pc.description',
+          'pcf.url as icon',
           'pc.updated_at',
           'pc.created_at',
           db.knex.raw(
@@ -24,7 +25,26 @@ export const productCategoryModel = {
               Tables.PRODUCT_PROPERTIES,
               ['pp']
             )})) as properties`
-          )
+          ),
+          db.knex
+            .select(
+              db.knex.raw(
+                `JSON_AGG(JSON_BUILD_OBJECT(${getJsonBuildObject(
+                  Tables.PRODUCT_SUBCATEGORIES,
+                  ['psc', 'pscf']
+                )})) as subcategories`
+              )
+            )
+            .from(`${Tables.PRODUCT_SUBCATEGORIES} as psc`)
+            .leftJoin(`${Tables.FILES} as pscf`, function () {
+              this.on('psc.id', '=', 'pscf.row_id').andOn(
+                'pscf.table_name',
+                '=',
+                db.knex.raw('?', [Tables.PRODUCT_SUBCATEGORIES])
+              );
+            })
+            .where(db.knex.raw('psc.product_category_id = pc.id'))
+            .as('subcategories')
         )
         .from(`${Tables.PRODUCT_CATEGORIES} as pc`)
         .leftJoin(
@@ -33,8 +53,15 @@ export const productCategoryModel = {
           '=',
           'pc.id'
         )
+        .leftJoin(`${Tables.FILES} as pcf`, function () {
+          this.on('pc.id', '=', 'pcf.row_id').andOn(
+            'pcf.table_name',
+            '=',
+            db.knex.raw('?', [Tables.PRODUCT_CATEGORIES])
+          );
+        })
         .where(condition)
-        .groupBy('pc.id');
+        .groupBy('pc.id', 'pcf.id');
       return productCategories;
     } catch (error) {
       console.error(

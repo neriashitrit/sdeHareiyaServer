@@ -230,7 +230,7 @@ export const getJsonBuildObject = (
         `'id', ${getFormattedPrefix(0, prefixes)}id,` +
         `'name', ${getFormattedPrefix(0, prefixes)}name,` +
         `'description', ${getFormattedPrefix(0, prefixes)}description,` +
-        `'icon_url', ${getFormattedPrefix(1, prefixes)}url,` +
+        `'icon', ${getFormattedPrefix(1, prefixes)}url,` +
         `'created_at', ${getFormattedPrefix(0, prefixes)}created_at,` +
         `'updated_at', ${getFormattedPrefix(0, prefixes)}updated_at`
       );
@@ -239,7 +239,7 @@ export const getJsonBuildObject = (
         `'id', ${getFormattedPrefix(0, prefixes)}id,` +
         `'name', ${getFormattedPrefix(0, prefixes)}name,` +
         `'description', ${getFormattedPrefix(0, prefixes)}description,` +
-        `'icon_url', ${getFormattedPrefix(1, prefixes)}url,` +
+        `'icon', ${getFormattedPrefix(1, prefixes)}url,` +
         `'created_at', ${getFormattedPrefix(0, prefixes)}created_at,` +
         `'updated_at', ${getFormattedPrefix(0, prefixes)}updated_at`
       );
@@ -274,10 +274,18 @@ export const failureResponse = (error?: any) => {
   return { status: { success: false, error } };
 };
 
-export const buildRange = (queryBuilder:any,column:string,startDate?:string,endDate?:string) => {
+export const buildRange = (
+  queryBuilder: any,
+  column: string,
+  startDate?: string,
+  endDate?: string
+) => {
   if (startDate && endDate) {
     // If both start and end dates are specified, filter by the date range
-    queryBuilder.whereBetween(column, [`${startDate} 00:00:00`, `${endDate} 23:59:59`]);
+    queryBuilder.whereBetween(column, [
+      `${startDate} 00:00:00`,
+      `${endDate} 23:59:59`,
+    ]);
   } else if (startDate) {
     // If only the start date is specified, filter by that date and later
     queryBuilder.where(column, '>=', `${startDate} 00:00:00`);
@@ -285,4 +293,4 @@ export const buildRange = (queryBuilder:any,column:string,startDate?:string,endD
     // If only the end date is specified, filter by that date and earlier
     queryBuilder.where(column, '<=', `${endDate} 23:59:59`);
   }
-}
+};

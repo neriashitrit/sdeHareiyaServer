@@ -78,27 +78,25 @@ export const isCreateTransactionBody = (
 
 export const isApproveStageBody = (body: any): body is ApproveStageBody => {
   return (
-    (typeof body === 'object' &&
-      !_.isNil(body) &&
-      (typeof body.transactionId === 'number' ||
-        typeof +body.transactionId === 'number') &&
-      (_.isNil(body.depositBankName) ||
-        typeof body.depositBankName === 'string') &&
-      (_.isNil(body.depositBankNumber) ||
-        typeof body.depositBankNumber === 'number' ||
-        typeof +body.depositBankNumber === 'number') &&
-      (_.isNil(body.depositBankAccountOwnerFullName) ||
-        typeof body.depositBankAccountOwnerFullName === 'string') &&
-      (_.isNil(body.depositTransferDate) ||
-        typeof body.depositTransferDate === 'string') &&
-      (_.isNil(body.depositReferenceNumber) ||
-        typeof body.depositReferenceNumber === 'string') &&
-      (_.isNil(body.deliveryDate) || typeof body.deliveryDate === 'string') &&
-      (_.isNil(body.deliveryType) || typeof body.deliveryType === 'string') &&
-      (_.isNil(body.deliveryNotes) ||
-        typeof body.deliveryNotes === 'string')) ||
-    _.isNil(body.depositReferenceFile) ||
-    typeof body.depositReferenceFile === 'object'
+    typeof body === 'object' &&
+    !_.isNil(body) &&
+    typeof body.transactionId === 'number' &&
+    (_.isNil(body.depositBankName) ||
+      typeof body.depositBankName === 'string') &&
+    (_.isNil(body.depositBankNumber) ||
+      typeof body.depositBankNumber === 'number' ||
+      typeof +body.depositBankNumber === 'number') &&
+    (_.isNil(body.depositBankAccountOwnerFullName) ||
+      typeof body.depositBankAccountOwnerFullName === 'string') &&
+    (_.isNil(body.depositTransferDate) ||
+      typeof body.depositTransferDate === 'string') &&
+    (_.isNil(body.depositReferenceNumber) ||
+      typeof body.depositReferenceNumber === 'string') &&
+    (_.isNil(body.deliveryDate) || typeof body.deliveryDate === 'string') &&
+    (_.isNil(body.deliveryType) || typeof body.deliveryType === 'string') &&
+    (_.isNil(body.deliveryNotes) || typeof body.deliveryNotes === 'string')
+    // _.isNil(body.depositReferenceFile) ||
+    // typeof body.depositReferenceFile === 'object'
   );
 };
 

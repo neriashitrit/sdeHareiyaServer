@@ -53,9 +53,9 @@ const transactionStageHelper = {
     }
   },
   getActiveStage: async (transactionId: number) => {
-    return await transactionStageModel.getTransactionStage({
-      transactionId: transactionId,
-      status: TransactionStageStatus.Active,
+    return await transactionStageModel.getTransactionStages({
+      'ts.transaction_id': transactionId,
+      'ts.status': TransactionStageStatus.Active,
     });
   },
   isStageCompleted: async (
@@ -68,7 +68,7 @@ const transactionStageHelper = {
     depositBankAccountOwnerFullName?: string,
     depositTransferDate?: string,
     depositReferenceNumber?: string,
-    depositReferenceFile?: File,
+    // depositReferenceFile?: File,
     deliveryDate?: Date,
     deliveryType?: string,
     deliveryNotes?: string
@@ -126,19 +126,19 @@ const transactionStageHelper = {
           _.isNil(depositBankNumber) ||
           _.isNil(depositBankAccountOwnerFullName) ||
           _.isNil(depositTransferDate) ||
-          _.isNil(depositReferenceNumber) ||
-          _.isNil(depositReferenceFile)
+          _.isNil(depositReferenceNumber)
+          // _.isNil(depositReferenceFile)
         ) {
           return {
             success: false,
             errorMessage: 'Invalid Parameters',
           };
         }
-        await fileHelper.uploadFile(
-          Tables.TRANSACTIONS,
-          transactionId,
-          depositReferenceFile
-        );
+        // await fileHelper.uploadFile(
+        //   Tables.TRANSACTIONS,
+        //   transactionId,
+        //   depositReferenceFile
+        // );
         transactionProps = {
           depositBankName,
           depositBankNumber,

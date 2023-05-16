@@ -8,17 +8,23 @@ import { getJsonBuildObject } from '../utils/db.utils';
 const db = new DbService();
 
 export const transactionStageModel = {
-  getTransactionStage: async (
+  getTransactionStages: async (
     condition: Record<string, any> | string
   ): Promise<ITransactionStage[]> => {
     try {
+      if (typeof condition === 'string') {
+        condition = db.knex.raw(condition);
+      }
       const transactionStage = await db.knex
         .queryBuilder()
         .select(
           'ts.id',
           'ts.name',
-          'ts.inCharge',
+          'ts.in_charge',
           'ts.status',
+          'ts.transaction_id',
+          'ts.created_at',
+          'ts.updated_at',
           db.knex.raw(
             `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.USERS, [
               'u',
@@ -29,30 +35,6 @@ export const transactionStageModel = {
         .leftJoin(`${Tables.USERS} as u`, 'ts.user_id', 'u.id')
         .where(condition)
         .groupBy('ts.id', 'u.id');
-      return transactionStage;
-    } catch (error) {
-      console.error(
-        'ERROR in transaction_stages.modal getTransactionStage()',
-        error.message
-      );
-      throw {
-        message: `error while trying to getTransactionStage. error: ${error.message}`,
-      };
-    }
-  },
-  getTransactionStages: async (
-    condition: Record<string, any> | string
-  ): Promise<ITransactionStage[]> => {
-    try {
-      if (typeof condition === 'string') {
-        condition = db.knex.raw(condition);
-      }
-      const transactionStage = await db.knex
-        .queryBuilder()
-        .select('*')
-        .from(Tables.TRANSACTION_STAGES)
-        .where(condition);
-
       return transactionStage;
     } catch (error) {
       console.error(

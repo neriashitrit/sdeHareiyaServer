@@ -98,7 +98,7 @@ const transactionHelper = {
 
     if (!stages)
       stages = await transactionStageModel.getTransactionStages({
-        transactionId: transaction.id,
+        'ts.transaction_id': transaction.id,
       });
 
     if (!properties) {
@@ -138,7 +138,7 @@ const transactionHelper = {
     );
 
     const stages = await transactionStageModel.getTransactionStages(
-      `transaction_id IN (${transactionIds})`
+      `ts.transaction_id IN (${transactionIds})`
     );
 
     const properties =

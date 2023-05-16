@@ -209,7 +209,7 @@ const run = async () => {
         type: 'text',
         label: 'type',
         validation:
-          "{required: true, requiredMessage: 'typeRequired',type: 'string'}",
+          '{"required": true, "requiredMessage": "typeRequired","type": "string"}',
       },
       {
         productCategoryId: 1,
@@ -217,7 +217,7 @@ const run = async () => {
         type: 'text',
         label: 'manufacturer',
         validation:
-          "{required: true, requiredMessage: 'manufacturerRequired',type: 'string'}",
+          '{"required": true, "requiredMessage": "manufacturerRequired","type": "string"}',
       },
       {
         productCategoryId: 1,
@@ -225,7 +225,7 @@ const run = async () => {
         type: 'text',
         label: 'model',
         validation:
-          "{required: true, requiredMessage: 'modelRequired',type: 'string'}",
+          '{"required": true, "requiredMessage": "modelRequired","type": "string"}',
       },
       {
         productCategoryId: 1,
@@ -233,7 +233,7 @@ const run = async () => {
         type: 'text',
         label: 'licenseNo',
         validation:
-          "{required: true, requiredMessage: 'licenseNoRequired',type: 'number'}",
+          '{"required": true, "requiredMessage": "licenseNoRequired","type": "number"}',
       },
       {
         productCategoryId: 1,
@@ -241,7 +241,7 @@ const run = async () => {
         type: 'text',
         label: 'manufactureYear',
         validation:
-          "{required: true, requiredMessage: 'manufactureYearRequired',type: 'number'}",
+          '{"required": true, "requiredMessage": "manufactureYearRequired","type": "number"}',
       },
       {
         productCategoryId: 1,
@@ -249,7 +249,7 @@ const run = async () => {
         type: 'file',
         label: 'licenseImages',
         validation:
-          "{required: true, requiredMessage: 'licenseImagesRequired'}",
+          '{"required": true, "requiredMessage": "licenseImagesRequired"}',
         multipleFiles: true,
       },
       {
@@ -258,7 +258,7 @@ const run = async () => {
         type: 'text',
         label: 'type',
         validation:
-          "{required: true, requiredMessage: 'typeRequired',type: 'string'}",
+          '{"required": true, "requiredMessage": "typeRequired","type": "string"}',
       },
       {
         productCategoryId: 2,
@@ -266,7 +266,7 @@ const run = async () => {
         type: 'text',
         label: 'manufacturer',
         validation:
-          "{required: true, requiredMessage: 'manufacturerRequired',type: 'string'}",
+          '{"required": true, "requiredMessage": "manufacturerRequired","type": "string"}',
       },
       {
         productCategoryId: 2,
@@ -274,7 +274,7 @@ const run = async () => {
         type: 'text',
         label: 'color',
         validation:
-          "{required: true, requiredMessage: 'colorRequired',type: 'string'}",
+          '{"required": true, "requiredMessage": "colorRequired","type": "string"}',
       },
       {
         productCategoryId: 3,
@@ -282,7 +282,7 @@ const run = async () => {
         type: 'text',
         label: 'type',
         validation:
-          "{required: true, requiredMessage: 'typeRequired',type: 'string'}",
+          '{"required": true, "requiredMessage": "typeRequired","type": "string"}',
       },
       {
         productCategoryId: 3,
@@ -290,7 +290,7 @@ const run = async () => {
         type: 'text',
         label: 'age',
         validation:
-          "{required: true, requiredMessage: 'ageRequired',type: 'number'}",
+          '{"required": true, "requiredMessage": "ageRequired","type": "number"}',
       },
       {
         productCategoryId: 3,
@@ -298,7 +298,7 @@ const run = async () => {
         type: 'text',
         label: 'breed',
         validation:
-          "{required: true, requiredMessage: 'breedRequired',type: 'string'}",
+          '{"required": true, "requiredMessage": "breedRequired","type": "string"}',
       },
       {
         productCategoryId: 3,
@@ -307,7 +307,7 @@ const run = async () => {
         label: 'gender',
         selectOptions: ['male', 'female'],
         validation:
-          "{required: true, requiredMessage: 'genderRequired',type: 'string'}",
+          '{"required": true, "requiredMessage": "genderRequired","type": "string"}',
       },
       {
         productCategoryId: 4,
@@ -315,7 +315,7 @@ const run = async () => {
         type: 'text',
         label: 'type',
         validation:
-          "{required: true, requiredMessage: 'typeRequired',type: 'string'}",
+          '{"required": true, "requiredMessage": "typeRequired","type": "string"}',
       },
       {
         productCategoryId: 4,
@@ -324,7 +324,7 @@ const run = async () => {
         label: 'serviceDescription',
         lineCountText: 4,
         validation:
-          "{required: true, requiredMessage: 'serviceDescriptionRequired',type: 'string'}",
+          '{"required": true, "requiredMessage": "serviceDescriptionRequired","type": "string"}',
       },
       {
         productCategoryId: 5,
@@ -332,7 +332,7 @@ const run = async () => {
         type: 'text',
         label: 'type',
         validation:
-          "{required: true, requiredMessage: 'typeRequired',type: 'string'}",
+          '{"required": true, "requiredMessage": "typeRequired","type": "string"}',
       },
       {
         productCategoryId: 5,
@@ -340,7 +340,7 @@ const run = async () => {
         type: 'text',
         label: 'manufacturer',
         validation:
-          "{required: true, requiredMessage: 'manufacturerRequired',type: 'string'}",
+          '{"required": true, "requiredMessage": "manufacturerRequired","type": "string"}',
       },
       {
         productCategoryId: 5,
@@ -348,7 +348,7 @@ const run = async () => {
         type: 'text',
         label: 'model',
         validation:
-          "{required: true, requiredMessage: 'modelRequired',type: 'string'}",
+          '{"required": true, "requiredMessage": "modelRequired","type": "string"}',
       },
       {
         productCategoryId: 6,
@@ -356,7 +356,7 @@ const run = async () => {
         type: 'text',
         label: 'type',
         validation:
-          "{required: true, requiredMessage: 'typeRequired',type: 'string'}",
+          '{"required": true, "requiredMessage": "typeRequired","type": "string"}',
       },
       {
         productCategoryId: 6,
@@ -365,7 +365,7 @@ const run = async () => {
         label: 'serviceDescription',
         lineCountText: 6,
         validation:
-          "{required: true, requiredMessage: 'serviceDescriptionRequired',type: 'string'}",
+          '{"required": true, "requiredMessage": "serviceDescriptionRequired","type": "string"}',
       },
     ]);
   }

@@ -111,6 +111,7 @@ export const transactionProductPropertyModel = {
         updatedTransactionProductProperty,
         condition
       );
+
       return transactionProductProperties?.[0];
     } catch (error) {
       console.error(

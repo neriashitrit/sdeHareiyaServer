@@ -44,7 +44,7 @@ app.use(
 );
 app.use(
   '/api/flutterapp',
-  passport.authenticate(bearerStrategy, { session: false }),
+  passport.authenticate('oauth-bearer', { session: false }),
   roleGuard(),
   webAppRouter
 );
