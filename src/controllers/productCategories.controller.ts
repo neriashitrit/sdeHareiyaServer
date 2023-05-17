@@ -4,6 +4,7 @@ import { productCategoryModel } from '../models/index';
 
 import { failureResponse, successResponse } from '../utils/db.utils';
 import _ from 'lodash';
+import { Tables } from '../constants';
 
 export const getActiveProductCategories = async (
   req: Request,

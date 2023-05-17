@@ -15,6 +15,12 @@ export const productCategoryModel = {
         .queryBuilder()
         .select(
           `${Tables.PRODUCT_CATEGORIES}.*`,
+          `${Tables.PRODUCT_CATEGORIES}.id`,
+          `${Tables.PRODUCT_CATEGORIES}.name`,
+          `${Tables.PRODUCT_CATEGORIES}.description`,
+          'product_category_file.url as icon',
+          `${Tables.PRODUCT_CATEGORIES}.updated_at`,
+          `${Tables.PRODUCT_CATEGORIES}.created_at`,
           db.knex.raw(
             `JSON_AGG(JSON_BUILD_OBJECT(${getJsonBuildObject(
               Tables.PRODUCT_PROPERTIES,

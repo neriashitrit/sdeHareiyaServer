@@ -184,7 +184,7 @@ const transactionHelper = {
     userId: number
   ): Promise<ITransaction[]> => {
     const transactions = await transactionModel.getTransactions(
-      `u.id = '${userId}' AND tsg.status = 'active' AND tsg.name IN ('authorizationSideA', 'authorizationSideB')`
+      `${Tables.USERS}.id = '${userId}' AND ${Tables.TRANSACTION_STAGES}.status = 'active' AND ${Tables.TRANSACTION_STAGES}.name IN ('authorizationSideA', 'authorizationSideB')`
     );
     return transactions;
   },

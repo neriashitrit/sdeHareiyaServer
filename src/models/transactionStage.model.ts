@@ -22,6 +22,10 @@ export const transactionStageModel = {
           `${Tables.TRANSACTION_STAGES}.name`,
           `${Tables.TRANSACTION_STAGES}.inCharge`,
           `${Tables.TRANSACTION_STAGES}.status`,
+          `${Tables.TRANSACTION_STAGES}.transaction_id`,
+          `${Tables.TRANSACTION_STAGES}.created_at`,
+          `${Tables.TRANSACTION_STAGES}.updated_at`,
+
           db.knex.raw(
             `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.USERS, [
               Tables.USERS,

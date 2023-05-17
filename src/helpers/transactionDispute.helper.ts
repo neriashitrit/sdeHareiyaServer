@@ -1,4 +1,6 @@
-import { transactionSideModel } from '../models/index';
+import { TransactionStatus } from 'safe-shore-common';
+import { Tables } from '../constants';
+import { transactionModel, transactionSideModel } from '../models/index';
 import { transactionDisputeModel } from '../models/transactionDispute.model';
 
 const transactionDisputeHelper = {
@@ -11,8 +13,8 @@ const transactionDisputeHelper = {
   ): Promise<void> => {
     const currentUserSide = (
       await transactionSideModel.getTransactionSides({
-        'ts.transaction_id': transactionId,
-        'u.id': userId,
+        [`${Tables.TRANSACTION_SIDES}.transaction_id`]: transactionId,
+        [`${Tables.USERS}.id`]: userId,
       })
     )[0];
 
@@ -31,6 +33,15 @@ const transactionDisputeHelper = {
       userId,
       isCompleted: false,
     });
+
+    await transactionModel.updateTransaction(
+      {
+        id: transactionId,
+      },
+      {
+        status: TransactionStatus.Dispute,
+      }
+    );
   },
   closeTransactionDispute: async (
     transactionId: number,
@@ -46,6 +57,15 @@ const transactionDisputeHelper = {
           isCompleted: true,
         }
       );
+
+    await transactionModel.updateTransaction(
+      {
+        id: transactionId,
+      },
+      {
+        status: TransactionStatus.Stage,
+      }
+    );
 
     return transactionDispute !== undefined;
   },
