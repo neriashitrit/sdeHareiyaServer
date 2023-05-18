@@ -7,10 +7,9 @@ export const shorthands: ColumnDefinitions | undefined = undefined;
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createTable(Tables.FILES, {
     id: 'id',
-    azure_key: { type: PgType.VARCHAR, notNull: true },
     url: { type: PgType.VARCHAR, notNull: true },
-    table_name: { type: PgType.VARCHAR, notNull: true },
-    row_id: { type: PgType.INT, notNull: true },
+    table_name: { type: PgType.VARCHAR },
+    row_id: { type: PgType.INT },
     created_at: {
       type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE,
       notNull: true,

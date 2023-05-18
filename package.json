@@ -17,7 +17,7 @@
     "db:reset": "ts-node ./src/scripts/resetDb.ts"
   },
   "dependencies": {
-    "@azure/storage-file-share": "^12.11.0",
+    "@azure/storage-blob": "^12.14.0",
     "@sendgrid/mail": "^7.7.0",
     "axios": "^0.27.2",
     "azure-connection-parser": "^1.0.1",
@@ -26,6 +26,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "generate-password": "^1.7.0",
     "helmet": "^5.1.0",
     "knex": "^2.1.0",
     "lodash": "^4.17.21",

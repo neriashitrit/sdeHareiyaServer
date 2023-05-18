@@ -14,6 +14,7 @@ const router = express.Router();
 
 router.get('/users/getAllUsers', adminUsersController.getAllUsers);
 router.post('/users/getUser', adminUsersController.getUserById);
+router.post('/users/createAdminUser', adminUsersController.createAdminUser);
 
 ///////////////////////////
 //      Accounts         //

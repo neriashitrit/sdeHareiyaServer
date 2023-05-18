@@ -10,3 +10,4 @@ export { transactionStageModel } from './transactionStage.model';
 export { userAccountModel } from './userAccount.model';
 export { userModel } from './users.model';
 export { productCategoryModel } from './productCategory.model';
+export { fileModel } from './file.model';

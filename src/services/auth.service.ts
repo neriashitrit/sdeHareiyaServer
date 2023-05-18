@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt-nodejs';
 import crypto from 'crypto';
+import generator from 'generate-password';
 
 const encryptionKey = process.env.ENCRYPTION_KEY || '';
 const algorithm = 'aes256';
@@ -32,3 +33,13 @@ export const decryptPassword = (Password: string) => {
 
 	return decrypted.toString();
 };
+
+export const generateRandomPassword = (length: number, useNumbers: boolean, useSymbols: boolean, useLower?: boolean, useUpper?: boolean) => {
+    return generator.generate({
+        length: length,
+        numbers: useNumbers,
+        symbols: useSymbols,
+        lowercase: useLower,
+        uppercase: useUpper
+    });
+}

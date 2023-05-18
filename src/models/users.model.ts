@@ -14,7 +14,7 @@ export const userModel = {
     } catch (error) {
       console.error('ERROR in users.modal getAllUsers()', error.message);
       throw {
-        message: `error while trying to getUser. error: ${error.message}`,
+        message: `error while trying to getAllUser. error: ${error.message}`,
       };
     }
   },

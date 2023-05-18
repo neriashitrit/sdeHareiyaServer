@@ -1,6 +1,6 @@
 import { AuthInfo } from 'types';
 import { accountModel, userAccountModel, userModel } from '../models/index';
-import { AccountType, IAccount, IUser, IUserAccount } from 'safe-shore-common';
+import { AccountType, IAccount, IUser, IUserAccount, UserRole } from 'safe-shore-common'; 
 
 const usersHelper = {
   createUserFromToken: async (
@@ -47,6 +47,7 @@ const usersHelper = {
       };
     }
   },
+
   createNotActivatedUser: async (
     firstName: string,
     lastName: string,
@@ -81,6 +82,31 @@ const usersHelper = {
       );
       throw {
         message: `error while trying to createNotActivatedUser. error: ${error.message}`,
+      };
+    }
+  },
+
+  createAdminUserFromADRespond: async (
+    ADUser: any
+  ): Promise<IUser> => {
+    try {
+      const newUser = await userModel.createUser({
+        firstName: ADUser.givenName,
+        lastName: ADUser.surname,
+        email:ADUser.mail,
+        activeDirectoryUuid:ADUser.id,
+        phoneNumber:ADUser.mobilePhone,
+        newsletterSubscription: false,
+        lastActiveAt: new Date(),
+        isActive: true,
+        role: UserRole.Admin
+      });
+
+      return newUser;
+    } catch (error) {
+      console.error('ERROR in users.helper createAdminUserFromADRespond()',error.message);
+      throw {
+        message: `error while trying to createAdminUserFromADRespond. error: ${error.message}`,
       };
     }
   },

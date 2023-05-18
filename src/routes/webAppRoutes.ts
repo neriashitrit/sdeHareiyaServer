@@ -1,5 +1,6 @@
 import express from 'express';
 
+import * as globalController from '../controllers/global.controller';
 import * as usersController from '../controllers/users.controller';
 import * as transactionsController from '../controllers/transactions.controller';
 import * as accountsController from '../controllers/accounts.controller';
@@ -37,5 +38,11 @@ router.post(
   accountsController.submitAccountAuthorization
 );
 router.get('/getAccount', accountsController.getAccount);
+
+///////////////////////////
+//       files        //
+///////////////////////////
+router.post('/files/uploadFile',globalController.uploadFileToStorage);
+router.get('/files/getSas', globalController.getSas);
 
 export default router;
