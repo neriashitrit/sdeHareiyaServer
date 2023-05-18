@@ -327,13 +327,14 @@ export const buildRange = (
 export type conditionTerm = {
   column:string;
   operator?:string;
-  value:string;
+  value:string | string[];
 }
 
 export const buildConditionString = (terms:conditionTerm[]) => {
   let sql:string[] = []
   terms.forEach(term => {
-    sql.push(term?.operator ? `${term.column} ${term.operator} '${term.value}'` : `${term.column} = '${term.value}'`)
+    let value = _.isArray(term.value) ? "('" +term.value.join(`','`) + "')" : `'${term.value}'`
+    sql.push(term?.operator ? `${term.column} ${term.operator} ${value}` : `${term.column} = ${value}`)
   })
   return sql.join(' and ')
 }

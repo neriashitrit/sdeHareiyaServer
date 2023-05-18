@@ -62,6 +62,12 @@ export type AdminApproveStageBody = {
   transactionId: number;
 };
 
+export type AdminApproveDisputeBody = {
+  transactionId: number;
+  userId:number;
+  continueTransaction:boolean;
+};
+
 export type CreateProductCategoryBody = {
   name: string;
   icon: File;

@@ -3,6 +3,7 @@ import {
   AccountAuthorizationCompanyBody,
   AccountAuthorizationPrivateBody,
   AdminApproveStageBody,
+  AdminApproveDisputeBody,
   ApproveStageBody,
   CancelDisputeBody,
   CreateProductCategoryBody,
@@ -114,6 +115,18 @@ export const isAdminApproveStageBody = (
     !_.isNil(body) &&
     (typeof body.transactionId === 'number' ||
       typeof +body.transactionId === 'number')
+  );
+};
+
+export const isAdminApproveDisputeBody = (
+  body: any
+): body is AdminApproveDisputeBody => {
+  return (
+    typeof body === 'object' &&
+    !_.isNil(body) &&
+    typeof body.transactionId === 'number' &&
+    typeof body.userId === 'number' &&
+    typeof body.continueTransaction === 'boolean'
   );
 };
 

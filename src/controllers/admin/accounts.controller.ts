@@ -17,7 +17,7 @@ export const getAllAccounts = async (req: Request, res: Response) => {
 };
 
 export const getAccountById = async (req: Request, res: Response) => {
-  const { accountId } = req.body;
+  const { accountId } = req.params;
   try {
     const account = await accountModel.getAccount({
       [`${Tables.ACCOUNTS}.id`]: accountId,

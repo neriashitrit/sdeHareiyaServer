@@ -9,7 +9,7 @@ import {
   failureResponse,
   successResponse,
 } from '../../utils/db.utils';
-import { isAdminApproveStageBody } from '../../utils/typeCheckers.utils';
+import { isAdminApproveDisputeBody, isAdminApproveStageBody } from '../../utils/typeCheckers.utils';
 import transactionStageHelper from '../../helpers/transactionStage.helper';
 import { IUser } from 'safe-shore-common';
 import DbService from '../../services/db.service';
@@ -20,19 +20,20 @@ import {
   TransactionStageStatus,
   TransactionStatus,
 } from 'safe-shore-common';
-import { conditionForTransactionsNeedAutorization } from '../../constants';
+import { conditionForTransactionsNeedAutorization, Tables } from '../../constants';
+import transactionDisputeHelper from '../../helpers/transactionDispute.helper';
 
 export const getAllTransactions = async (req: Request, res: Response) => {
   try {
     const { startDate, endDate } = req.body;
     const condition = buildConditionString([
       {
-        column: 't.updated_at',
+        column: Tables.TRANSACTIONS+'.updated_at',
         operator: '>=',
         value: startDate,
       },
       {
-        column: 't.updated_at',
+        column: Tables.TRANSACTIONS+'.updated_at',
         operator: '<=',
         value: endDate,
       },
@@ -52,7 +53,7 @@ export const getTransactionById = async (req: Request, res: Response) => {
     const { transactionId } = req.params;
     const condition = buildConditionString([
       {
-        column: 't.id',
+        column: Tables.TRANSACTIONS+'.id',
         value: transactionId,
       },
     ]);
@@ -72,17 +73,73 @@ export const getTransactionById = async (req: Request, res: Response) => {
   }
 };
 
+export const getTransactionsByAccount = async (req: Request, res: Response) => {
+  try {
+    const { accountId } = req.params;
+    const condition = buildConditionString([
+      {
+        column: Tables.TRANSACTION_SIDES+'.user_account_id',
+        value: accountId,
+      },
+    ]);
+    const transactions = await transactionHelper.getFullTransactions({
+      condition,
+    });
+
+    return res.status(200).json(successResponse(transactions));
+  } catch (error: any) {
+    console.log(error);
+    return res.status(500).json(failureResponse(error));
+  }
+};
+
+
+export const settleTransactionDispute = async (req: Request, res: Response) => {
+  try {
+    if (!isAdminApproveDisputeBody(req.body)) {
+      return res.status(400).json(failureResponse('Invalid Parameters'));
+    }
+    const { transactionId, userId, continueTransaction } = req.body;
+
+   const closeDispute = await transactionDisputeHelper.closeTransactionDispute(transactionId,userId)
+    
+    if( !continueTransaction ){ //move transaction to canceled status
+      const updateTransaction = await transactionModel.updateTransaction(
+        {
+          id:transactionId
+        },
+        {
+          status:TransactionStatus.Canceled
+        }
+      )
+    }
+    const condition = buildConditionString([
+      {
+        column: Tables.TRANSACTIONS+'.id',
+        value: String(transactionId),
+      },
+    ]);
+    const transaction = await transactionHelper.getFullTransactions({
+      condition,
+    });
+    return res.status(200).json(successResponse(transaction[0]));
+  } catch (error: any) {
+    console.log(error);
+    return res.status(500).json(failureResponse(error));
+  }
+};
+
 export const getAutorizeTransactions = async (req: Request, res: Response) => {
   try {
     const { startDate, endDate } = req.body;
     const condition = buildConditionString([
       {
-        column: 't.updated_at',
+        column: Tables.TRANSACTIONS+'.updated_at',
         operator: '>=',
         value: startDate,
       },
       {
-        column: 't.updated_at',
+        column: Tables.TRANSACTIONS+'.updated_at',
         operator: '<=',
         value: endDate,
       },

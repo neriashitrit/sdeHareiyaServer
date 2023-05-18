@@ -77,15 +77,16 @@ export const transactionStageInCharge: {
 
 export const conditionForTransactionsNeedAutorization = [
   {
-    column:'t.status',
-    value:TransactionStatus.Stage
+    column:Tables.TRANSACTIONS+'.status',
+    operator:'in',
+    value:[TransactionStatus.Stage,TransactionStatus.Dispute]
   },
   {
-    column:'tsg.in_charge',
+    column:Tables.TRANSACTION_STAGES+'.in_charge',
     value:TransactionSide.Admin
   },
   {
-    column:'tsg.status',
+    column:Tables.TRANSACTION_STAGES+'.status',
     value:TransactionStageStatus.Active
   },
 ]

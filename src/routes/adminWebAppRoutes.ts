@@ -42,6 +42,9 @@ router.post('/transactions/getAllTransactions', adminTransactionsController.getA
 router.post('/transactions/getAutorizeTransactions', adminTransactionsController.getAutorizeTransactions)
 router.get('/transactions/getTransactionById/:transactionId', adminTransactionsController.getTransactionById)
 router.post('/transactions/approveStage', adminTransactionsController.approveStage)
+router.post('/transactions/settleTransactionDispute', adminTransactionsController.settleTransactionDispute)
+router.get('/transactions/getTransactionsByAccount/:accountId', adminTransactionsController.getTransactionsByAccount)
+
 
 ///////////////////////////
 //      Commissions      //

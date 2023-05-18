@@ -154,6 +154,9 @@ export const transactionModel = {
     condition: Record<string, any> | string,
     updatedTransaction: Record<string, any>
   ): Promise<void> => {
+    if (typeof condition === 'string') {
+      condition = db.knex.raw(condition);
+    }
     try {
       await db
         .knex(Tables.TRANSACTIONS)
@@ -230,8 +233,8 @@ export const transactionModel = {
         .select(`${Tables.TRANSACTIONS}.status`)
         .from(Tables.TRANSACTIONS)
         .count(`${Tables.TRANSACTIONS}.status AS total`)
-        .sum('amount')
-        .sum('commission_amount')
+        .sum(`${Tables.TRANSACTIONS}.amount AS amount`)
+        .sum(`${Tables.TRANSACTIONS}.commission_amount AS commission_amount`)
         .select(`${Tables.TRANSACTION_STAGES}.name`)
         .leftJoin(
           Tables.TRANSACTION_STAGES,
