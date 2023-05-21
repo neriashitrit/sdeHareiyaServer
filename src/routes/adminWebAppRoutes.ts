@@ -3,6 +3,7 @@ import express from 'express';
 import * as adminUsersController from '../controllers/admin/users.controller';
 import * as adminAccountsController from '../controllers/admin/accounts.controller';
 import * as adminTransactionsController from '../controllers/admin/transactions.controller';
+import * as adminCommissionsController from '../controllers/admin/commissions.controller';
 import * as commissionsController from '../controllers/commissions.controller';
 import * as adminProductCategoriesController from '../controllers/admin/productCategories.controller';
 
@@ -51,10 +52,8 @@ router.get('/transactions/getTransactionsByAccount/:accountId', adminTransaction
 //      Commissions      //
 ///////////////////////////
 
-router.get(
-  '/commissions/getActiveCommissions',
-  commissionsController.getActiveCommissions
-);
+router.get('/commissions/getActiveCommissions',commissionsController.getActiveCommissions);
+router.post('/commissions/updateCommission',adminCommissionsController.updateCommission);
 
 ///////////////////////////
 //   Product Categories  //

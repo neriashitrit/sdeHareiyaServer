@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { CommissionType } from 'safe-shore-common';
 import {
   AccountAuthorizationCompanyBody,
   AccountAuthorizationPrivateBody,
@@ -13,6 +14,7 @@ import {
   OpenDisputeBody,
   UpdateTransactionBody,
   UpdateUserBody,
+  updateCommissionParams,
 } from '../types/requestBody.types';
 
 export const isUpdateTransactionBody = (
@@ -128,6 +130,20 @@ export const isAdminApproveDisputeBody = (
     typeof body.transactionId === 'number' &&
     typeof body.userId === 'number' &&
     typeof body.continueTransaction === 'boolean'
+  );
+};
+
+export const isUpdateCommissionParams = (
+  body: any
+): body is updateCommissionParams => {
+  return (
+    typeof body === 'object' &&
+    !_.isNil(body) &&
+    typeof body.id === 'number'  &&
+    typeof body.from === 'number' &&
+    typeof body.to === 'number' &&
+    typeof body.amount === 'number' &&
+    _.values(CommissionType).includes(body.type)
   );
 };
 

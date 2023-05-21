@@ -9,6 +9,7 @@ import {
   ICompanyContact,
   Purpose,
   FundsSource,
+  CommissionType,
 } from 'safe-shore-common';
 
 export type CreateTransactionBodyProductProperty = {
@@ -66,6 +67,14 @@ export type AdminApproveDisputeBody = {
   transactionId: number;
   userId:number;
   continueTransaction:boolean;
+};
+
+export type updateCommissionParams = {
+  id: number;
+  from:number;
+  to:number;
+  type:CommissionType;
+  amount:number;
 };
 
 export type CreateProductCategoryBody = {
