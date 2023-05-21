@@ -120,22 +120,32 @@ export type AccountAuthorizationPrivateBody = AccountAuthorizationBaseBody & {
   birthday: string;
   gender: Gender;
   isThirdParty: boolean;
-  isThirdPartyFullName?: string;
+  thirdPartyFullName?: string;
   isBankAccountBlocked: boolean;
 };
 
 export type AccountAuthorizationCompanyBody = AccountAuthorizationBaseBody & {
-  companyIdentityNumber: number;
+  companyIdentityNumber: string;
   incorporationName: string;
   incorporationDate: string;
   incorporationCountry: string;
   fundsSource: FundsSource;
   fundsSourceOther?: string;
   contacts: ICompanyContact[];
-  activeYears: number;
+  activeYears: string;
   purpose: Purpose;
 };
 
 export type AccountAuthorizationBody =
   | AccountAuthorizationPrivateBody
   | AccountAuthorizationCompanyBody;
+
+export type CreateBankDetailsBody = {
+  accountId: string;
+  bankName: string;
+  branchName: string;
+  branchNumber: string;
+  bankAccountOwnerFullName: string;
+  bankAccountOwnerIdNumber: string;
+  bankAccountNumber: string;
+};

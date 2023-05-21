@@ -6,6 +6,7 @@ import {
   AdminApproveDisputeBody,
   ApproveStageBody,
   CancelDisputeBody,
+  CreateBankDetailsBody,
   CreateProductCategoryBody,
   CreateTransactionBody,
   GetTransactionParams,
@@ -227,8 +228,8 @@ export const isAccountAuthorizationPrivateBody = (
     typeof body.gender === 'string' &&
     typeof body.isThirdParty === 'boolean' &&
     (!body.isThirdParty
-      ? _.isNil(body.isThirdPartyFullName)
-      : typeof body.isThirdPartyFullName === 'string') &&
+      ? _.isNil(body.thirdPartyFullName)
+      : typeof body.thirdPartyFullName === 'string') &&
     typeof body.isBankAccountBlocked === 'boolean'
   );
 };
@@ -238,7 +239,7 @@ export const isAccountAuthorizationCompanyBody = (
 ): body is AccountAuthorizationCompanyBody => {
   return (
     isAccountAuthorizationBaseBody(body) &&
-    typeof body.companyIdentityNumber === 'number' &&
+    typeof body.companyIdentityNumber === 'string' &&
     typeof body.incorporationName === 'string' &&
     typeof body.incorporationDate === 'string' &&
     typeof body.incorporationCountry === 'string' &&
@@ -255,7 +256,23 @@ export const isAccountAuthorizationCompanyBody = (
         typeof contact.idNumber === 'string'
     ) &&
     body.contacts.length > 0 &&
-    typeof body.activeYears === 'number' &&
+    typeof body.activeYears === 'string' &&
     typeof body.purpose === 'string'
+  );
+};
+
+export const isCreateBankDetailsBody = (
+  body: any
+): body is CreateBankDetailsBody => {
+  return (
+    typeof body === 'object' &&
+    !_.isNil(body) &&
+    typeof body.accountId === 'number' &&
+    typeof body.bankName === 'string' &&
+    typeof body.branchName === 'string' &&
+    typeof body.branchNumber === 'string' &&
+    typeof body.bankAccountOwnerFullName === 'string' &&
+    typeof body.bankAccountOwnerIdNumber === 'string' &&
+    typeof body.bankAccountNumber === 'string'
   );
 };

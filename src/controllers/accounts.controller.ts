@@ -5,13 +5,15 @@ import { IUser } from 'safe-shore-common';
 import {
   isAccountAuthorizationCompanyBody,
   isAccountAuthorizationPrivateBody,
+  isCreateBankDetailsBody,
 } from '../utils/typeCheckers.utils';
 import accountHelper from '../helpers/account.helper';
 import transactionStageHelper from '../helpers/transactionStage.helper';
 import transactionHelper from '../helpers/transaction.helper';
 import transactionSideHelper from '../helpers/transactionSide.helper';
-import { accountModel } from '../models';
+import { accountModel, userModel } from '../models';
 import { Tables } from '../constants';
+import bankDetailsHelper from '../helpers/bankDetails.helper';
 
 export const submitAccountAuthorization = async (
   req: Request,
@@ -65,7 +67,14 @@ export const submitAccountAuthorization = async (
       );
     }
 
-    return res.status(200).json(successResponse());
+    const updatedUser = await userModel.getUserById(user.id);
+    const updatedAccount = (
+      await accountModel.getAccount({ [`${Tables.USERS}.id`]: user.id })
+    )[0];
+
+    return res
+      .status(200)
+      .json(successResponse({ user: updatedUser, account: updatedAccount }));
   } catch (error) {
     return res.status(500).json(failureResponse(error));
   }
@@ -82,5 +91,26 @@ export const getAccount = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.log(error);
     res.status(500).json(failureResponse(error));
+  }
+};
+
+export const createBankDetails = async (req: Request, res: Response) => {
+  try {
+    const user = req.user as IUser;
+    const body = req.body;
+
+    if (!isCreateBankDetailsBody(body)) {
+      return res.status(400).json(failureResponse('Invalid Parameters'));
+    }
+
+    await bankDetailsHelper.createNewBankDetails(body);
+
+    const account = await accountModel.getAccount({
+      [`${Tables.USERS}.id`]: user.id,
+    });
+
+    res.status(200).json(successResponse(account[0]));
+  } catch (error) {
+    return res.status(500).json(failureResponse(error));
   }
 };

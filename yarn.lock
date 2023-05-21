@@ -2507,8 +2507,8 @@ safe-json-stringify@~1:
   integrity sha512-gH8eh2nZudPQO6TytOvbxnuhYBOvDBBLW52tz5q6X58lJcd/tkmqFR+5Z9adS8aJtURSXWThWy/xJtJwixErvg==
 
 "safe-shore-common@https://x-token-auth:ATCTT3xFfGN0MWpLYVzn8PcB3EIxpNJE69yA-onLv7VMnQjX9wMuRz8JNCHBGmnKCuVCdH2lVOhpvbGXKNzk-afFvHS581DzqZIwhJuoOL3LTEumCT5AvMJWGdAPBjkuj6lWifgQ7GAQ85DRRSNKTs_aJ4pCWEOGE5wMy5MfuzUUN7aSaLzEWNQ=7A8A2DEF@bitbucket.org/digitaltingz/safe-shore-common.git":
-  version "0.0.52"
-  resolved "https://x-token-auth:ATCTT3xFfGN0MWpLYVzn8PcB3EIxpNJE69yA-onLv7VMnQjX9wMuRz8JNCHBGmnKCuVCdH2lVOhpvbGXKNzk-afFvHS581DzqZIwhJuoOL3LTEumCT5AvMJWGdAPBjkuj6lWifgQ7GAQ85DRRSNKTs_aJ4pCWEOGE5wMy5MfuzUUN7aSaLzEWNQ=7A8A2DEF@bitbucket.org/digitaltingz/safe-shore-common.git#4d86fedc3c69085f412c54e8edef3815501c3625"
+  version "0.0.55"
+  resolved "https://x-token-auth:ATCTT3xFfGN0MWpLYVzn8PcB3EIxpNJE69yA-onLv7VMnQjX9wMuRz8JNCHBGmnKCuVCdH2lVOhpvbGXKNzk-afFvHS581DzqZIwhJuoOL3LTEumCT5AvMJWGdAPBjkuj6lWifgQ7GAQ85DRRSNKTs_aJ4pCWEOGE5wMy5MfuzUUN7aSaLzEWNQ=7A8A2DEF@bitbucket.org/digitaltingz/safe-shore-common.git#91b9c812f57649ad7a6c8b2b1f633832cac5dc49"
 
 "safer-buffer@>= 2.1.2 < 3", safer-buffer@^2.0.2, safer-buffer@^2.1.0, safer-buffer@~2.1.0:
   version "2.1.2"

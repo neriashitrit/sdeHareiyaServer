@@ -38,6 +38,10 @@ router.post(
   accountsController.submitAccountAuthorization
 );
 router.get('/getAccount', accountsController.getAccount);
+router.post(
+  '/accounts/createBankDetails',
+  accountsController.createBankDetails
+);
 
 ///////////////////////////
 //       files        //
