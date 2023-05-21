@@ -1,43 +1,32 @@
+import _ from 'lodash'
 import {
   AuthorizationStatus,
   ITransactionSide,
   ITransactionStage,
+  TransactionSide,
   TransactionStageName,
   TransactionStageStatus,
-  TransactionSide,
-  TransactionStatus,
-} from 'safe-shore-common';
-import {
-  transactionStageModel,
-  transactionModel,
-  transactionSideModel,
-} from '../models/index';
-import _ from 'lodash';
-import {
-  transactionStagePossiblePaths,
-  transactionStageInCharge,
-  Tables,
-} from '../constants';
-import transactionHelper from './transaction.helper';
-import fileHelper from './file.helper';
+  TransactionStatus
+} from 'safe-shore-common'
+
+import { Tables, transactionStageInCharge, transactionStagePossiblePaths } from '../constants'
+import { transactionModel, transactionSideModel, transactionStageModel } from '../models/index'
+import fileHelper from './file.helper'
+import transactionHelper from './transaction.helper'
 
 const transactionStageHelper = {
-  adminNextStage: async (
-    transactionId: number,
-    userId: number,
-    activeStage: ITransactionStage
-  ) => {
+  adminNextStage: async (transactionId: number, userId: number, activeStage: ITransactionStage) => {
     try {
-      const nextStages = transactionStagePossiblePaths[activeStage.name];
+      const nextStages = transactionStagePossiblePaths[activeStage.name]
 
-      await setPreviousStageCompleted(transactionId, activeStage.id, userId);
+      await setPreviousStageCompleted(transactionId, activeStage.id, userId)
 
-      return createNextStage(transactionId, nextStages);
+      return createNextStage(transactionId, nextStages)
     } catch (error) {
-      console.error('ERROR in transaction.helper nextStage()', error.message);
+      console.error('ERROR in transaction.helper nextStage()', error.message)
       throw {
-        message: `error while trying to next stage. error: ${error.message}`,
-      };
+        message: `error while trying to next stage. error: ${error.message}`
+      }
     }
   },
   nextStage: async (
@@ -48,7 +37,7 @@ const transactionStageHelper = {
     additionalData?: Record<string, any>
   ): Promise<ITransactionStage | undefined> => {
     try {
-      const nextStages = transactionStagePossiblePaths[activeStage.name];
+      const nextStages = transactionStagePossiblePaths[activeStage.name]
 
       await setPreviousStageCompleted(
         transactionId,
@@ -56,31 +45,26 @@ const transactionStageHelper = {
         requestingSide.user.id,
         transactionProps,
         additionalData
-      );
+      )
 
       if (nextStages.length === 1) {
-        return createNextStage(transactionId, nextStages);
+        return createNextStage(transactionId, nextStages)
       } else if (nextStages.length > 1) {
-        return createNextStageFromMultiChoice(
-          activeStage.name,
-          requestingSide,
-          transactionId,
-          nextStages
-        );
+        return createNextStageFromMultiChoice(activeStage.name, requestingSide, transactionId, nextStages)
       }
-      return;
+      return
     } catch (error) {
-      console.error('ERROR in transaction.helper nextStage()', error.message);
+      console.error('ERROR in transaction.helper nextStage()', error.message)
       throw {
-        message: `error while trying to next stage. error: ${error.message}`,
-      };
+        message: `error while trying to next stage. error: ${error.message}`
+      }
     }
   },
   getActiveStage: async (transactionId: number) => {
     return await transactionStageModel.getTransactionStages({
       [`${Tables.TRANSACTION_STAGES}.transaction_id`]: transactionId,
-      [`${Tables.TRANSACTION_STAGES}.status`]: TransactionStageStatus.Active,
-    });
+      [`${Tables.TRANSACTION_STAGES}.status`]: TransactionStageStatus.Active
+    })
   },
   isStageCompleted: async (
     transactionId: number,
@@ -97,53 +81,43 @@ const transactionStageHelper = {
     deliveryType?: string,
     deliveryNotes?: string
   ): Promise<{
-    success: boolean;
-    additionalData?: Record<string, any>;
-    transactionProps?: Record<string, any>;
-    errorMessage?: string;
+    success: boolean
+    additionalData?: Record<string, any>
+    transactionProps?: Record<string, any>
+    errorMessage?: string
   }> => {
-    let additionalData: Record<string, any> | undefined;
-    let transactionProps: Record<string, any> | undefined;
-
+    let additionalData: Record<string, any> | undefined
+    let transactionProps: Record<string, any> | undefined
+    let isTransactionCompleted: boolean
     switch (activeStage?.name) {
       case TransactionStageName.Draft:
-        const isTransactionCompleted =
-          await transactionHelper.isTransactionCompleted(transactionId);
+        isTransactionCompleted = await transactionHelper.isTransactionCompleted(transactionId)
         if (!isTransactionCompleted) {
           return {
             success: false,
-            errorMessage:
-              'Can`t complete transaction stage, some properties are missing',
-          };
+            errorMessage: 'Can`t complete transaction stage, some properties are missing'
+          }
         }
-        break;
+        break
       case TransactionStageName.AuthorizationSideA:
-        if (
-          transactionCurrentSide?.account.authorizationStatus !==
-          AuthorizationStatus.Pending
-        ) {
+        if (transactionCurrentSide?.account.authorizationStatus !== AuthorizationStatus.Pending) {
           return {
             success: false,
-            errorMessage:
-              'Can`t complete transaction stage, side A authorization form is required',
-          };
+            errorMessage: 'Can`t complete transaction stage, side A authorization form is required'
+          }
         }
-        break;
+        break
       case TransactionStageName.AuthorizationSideB:
-        if (
-          transactionOtherSide?.account.authorizationStatus !==
-          AuthorizationStatus.Pending
-        ) {
+        if (transactionOtherSide?.account.authorizationStatus !== AuthorizationStatus.Pending) {
           return {
             success: false,
-            errorMessage:
-              'Can`t complete transaction stage, side B authorization form is required',
-          };
+            errorMessage: 'Can`t complete transaction stage, side B authorization form is required'
+          }
         }
-        break;
+        break
       case TransactionStageName.ConfirmationSideB:
         //  No additional data
-        break;
+        break
       case TransactionStageName.BuyerDeposit:
         if (
           _.isNil(depositBankName) ||
@@ -155,8 +129,8 @@ const transactionStageHelper = {
         ) {
           return {
             success: false,
-            errorMessage: 'Invalid Parameters',
-          };
+            errorMessage: 'Invalid Parameters'
+          }
         }
         // await fileHelper.uploadFile(
         //   Tables.TRANSACTIONS,
@@ -168,34 +142,30 @@ const transactionStageHelper = {
           depositBankNumber,
           depositBankAccountOwnerFullName,
           depositTransferDate,
-          depositReferenceNumber,
-        };
-        break;
+          depositReferenceNumber
+        }
+        break
       case TransactionStageName.SellerProductTransfer:
-        if (
-          _.isNil(deliveryDate) ||
-          _.isNil(deliveryType) ||
-          _.isNil(deliveryNotes)
-        ) {
+        if (_.isNil(deliveryDate) || _.isNil(deliveryType) || _.isNil(deliveryNotes)) {
           return {
             success: false,
-            errorMessage: 'Invalid Parameters',
-          };
+            errorMessage: 'Invalid Parameters'
+          }
         }
         additionalData = {
           deliveryDate,
           deliveryType,
-          deliveryNotes,
-        };
-        break;
+          deliveryNotes
+        }
+        break
       case TransactionStageName.BuyerProductConfirmation:
         //  No additional data
-        break;
+        break
       case TransactionStageName.Completed:
         return {
           success: false,
-          errorMessage: 'No next stages for completed transaction',
-        };
+          errorMessage: 'No next stages for completed transaction'
+        }
       case TransactionStageName.DepositConfirmation:
       case TransactionStageName.AuthorizationSideAConfirmation:
       case TransactionStageName.AuthorizationSideBConfirmation:
@@ -203,12 +173,12 @@ const transactionStageHelper = {
       default:
         return {
           success: false,
-          errorMessage: 'Only admin stages',
-        };
+          errorMessage: 'Only admin stages'
+        }
     }
-    return { success: true, additionalData, transactionProps };
-  },
-};
+    return { success: true, additionalData, transactionProps }
+  }
+}
 
 const setPreviousStageCompleted = async (
   transactionId: number,
@@ -218,39 +188,30 @@ const setPreviousStageCompleted = async (
   additionalData?: Record<string, any>
 ) => {
   if (transactionProps) {
-    await transactionModel.updateTransaction(
-      { id: transactionId },
-      { ...transactionProps }
-    );
+    await transactionModel.updateTransaction({ id: transactionId }, { ...transactionProps })
   }
   await transactionStageModel.updateTransactionStage(
     { transactionId, id: activeStageId },
     {
       status: TransactionStageStatus.Completed,
       userId,
-      additionalData,
+      additionalData
     }
-  );
-};
+  )
+}
 //  sets one choice next stage
-const createNextStage = async (
-  transactionId: number,
-  nextStages: TransactionStageName[]
-) => {
+const createNextStage = async (transactionId: number, nextStages: TransactionStageName[]) => {
   if (nextStages[0] === TransactionStageName.Completed) {
-    await transactionModel.updateTransaction(
-      { id: transactionId },
-      { status: TransactionStatus.Completed }
-    );
+    await transactionModel.updateTransaction({ id: transactionId }, { status: TransactionStatus.Completed })
   }
 
   return await transactionStageModel.createTransactionStage({
     transactionId,
     name: nextStages[0],
     status: TransactionStageStatus.Active,
-    inCharge: transactionStageInCharge[nextStages[0]],
-  });
-};
+    inCharge: transactionStageInCharge[nextStages[0]]
+  })
+}
 //  sets multi choice next stage with logic
 const createNextStageFromMultiChoice = async (
   activeStageName: string,
@@ -258,30 +219,29 @@ const createNextStageFromMultiChoice = async (
   transactionId: number,
   nextStages: TransactionStageName[]
 ) => {
+  let sum: number
   switch (activeStageName) {
     case TransactionStageName.Draft:
     case TransactionStageName.ConfirmationSideB:
-      const sum = await transactionModel.getTransactionsAmountSumLastHalfYear(
-        requestingSide.account.id
-      );
+      sum = await transactionModel.getTransactionsAmountSumLastHalfYear(requestingSide.account.id)
       if (sum <= 50000) {
         return await transactionStageModel.createTransactionStage({
           transactionId,
           name: nextStages[1],
           status: TransactionStageStatus.Active,
-          inCharge: transactionStageInCharge[nextStages[1]],
-        });
+          inCharge: transactionStageInCharge[nextStages[1]]
+        })
       } else {
         return await transactionStageModel.createTransactionStage({
           transactionId,
           name: nextStages[0],
           status: TransactionStageStatus.Active,
-          inCharge: transactionStageInCharge[nextStages[0]],
-        });
+          inCharge: transactionStageInCharge[nextStages[0]]
+        })
       }
     default:
-      throw 'error!';
+      throw 'error!'
   }
-};
+}
 
-export default transactionStageHelper;
+export default transactionStageHelper

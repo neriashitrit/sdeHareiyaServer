@@ -1,95 +1,84 @@
-import { Request, Response } from 'express';
-
+import { Request, Response } from 'express'
+import _ from 'lodash'
 import {
-  transactionModel,
-  commissionModel,
-  transactionStageModel,
-  transactionProductPropertyModel,
-} from '../models/index';
-
-import _ from 'lodash';
-import transactionHelper from '../helpers/transaction.helper';
-import { commissionCalculate } from '../utils/global.utils';
-import { failureResponse, successResponse } from '../utils/db.utils';
-
-import {
-  TransactionSide,
-  TransactionStageStatus,
-  IUser,
-  TransactionStageName,
-  TransactionStatus,
   ITransactionSide,
-} from 'safe-shore-common';
+  IUser,
+  TransactionSide,
+  TransactionStageName,
+  TransactionStageStatus,
+  TransactionStatus
+} from 'safe-shore-common'
+
+import { Tables } from '../constants'
+import transactionHelper from '../helpers/transaction.helper'
+import transactionDisputeHelper from '../helpers/transactionDispute.helper'
+import transactionSideHelper from '../helpers/transactionSide.helper'
+import transactionStageHelper from '../helpers/transactionStage.helper'
+import {
+  commissionModel,
+  transactionModel,
+  transactionProductPropertyModel,
+  transactionStageModel
+} from '../models/index'
+import { CreateTransactionBodyProductProperty } from '../types/requestBody.types'
+import { failureResponse, successResponse } from '../utils/db.utils'
+import { commissionCalculate } from '../utils/global.utils'
 import {
   isApproveStageBody,
   isCancelDisputeBody,
   isCreateTransactionBody,
   isGetTransactionParams,
   isOpenDisputeBody,
-  isUpdateTransactionBody,
-} from '../utils/typeCheckers.utils';
-
-import { CreateTransactionBodyProductProperty } from '../types/requestBody.types';
-import transactionSideHelper from '../helpers/transactionSide.helper';
-import transactionStageHelper from '../helpers/transactionStage.helper';
-import { Tables } from '../constants';
-import transactionDisputeHelper from '../helpers/transactionDispute.helper';
+  isUpdateTransactionBody
+} from '../utils/typeCheckers.utils'
 
 export const getTransactions = async (req: Request, res: Response) => {
   try {
-    const user = req.user as IUser;
+    const user = req.user as IUser
 
     const transactions = await transactionHelper.getFullTransactions({
-      userId: user.id,
-    });
+      userId: user.id
+    })
 
-    return res.status(200).json(successResponse(transactions));
+    return res.status(200).json(successResponse(transactions))
   } catch (error) {
-    console.error(
-      'ERROR in transactions.controller getTransactions()',
-      error.message
-    );
-    return res.status(500).json(failureResponse(error.message));
+    console.error('ERROR in transactions.controller getTransactions()', error.message)
+    return res.status(500).json(failureResponse(error.message))
   }
-};
+}
 
 export const getTransaction = async (req: Request, res: Response) => {
   try {
-    const params = req.params;
+    const params = req.params
 
     if (!isGetTransactionParams(params)) {
-      return res.status(400).json(failureResponse('Invalid Parameters'));
+      return res.status(400).json(failureResponse('Invalid Parameters'))
     }
 
-    const { transactionId } = params;
+    const { transactionId } = params
 
     const responseTransaction = await transactionHelper.getFullTransaction({
-      transactionId,
-    });
+      transactionId
+    })
 
     if (_.isNull(responseTransaction)) {
-      return res
-        .status(400)
-        .json(failureResponse('No transaction with this id'));
+      return res.status(400).json(failureResponse('No transaction with this id'))
     }
 
-    return res.status(200).json(successResponse(responseTransaction));
+    return res.status(200).json(successResponse(responseTransaction))
   } catch (error) {
-    console.error(
-      'ERROR in transactions.controller getTransaction()',
-      error.message
-    );
-    return res.status(500).send(failureResponse(error.message));
+    console.error('ERROR in transactions.controller getTransaction()', error.message)
+    return res.status(500).send(failureResponse(error.message))
   }
-};
+}
 
 export const createTransaction = async (req: Request, res: Response) => {
   try {
-    const user = req.user as IUser;
-    const body = req.body;
+    const user = req.user as IUser
+    const body = req.body
 
     if (!isCreateTransactionBody(body)) {
-      return res.status(400).json(failureResponse('Invalid Parameters'));
+      return res.status(400).json(failureResponse('Invalid Parameters'))
     }
 
     const {
@@ -99,10 +88,10 @@ export const createTransaction = async (req: Request, res: Response) => {
       productSubcategoryOther,
       currency,
       amount,
-      properties,
-    } = body;
+      properties
+    } = body
 
-    const commissionObject = await getCommissionByAmount(amount);
+    const commissionObject = await getCommissionByAmount(amount)
 
     const newTransaction = await transactionModel.createTransaction({
       status: TransactionStatus.Stage,
@@ -114,60 +103,50 @@ export const createTransaction = async (req: Request, res: Response) => {
       amount,
       commissionId: commissionObject.commissionId,
       commissionAmountCurrency: currency,
-      commissionAmount: commissionObject.amount,
-    });
+      commissionAmount: commissionObject.amount
+    })
 
     if (!newTransaction) {
-      return res
-        .status(400)
-        .json(failureResponse('Couldn`t create new transaction'));
+      return res.status(400).json(failureResponse('Couldn`t create new transaction'))
     }
 
-    const transactionStage = await transactionStageModel.createTransactionStage(
-      {
-        name: TransactionStageName.Draft,
-        transactionId: newTransaction.id,
-        inCharge: TransactionSide.SideA,
-        status: TransactionStageStatus.Active,
-        userId: user.id,
-      }
-    );
+    const transactionStage = await transactionStageModel.createTransactionStage({
+      name: TransactionStageName.Draft,
+      transactionId: newTransaction.id,
+      inCharge: TransactionSide.SideA,
+      status: TransactionStageStatus.Active,
+      userId: user.id
+    })
 
-    await upsertProductProperties(newTransaction.id, properties);
+    await upsertProductProperties(newTransaction.id, properties)
 
-    const transactionSides = await transactionSideHelper.createTransactionSideA(
-      newTransaction.id,
-      user.id
-    );
+    const transactionSides = await transactionSideHelper.createTransactionSideA(newTransaction.id, user.id)
 
     const responseTransaction = await transactionHelper.getFullTransaction({
       transactionId: newTransaction.id,
       sides: transactionSides,
       stages: transactionStage ? [transactionStage] : [],
-      disputes: [],
-    });
+      disputes: []
+    })
 
     if (_.isNull(responseTransaction)) {
-      throw `Could not find created transaction with id ${newTransaction.id}`;
+      throw `Could not find created transaction with id ${newTransaction.id}`
     }
 
-    return res.status(200).json(successResponse(responseTransaction));
+    return res.status(200).json(successResponse(responseTransaction))
   } catch (error) {
-    console.error(
-      'ERROR in transactions.controller createTransaction()',
-      error.message
-    );
-    return res.status(500).send(failureResponse(error.message));
+    console.error('ERROR in transactions.controller createTransaction()', error.message)
+    return res.status(500).send(failureResponse(error.message))
   }
-};
+}
 
 export const updateTransaction = async (req: Request, res: Response) => {
   try {
-    const user = req.user as IUser;
-    const body = req.body;
+    const user = req.user as IUser
+    const body = req.body
 
     if (!isUpdateTransactionBody(body)) {
-      return res.status(400).json(failureResponse('Invalid Parameters'));
+      return res.status(400).json(failureResponse('Invalid Parameters'))
     }
 
     const {
@@ -185,50 +164,43 @@ export const updateTransaction = async (req: Request, res: Response) => {
       firstName,
       lastName,
       phoneNumber,
-      email,
-    } = body;
+      email
+    } = body
 
     //  Check user is one of the sides of the transaction
-    let [transactionCurrentSide, transactionOtherSide] =
-      await transactionSideHelper.getTransactionSides(transactionId, user.id);
+    const [transactionCurrentSide, transactionOtherSide] = await transactionSideHelper.getTransactionSides(
+      transactionId,
+      user.id
+    )
 
     if (!transactionCurrentSide) {
-      return res
-        .status(400)
-        .send(failureResponse('cant update this transaction'));
+      return res.status(400).send(failureResponse('cant update this transaction'))
     }
 
-    const activeStage = (
-      await transactionStageHelper.getActiveStage(transactionId)
-    )[0];
+    const activeStage = (await transactionStageHelper.getActiveStage(transactionId))[0]
 
     if (
       _.isNil(activeStage) ||
-      (activeStage.name !== TransactionStageName.AuthorizationSideA &&
-        activeStage.name !== TransactionStageName.Draft)
+      (activeStage.name !== TransactionStageName.AuthorizationSideA && activeStage.name !== TransactionStageName.Draft)
     ) {
-      return res
-        .status(400)
-        .send(
-          failureResponse(`cant edit transaction at ${activeStage?.name} stage`)
-        );
+      return res.status(400).send(failureResponse(`cant edit transaction at ${activeStage?.name} stage`))
     }
 
-    const updatedFields: Record<string, any> = {};
+    const updatedFields: Record<string, any> = {}
 
     if (amount) {
-      const commissionObject = await getCommissionByAmount(amount);
+      const commissionObject = await getCommissionByAmount(amount)
 
-      updatedFields.amount = amount;
-      updatedFields.commissionId = commissionObject.commissionId;
-      updatedFields.commissionAmount = commissionObject.amount;
+      updatedFields.amount = amount
+      updatedFields.commissionId = commissionObject.commissionId
+      updatedFields.commissionAmount = commissionObject.amount
     }
 
     if (properties) {
-      await upsertProductProperties(transactionId, properties);
+      await upsertProductProperties(transactionId, properties)
     }
 
-    let transactionSides: ITransactionSide[] | null = null;
+    let transactionSides: ITransactionSide[] | null = null
     if (firstName || lastName || email || phoneNumber || creatorSide) {
       if (transactionOtherSide) {
         transactionSides = await transactionSideHelper.updateTransactionSideB(
@@ -240,22 +212,16 @@ export const updateTransaction = async (req: Request, res: Response) => {
           email,
           phoneNumber,
           creatorSide
-        );
+        )
       } else {
-        if (
-          _.isNil(firstName) ||
-          _.isNil(lastName) ||
-          _.isNil(email) ||
-          _.isNil(phoneNumber) ||
-          _.isNil(creatorSide)
-        ) {
+        if (_.isNil(firstName) || _.isNil(lastName) || _.isNil(email) || _.isNil(phoneNumber) || _.isNil(creatorSide)) {
           return res
             .status(400)
             .json(
               failureResponse(
                 'one of these parameters firstName, lastName, email, phoneNumber, creatorSide are missing'
               )
-            );
+            )
         }
 
         transactionSides = await transactionSideHelper.createTransactionSideB(
@@ -266,7 +232,7 @@ export const updateTransaction = async (req: Request, res: Response) => {
           email,
           phoneNumber,
           creatorSide
-        );
+        )
       }
     }
     if (
@@ -291,44 +257,39 @@ export const updateTransaction = async (req: Request, res: Response) => {
           commissionAmountCurrency: currency,
           endDate,
           commissionPayer,
-          ...updatedFields,
+          ...updatedFields
         }
-      );
+      )
     }
 
     const responseTransaction = await transactionHelper.getFullTransaction({
       transactionId,
       sides:
         transactionSides ??
-        (transactionOtherSide !== undefined
-          ? [transactionCurrentSide, transactionOtherSide]
-          : [transactionCurrentSide]),
-    });
+        (transactionOtherSide !== undefined ? [transactionCurrentSide, transactionOtherSide] : [transactionCurrentSide])
+    })
 
     if (_.isNull(responseTransaction)) {
-      throw `Could not find updated transaction with id ${transactionId}`;
+      throw `Could not find updated transaction with id ${transactionId}`
     }
 
-    return res.status(200).json(successResponse(responseTransaction));
+    return res.status(200).json(successResponse(responseTransaction))
   } catch (error) {
-    console.error(
-      'ERROR in transactions.controller updateTransaction()',
-      error.message
-    );
-    return res.status(500).send(failureResponse(error.message));
+    console.error('ERROR in transactions.controller updateTransaction()', error.message)
+    return res.status(500).send(failureResponse(error.message))
   }
-};
+}
 
 export const approveStage = async (req: Request, res: Response) => {
   try {
-    const user = req.user as IUser;
+    const user = req.user as IUser
     const body = {
-      ...req.body,
+      ...req.body
       // depositReferenceFile: req.files?.depositReferenceFile,
-    };
+    }
 
     if (!isApproveStageBody(body)) {
-      return res.status(400).json(failureResponse('Invalid Parameters'));
+      return res.status(400).json(failureResponse('Invalid Parameters'))
     }
 
     const {
@@ -341,55 +302,46 @@ export const approveStage = async (req: Request, res: Response) => {
       // depositReferenceFile,
       deliveryDate,
       deliveryType,
-      deliveryNotes,
-    } = body;
+      deliveryNotes
+    } = body
 
-    const [transactionCurrentSide, transactionOtherSide] =
-      await transactionSideHelper.getTransactionSides(transactionId, user.id);
+    const [transactionCurrentSide, transactionOtherSide] = await transactionSideHelper.getTransactionSides(
+      transactionId,
+      user.id
+    )
 
-    const activeStage = (
-      await transactionStageHelper.getActiveStage(transactionId)
-    )[0];
+    const activeStage = (await transactionStageHelper.getActiveStage(transactionId))[0]
 
     if (
       activeStage.inCharge !== transactionCurrentSide?.side &&
-      !(
-        activeStage.inCharge === TransactionSide.SideA &&
-        transactionCurrentSide?.isCreator
-      ) &&
-      !(
-        activeStage.inCharge === TransactionSide.SideB &&
-        !transactionCurrentSide?.isCreator
-      )
+      !(activeStage.inCharge === TransactionSide.SideA && transactionCurrentSide?.isCreator) &&
+      !(activeStage.inCharge === TransactionSide.SideB && !transactionCurrentSide?.isCreator)
     ) {
-      return res
-        .status(400)
-        .json(failureResponse('Current user is not in charge of this stage'));
+      return res.status(400).json(failureResponse('Current user is not in charge of this stage'))
     }
 
     if (!transactionCurrentSide || !transactionOtherSide) {
-      throw 'transactionCurrentSide or transactionOtherSide are undefined in transactions.controller approveStage() ';
+      throw 'transactionCurrentSide or transactionOtherSide are undefined in transactions.controller approveStage() '
     }
 
-    const { success, additionalData, transactionProps, errorMessage } =
-      await transactionStageHelper.isStageCompleted(
-        transactionId,
-        activeStage,
-        transactionCurrentSide,
-        transactionOtherSide,
-        depositBankName,
-        depositBankNumber,
-        depositBankAccountOwnerFullName,
-        depositTransferDate,
-        depositReferenceNumber,
-        // depositReferenceFile,
-        deliveryDate,
-        deliveryType,
-        deliveryNotes
-      );
+    const { success, additionalData, transactionProps, errorMessage } = await transactionStageHelper.isStageCompleted(
+      transactionId,
+      activeStage,
+      transactionCurrentSide,
+      transactionOtherSide,
+      depositBankName,
+      depositBankNumber,
+      depositBankAccountOwnerFullName,
+      depositTransferDate,
+      depositReferenceNumber,
+      // depositReferenceFile,
+      deliveryDate,
+      deliveryType,
+      deliveryNotes
+    )
 
     if (!success) {
-      return res.status(400).json(failureResponse(errorMessage));
+      return res.status(400).json(failureResponse(errorMessage))
     }
 
     const nextStage = await transactionStageHelper.nextStage(
@@ -398,115 +350,93 @@ export const approveStage = async (req: Request, res: Response) => {
       activeStage,
       transactionProps,
       additionalData
-    );
+    )
 
-    return res.status(200).json(successResponse(nextStage!));
+    return res.status(200).json(successResponse(nextStage!))
   } catch (error) {
-    console.error(
-      'ERROR in transactions.controller approveStage()',
-      error.message
-    );
-    return res.status(500).send(failureResponse(error.message));
+    console.error('ERROR in transactions.controller approveStage()', error.message)
+    return res.status(500).send(failureResponse(error.message))
   }
-};
+}
 
 export const openDispute = async (req: Request, res: Response) => {
   try {
-    const user = req.user as IUser;
-    const body = req.body;
+    const user = req.user as IUser
+    const body = req.body
 
     if (!isOpenDisputeBody(body)) {
-      return res.status(400).json(failureResponse('Invalid Parameters'));
+      return res.status(400).json(failureResponse('Invalid Parameters'))
     }
 
-    const { transactionId, reason, reasonOther, notes } = body;
+    const { transactionId, reason, reasonOther, notes } = body
 
-    await transactionDisputeHelper.createTransactionDispute(
-      transactionId,
-      user.id,
-      reason,
-      reasonOther,
-      notes
-    );
+    await transactionDisputeHelper.createTransactionDispute(transactionId, user.id, reason, reasonOther, notes)
 
-    return res.status(200).json(successResponse({}));
+    return res.status(200).json(successResponse({}))
   } catch (error) {
-    console.error(
-      'ERROR in transactions.controller openDispute()',
-      error.message
-    );
-    return res.status(500).send(failureResponse(error.message));
+    console.error('ERROR in transactions.controller openDispute()', error.message)
+    return res.status(500).send(failureResponse(error.message))
   }
-};
+}
 
 export const cancelDispute = async (req: Request, res: Response) => {
   try {
-    const user = req.user as IUser;
-    const body = req.body;
+    const user = req.user as IUser
+    const body = req.body
 
     if (!isCancelDisputeBody(body)) {
-      return res.status(400).json(failureResponse('Invalid Parameters'));
+      return res.status(400).json(failureResponse('Invalid Parameters'))
     }
 
-    const { transactionId } = body;
+    const { transactionId } = body
 
-    const result = await transactionDisputeHelper.closeTransactionDispute(
-      transactionId,
-      user.id
-    );
+    const result = await transactionDisputeHelper.closeTransactionDispute(transactionId, user.id)
 
     if (!result) {
-      return res.status(400).json(failureResponse('Could not cancel dispute'));
+      return res.status(400).json(failureResponse('Could not cancel dispute'))
     }
 
-    return res.status(200).json(successResponse({}));
+    return res.status(200).json(successResponse({}))
   } catch (error) {
-    console.error(
-      'ERROR in transactions.controller cancelDispute()',
-      error.message
-    );
-    return res.status(500).send(failureResponse(error.message));
+    console.error('ERROR in transactions.controller cancelDispute()', error.message)
+    return res.status(500).send(failureResponse(error.message))
   }
-};
+}
 
-const getCommissionByAmount = async (
-  amount: number
-): Promise<{ commissionId: number | null; amount: number }> => {
+const getCommissionByAmount = async (amount: number): Promise<{ commissionId: number | null; amount: number }> => {
   const commissions = await commissionModel.getCommissions({
-    isActive: true,
-  });
+    isActive: true
+  })
 
-  return commissionCalculate(commissions, amount);
-};
+  return commissionCalculate(commissions, amount)
+}
 
 const upsertProductProperties = async (
   transactionId: number,
   properties: CreateTransactionBodyProductProperty[]
 ): Promise<void> => {
   for (const property of properties) {
-    const transactionProductProperty =
-      await transactionProductPropertyModel.getTransactionProductProperty({
-        [`${Tables.PRODUCT_PROPERTIES}.id`]: property.productPropertyId,
-        [`${Tables.TRANSACTION_PRODUCT_PROPERTIES}.transaction_id`]:
-          transactionId,
-      });
+    const transactionProductProperty = await transactionProductPropertyModel.getTransactionProductProperty({
+      [`${Tables.PRODUCT_PROPERTIES}.id`]: property.productPropertyId,
+      [`${Tables.TRANSACTION_PRODUCT_PROPERTIES}.transaction_id`]: transactionId
+    })
     if (transactionProductProperty) {
       await transactionProductPropertyModel.updateTransactionProductProperty(
         {
-          value: property.value,
+          value: property.value
           // TODO files
         },
         {
-          id: transactionProductProperty.id,
+          id: transactionProductProperty.id
         }
-      );
-      continue;
+      )
+      continue
     }
     await transactionProductPropertyModel.createTransactionProductProperty({
       transactionId,
       productPropertyId: property.productPropertyId,
-      value: property.value,
+      value: property.value
       // TODO files
-    });
+    })
   }
-};
+}

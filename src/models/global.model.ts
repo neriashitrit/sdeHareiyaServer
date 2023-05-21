@@ -1,7 +1,7 @@
-import DbService from '../services/db.service';
+import _ from 'lodash'
 
-import _ from 'lodash';
+import DbService from '../services/db.service'
 
-const db = new DbService();
+const db = new DbService()
 
-export const globalModel = {};
+export const globalModel = {}

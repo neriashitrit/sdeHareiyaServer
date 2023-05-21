@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Tables } from '../../constants';
-import { MigrationBuilder, ColumnDefinitions, PgType } from 'node-pg-migrate';
+import { ColumnDefinitions, MigrationBuilder, PgType } from 'node-pg-migrate'
 
-export const shorthands: ColumnDefinitions | undefined = undefined;
+import { Tables } from '../../constants'
+
+export const shorthands: ColumnDefinitions | undefined = undefined
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createTable(Tables.AUDIT, {
@@ -10,7 +11,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     user_id: {
       type: PgType.INT,
       references: Tables.USERS,
-      onDelete: 'SET NULL',
+      onDelete: 'SET NULL'
     },
     table_name: { type: PgType.VARCHAR, notNull: true },
     row_id: { type: PgType.INT, notNull: true },
@@ -18,16 +19,16 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     modified_at: {
       type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE,
       notNull: true,
-      default: pgm.func('current_timestamp'),
+      default: pgm.func('current_timestamp')
     },
     created_at: {
       type: PgType.TIMESTAMP_WITHOUT_TIME_ZONE,
       notNull: true,
-      default: pgm.func('current_timestamp'),
-    },
-  });
+      default: pgm.func('current_timestamp')
+    }
+  })
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropTable(Tables.AUDIT, { ifExists: true });
+  pgm.dropTable(Tables.AUDIT, { ifExists: true })
 }

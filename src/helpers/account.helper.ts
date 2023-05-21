@@ -1,10 +1,9 @@
-import { accountModel, userModel } from '../models';
-import {
-  AccountAuthorizationCompanyBody,
-  AccountAuthorizationPrivateBody,
-} from '../types/requestBody.types';
-import { Tables } from '../constants';
-import { AccountType, AuthorizationStatus } from 'safe-shore-common';
+import { AccountType, AuthorizationStatus } from 'safe-shore-common'
+
+import { Tables } from '../constants'
+import { accountModel, userModel } from '../models'
+import { AccountAuthorizationCompanyBody, AccountAuthorizationPrivateBody } from '../types/requestBody.types'
+
 const accountHelper = {
   privateAccountAuthorization: async (
     userId: number,
@@ -13,11 +12,11 @@ const accountHelper = {
     const account = await accountModel.getAccount({
       [`${Tables.USERS}.id`]: userId,
       type: AccountType.Private,
-      authorizationStatus: AuthorizationStatus.NotAuthorized,
-    });
+      authorizationStatus: AuthorizationStatus.NotAuthorized
+    })
 
     if (account.length === 0) {
-      return false;
+      return false
     }
 
     const {
@@ -33,8 +32,8 @@ const accountHelper = {
       thirdPartyFullName,
       isBankAccountBlocked,
       birthday,
-      gender,
-    } = accountAuthorizationPrivateBody;
+      gender
+    } = accountAuthorizationPrivateBody
 
     await accountModel.updateAccount(
       {
@@ -48,23 +47,23 @@ const accountHelper = {
         isThirdParty,
         thirdPartyFullName,
         isBankAccountBlocked,
-        authorizationStatus: AuthorizationStatus.Pending,
+        authorizationStatus: AuthorizationStatus.Pending
       },
       {
-        id: account[0].id,
+        id: account[0].id
       }
-    );
+    )
     await userModel.updateUser(
       {
         birthday,
         gender,
-        idNumberCountryOfIssue,
+        idNumberCountryOfIssue
       },
       {
-        id: userId,
+        id: userId
       }
-    );
-    return true;
+    )
+    return true
   },
   companyAccountAuthorization: async (
     userId: number,
@@ -73,11 +72,11 @@ const accountHelper = {
     const account = await accountModel.getAccount({
       [`${Tables.USERS}.id`]: userId,
       type: AccountType.Company,
-      authorizationStatus: AuthorizationStatus.NotAuthorized,
-    });
+      authorizationStatus: AuthorizationStatus.NotAuthorized
+    })
 
     if (account.length === 0) {
-      return false;
+      return false
     }
 
     const {
@@ -96,8 +95,8 @@ const accountHelper = {
       fundsSourceOther,
       contacts,
       activeYears,
-      purpose,
-    } = accountAuthorizationCompanyBody;
+      purpose
+    } = accountAuthorizationCompanyBody
 
     await accountModel.createCompanyDetails({
       companyIdentityNumber,
@@ -109,8 +108,8 @@ const accountHelper = {
       contacts: JSON.stringify(contacts),
       activeYears,
       purpose,
-      accountId: account[0].id,
-    });
+      accountId: account[0].id
+    })
 
     await accountModel.updateAccount(
       {
@@ -121,14 +120,14 @@ const accountHelper = {
         houseNumber,
         apartmentNumber,
         occupation,
-        authorizationStatus: AuthorizationStatus.Pending,
+        authorizationStatus: AuthorizationStatus.Pending
       },
       {
-        id: account[0].id,
+        id: account[0].id
       }
-    );
-    return true;
-  },
-};
+    )
+    return true
+  }
+}
 
-export default accountHelper;
+export default accountHelper

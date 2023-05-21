@@ -1,5 +1,5 @@
-import { Tables } from '../constants';
-import { fileModel } from '../models/file.model';
+import { Tables } from '../constants'
+import { fileModel } from '../models/index'
 
 const fileHelper = {
   uploadFile: async (tableName: Tables, rowId: number, file: File) => {
@@ -8,9 +8,9 @@ const fileHelper = {
       azureKey: 'AZURE_KEY',
       url: 'AZURE_FILE_URL',
       tableName,
-      rowId,
-    });
-  },
-};
+      rowId
+    })
+  }
+}
 
-export default fileHelper;
+export default fileHelper

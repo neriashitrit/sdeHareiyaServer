@@ -1,4 +1,4 @@
-import { TransactionSide, TransactionStageName, TransactionStageStatus, TransactionStatus } from 'safe-shore-common';
+import { TransactionSide, TransactionStageName, TransactionStageStatus, TransactionStatus } from 'safe-shore-common'
 
 export enum Tables {
   USERS = 'users',
@@ -16,50 +16,31 @@ export enum Tables {
   PRODUCT_SUBCATEGORIES = 'product_subcategories',
   PRODUCT_PROPERTIES = 'product_properties',
   TRANSACTION_PRODUCT_PROPERTIES = 'transaction_product_properties',
-  FILES = 'files',
+  FILES = 'files'
 }
 
 export const transactionStagePossiblePaths: {
-  [key in TransactionStageName]: TransactionStageName[];
+  [key in TransactionStageName]: TransactionStageName[]
 } = {
-  [TransactionStageName.Draft]: [
-    TransactionStageName.AuthorizationSideA,
-    TransactionStageName.ConfirmationSideB,
-  ],
-  [TransactionStageName.AuthorizationSideA]: [
-    TransactionStageName.AuthorizationSideAConfirmation,
-  ],
-  [TransactionStageName.AuthorizationSideAConfirmation]: [
-    TransactionStageName.ConfirmationSideB,
-  ],
+  [TransactionStageName.Draft]: [TransactionStageName.AuthorizationSideA, TransactionStageName.ConfirmationSideB],
+  [TransactionStageName.AuthorizationSideA]: [TransactionStageName.AuthorizationSideAConfirmation],
+  [TransactionStageName.AuthorizationSideAConfirmation]: [TransactionStageName.ConfirmationSideB],
   [TransactionStageName.ConfirmationSideB]: [
     TransactionStageName.AuthorizationSideB,
-    TransactionStageName.BuyerDeposit,
+    TransactionStageName.BuyerDeposit
   ],
-  [TransactionStageName.AuthorizationSideB]: [
-    TransactionStageName.AuthorizationSideBConfirmation,
-  ],
-  [TransactionStageName.AuthorizationSideBConfirmation]: [
-    TransactionStageName.BuyerDeposit,
-  ],
-  [TransactionStageName.BuyerDeposit]: [
-    TransactionStageName.DepositConfirmation,
-  ],
-  [TransactionStageName.DepositConfirmation]: [
-    TransactionStageName.SellerProductTransfer,
-  ],
-  [TransactionStageName.SellerProductTransfer]: [
-    TransactionStageName.BuyerProductConfirmation,
-  ],
-  [TransactionStageName.BuyerProductConfirmation]: [
-    TransactionStageName.SellerPayment,
-  ],
+  [TransactionStageName.AuthorizationSideB]: [TransactionStageName.AuthorizationSideBConfirmation],
+  [TransactionStageName.AuthorizationSideBConfirmation]: [TransactionStageName.BuyerDeposit],
+  [TransactionStageName.BuyerDeposit]: [TransactionStageName.DepositConfirmation],
+  [TransactionStageName.DepositConfirmation]: [TransactionStageName.SellerProductTransfer],
+  [TransactionStageName.SellerProductTransfer]: [TransactionStageName.BuyerProductConfirmation],
+  [TransactionStageName.BuyerProductConfirmation]: [TransactionStageName.SellerPayment],
   [TransactionStageName.SellerPayment]: [TransactionStageName.Completed],
-  [TransactionStageName.Completed]: [],
-};
+  [TransactionStageName.Completed]: []
+}
 
 export const transactionStageInCharge: {
-  [key in TransactionStageName]: TransactionSide;
+  [key in TransactionStageName]: TransactionSide
 } = {
   [TransactionStageName.Draft]: TransactionSide.SideA,
   [TransactionStageName.AuthorizationSideA]: TransactionSide.SideA,
@@ -72,21 +53,21 @@ export const transactionStageInCharge: {
   [TransactionStageName.SellerProductTransfer]: TransactionSide.Seller,
   [TransactionStageName.BuyerProductConfirmation]: TransactionSide.Buyer,
   [TransactionStageName.SellerPayment]: TransactionSide.Admin,
-  [TransactionStageName.Completed]: TransactionSide.Admin,
-};
+  [TransactionStageName.Completed]: TransactionSide.Admin
+}
 
-export const conditionForTransactionsNeedAutorization = [
+export const conditionForTransactionsNeedAuthorization = [
   {
-    column:Tables.TRANSACTIONS+'.status',
-    operator:'in',
-    value:[TransactionStatus.Stage,TransactionStatus.Dispute]
+    column: Tables.TRANSACTIONS + '.status',
+    operator: 'in',
+    value: [TransactionStatus.Stage, TransactionStatus.Dispute]
   },
   {
-    column:Tables.TRANSACTION_STAGES+'.in_charge',
-    value:TransactionSide.Admin
+    column: Tables.TRANSACTION_STAGES + '.in_charge',
+    value: TransactionSide.Admin
   },
   {
-    column:Tables.TRANSACTION_STAGES+'.status',
-    value:TransactionStageStatus.Active
-  },
+    column: Tables.TRANSACTION_STAGES + '.status',
+    value: TransactionStageStatus.Active
+  }
 ]

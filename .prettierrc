@@ -1,0 +1,14 @@
+{
+  "semi": false,
+  "useTabs": false,
+  "singleQuote": true,
+  "printWidth": 120,
+  "jsxSingleQuote": true,
+  "trailingComma": "none",
+  "importOrder": [
+    "^@(?!)",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
+}

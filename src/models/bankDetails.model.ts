@@ -1,25 +1,20 @@
-import { IBankDetails } from 'safe-shore-common';
-import DbService from '../services/db.service';
+import { IBankDetails } from 'safe-shore-common'
 
-import { Tables } from '../constants';
+import { Tables } from '../constants'
+import DbService from '../services/db.service'
 
-const db = new DbService();
+const db = new DbService()
 
 export const bankDetailsModel = {
-  createBankDetails: async (
-    newBankDetails: Record<string, any>
-  ): Promise<IBankDetails[]> => {
+  createBankDetails: async (newBankDetails: Record<string, any>): Promise<IBankDetails[]> => {
     try {
-      const bankDetails = await db.insert(Tables.BANK_DETAILS, newBankDetails);
-      return bankDetails;
+      const bankDetails = await db.insert(Tables.BANK_DETAILS, newBankDetails)
+      return bankDetails
     } catch (error) {
-      console.error(
-        'ERROR in bankDetails.modal createBankDetails()',
-        error.message
-      );
+      console.error('ERROR in bankDetails.modal createBankDetails()', error.message)
       throw {
-        message: `error while trying to createBankDetails. error: ${error.message}`,
-      };
+        message: `error while trying to createBankDetails. error: ${error.message}`
+      }
     }
   },
   updateBankDetails: async (
@@ -27,20 +22,13 @@ export const bankDetailsModel = {
     updatedBankDetails: Record<string, any>
   ): Promise<IBankDetails[]> => {
     try {
-      const bankDetails = await db.update(
-        Tables.BANK_DETAILS,
-        updatedBankDetails,
-        condition
-      );
-      return bankDetails;
+      const bankDetails = await db.update(Tables.BANK_DETAILS, updatedBankDetails, condition)
+      return bankDetails
     } catch (error) {
-      console.error(
-        'ERROR in bankDetails.modal updateBankDetails()',
-        error.message
-      );
+      console.error('ERROR in bankDetails.modal updateBankDetails()', error.message)
       throw {
-        message: `error while trying to updateBankDetails. error: ${error.message}`,
-      };
+        message: `error while trying to updateBankDetails. error: ${error.message}`
+      }
     }
-  },
-};
+  }
+}

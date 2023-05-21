@@ -1,5 +1,5 @@
-import { AuthInfo } from '../types';
-import { globalModel } from '../models/index';
+import { globalModel } from '../models/index'
+import { AuthInfo } from '../types'
 
-const globalHelper = {};
-export default globalHelper;
+const globalHelper = {}
+export default globalHelper

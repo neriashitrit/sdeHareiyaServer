@@ -1,11 +1,11 @@
-import DbService from '../services/db.service';
+import _ from 'lodash'
+import { ITransactionProductProperty } from 'safe-shore-common'
 
-import _ from 'lodash';
-import { Tables } from '../constants';
-import { ITransactionProductProperty } from 'safe-shore-common';
-import { getJsonBuildObject } from '../utils/db.utils';
+import { Tables } from '../constants'
+import DbService from '../services/db.service'
+import { getJsonBuildObject } from '../utils/db.utils'
 
-const db = new DbService();
+const db = new DbService()
 
 export const transactionProductPropertyModel = {
   getTransactionProductProperty: async (
@@ -20,7 +20,7 @@ export const transactionProductPropertyModel = {
           `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.transaction_id`,
           db.knex.raw(
             `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.PRODUCT_PROPERTIES, [
-              Tables.PRODUCT_PROPERTIES,
+              Tables.PRODUCT_PROPERTIES
             ])}) as property`
           )
         )
@@ -31,29 +31,24 @@ export const transactionProductPropertyModel = {
           `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.product_property_id`,
           `${Tables.PRODUCT_PROPERTIES}.id`
         )
-        .groupBy(
-          `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.id`,
-          `${Tables.PRODUCT_PROPERTIES}.id`
-        )
-        .first();
+        .groupBy(`${Tables.TRANSACTION_PRODUCT_PROPERTIES}.id`, `${Tables.PRODUCT_PROPERTIES}.id`)
+        .first()
 
-      return transactionProductProperties;
+      return transactionProductProperties
     } catch (error) {
-      console.error(
-        'ERROR in transactionProductPropertyModel.modal getTransactionProductProperty()',
-        error.message
-      );
+      console.error('ERROR in transactionProductPropertyModel.modal getTransactionProductProperty()', error.message)
       throw {
-        message: `error while trying to getTransactionProductProperty. error: ${error.message}`,
-      };
+        message: `error while trying to getTransactionProductProperty. error: ${error.message}`
+      }
     }
   },
   getAllTransactionProductProperties: async (
     condition: Record<string, any> | string
   ): Promise<ITransactionProductProperty[]> => {
     try {
+      let parsedCondition = condition
       if (typeof condition === 'string') {
-        condition = db.knex.raw(condition);
+        parsedCondition = db.knex.raw(condition)
       }
       const transactionProductProperties = await db.knex
         .queryBuilder()
@@ -63,31 +58,25 @@ export const transactionProductPropertyModel = {
           `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.transaction_id`,
           db.knex.raw(
             `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.PRODUCT_PROPERTIES, [
-              Tables.PRODUCT_PROPERTIES,
+              Tables.PRODUCT_PROPERTIES
             ])}) as property`
           )
         )
         .from(Tables.TRANSACTION_PRODUCT_PROPERTIES)
-        .where(condition)
+        .where(parsedCondition)
         .leftJoin(
           Tables.PRODUCT_PROPERTIES,
           `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.product_property_id`,
           `${Tables.PRODUCT_PROPERTIES}.id`
         )
-        .groupBy(
-          `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.id`,
-          `${Tables.PRODUCT_PROPERTIES}.id`
-        );
+        .groupBy(`${Tables.TRANSACTION_PRODUCT_PROPERTIES}.id`, `${Tables.PRODUCT_PROPERTIES}.id`)
 
-      return transactionProductProperties;
+      return transactionProductProperties
     } catch (error) {
-      console.error(
-        'ERROR in transactionProductPropertyModel.modal getTransactionProductProperty()',
-        error.message
-      );
+      console.error('ERROR in transactionProductPropertyModel.modal getTransactionProductProperty()', error.message)
       throw {
-        message: `error while trying to getTransactionProductProperty. error: ${error.message}`,
-      };
+        message: `error while trying to getTransactionProductProperty. error: ${error.message}`
+      }
     }
   },
   createTransactionProductProperty: async (
@@ -97,16 +86,13 @@ export const transactionProductPropertyModel = {
       const transactionProductProperties = await db.insert(
         Tables.TRANSACTION_PRODUCT_PROPERTIES,
         newTransactionProductProperty
-      );
-      return transactionProductProperties?.[0];
+      )
+      return transactionProductProperties?.[0]
     } catch (error) {
-      console.error(
-        'ERROR in transactionProductPropertyModel.modal createTransactionProductProperty()',
-        error.message
-      );
+      console.error('ERROR in transactionProductPropertyModel.modal createTransactionProductProperty()', error.message)
       throw {
-        message: `error while trying to createTransactionProductProperty. error: ${error.message}`,
-      };
+        message: `error while trying to createTransactionProductProperty. error: ${error.message}`
+      }
     }
   },
   updateTransactionProductProperty: async (
@@ -118,17 +104,14 @@ export const transactionProductPropertyModel = {
         Tables.TRANSACTION_PRODUCT_PROPERTIES,
         updatedTransactionProductProperty,
         condition
-      );
+      )
 
-      return transactionProductProperties?.[0];
+      return transactionProductProperties?.[0]
     } catch (error) {
-      console.error(
-        'ERROR in transactionProductPropertyModel.modal updateTransactionProductProperty()',
-        error.message
-      );
+      console.error('ERROR in transactionProductPropertyModel.modal updateTransactionProductProperty()', error.message)
       throw {
-        message: `error while trying to updateTransactionProductProperty. error: ${error.message}`,
-      };
+        message: `error while trying to updateTransactionProductProperty. error: ${error.message}`
+      }
     }
-  },
-};
+  }
+}

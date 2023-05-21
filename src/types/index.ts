@@ -1,1 +1,1 @@
-export { AuthInfo } from './authInfo.types';
+export { IAuthInfo as AuthInfo } from './authInfo.types'

@@ -1,19 +1,18 @@
-import { ITransactionSide } from 'safe-shore-common';
-import DbService from '../services/db.service';
+import _ from 'lodash'
+import { ITransactionSide } from 'safe-shore-common'
 
-import _ from 'lodash';
-import { Tables } from '../constants';
-import { getJsonBuildObject } from '../utils/db.utils';
+import { Tables } from '../constants'
+import DbService from '../services/db.service'
+import { getJsonBuildObject } from '../utils/db.utils'
 
-const db = new DbService();
+const db = new DbService()
 
 export const transactionSideModel = {
-  getTransactionSides: async (
-    condition: Record<string, any> | string
-  ): Promise<ITransactionSide[]> => {
+  getTransactionSides: async (condition: Record<string, any> | string): Promise<ITransactionSide[]> => {
     try {
+      let parsedCondition = condition
       if (typeof condition === 'string') {
-        condition = db.knex.raw(condition);
+        parsedCondition = db.knex.raw(condition)
       }
       const result = await db.knex
         .queryBuilder()
@@ -25,82 +24,45 @@ export const transactionSideModel = {
           `${Tables.TRANSACTION_SIDES}.updated_at`,
           `${Tables.TRANSACTION_SIDES}.is_creator`,
           db.knex.raw(
-            `CASE WHEN ${
-              Tables.BANK_DETAILS
-            }.id IS NULL THEN null ELSE JSON_BUILD_OBJECT(${getJsonBuildObject(
+            `CASE WHEN ${Tables.BANK_DETAILS}.id IS NULL THEN null ELSE JSON_BUILD_OBJECT(${getJsonBuildObject(
               Tables.BANK_DETAILS,
               [Tables.BANK_DETAILS, Tables.ACCOUNTS]
             )}) END as bank_details`
           ),
-          db.knex.raw(
-            `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.USERS, [
-              Tables.USERS,
-            ])}) as user`
-          ),
-          db.knex.raw(
-            `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.ACCOUNTS, [
-              Tables.ACCOUNTS,
-            ])}) as account`
-          )
+          db.knex.raw(`JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.USERS, [Tables.USERS])}) as user`),
+          db.knex.raw(`JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.ACCOUNTS, [Tables.ACCOUNTS])}) as account`)
         )
         .from(Tables.TRANSACTION_SIDES)
-        .leftJoin(
-          Tables.BANK_DETAILS,
-          `${Tables.TRANSACTION_SIDES}.bank_details_id`,
-          `${Tables.BANK_DETAILS}.id`
-        )
-        .leftJoin(
-          Tables.USER_ACCOUNTS,
-          `${Tables.TRANSACTION_SIDES}.user_account_id`,
-          `${Tables.USER_ACCOUNTS}.id`
-        )
-        .leftJoin(
-          Tables.USERS,
-          `${Tables.USER_ACCOUNTS}.user_id`,
-          `${Tables.USERS}.id`
-        )
-        .leftJoin(
-          Tables.ACCOUNTS,
-          `${Tables.USER_ACCOUNTS}.account_id`,
-          `${Tables.ACCOUNTS}.id`
-        )
-        .where(condition)
+        .leftJoin(Tables.BANK_DETAILS, `${Tables.TRANSACTION_SIDES}.bank_details_id`, `${Tables.BANK_DETAILS}.id`)
+        .leftJoin(Tables.USER_ACCOUNTS, `${Tables.TRANSACTION_SIDES}.user_account_id`, `${Tables.USER_ACCOUNTS}.id`)
+        .leftJoin(Tables.USERS, `${Tables.USER_ACCOUNTS}.user_id`, `${Tables.USERS}.id`)
+        .leftJoin(Tables.ACCOUNTS, `${Tables.USER_ACCOUNTS}.account_id`, `${Tables.ACCOUNTS}.id`)
+        .where(parsedCondition)
         .groupBy(
           `${Tables.TRANSACTION_SIDES}.id`,
           `${Tables.USER_ACCOUNTS}.id`,
           `${Tables.BANK_DETAILS}.id`,
           `${Tables.USERS}.id`,
           `${Tables.ACCOUNTS}.id`
-        );
+        )
 
-      return result;
+      return result
     } catch (error) {
-      console.error(
-        'ERROR in transactionSide.modal getTransactionSides()',
-        error.message
-      );
+      console.error('ERROR in transactionSide.modal getTransactionSides()', error.message)
       throw {
-        message: `error while trying to getTransactionSides. error: ${error.message}`,
-      };
+        message: `error while trying to getTransactionSides. error: ${error.message}`
+      }
     }
   },
-  createTransactionSide: async (
-    newTransactionSide: Record<string, any>
-  ): Promise<ITransactionSide> => {
+  createTransactionSide: async (newTransactionSide: Record<string, any>): Promise<ITransactionSide> => {
     try {
-      const transactionSide = await db.insert(
-        Tables.TRANSACTION_SIDES,
-        newTransactionSide
-      );
-      return transactionSide?.[0];
+      const transactionSide = await db.insert(Tables.TRANSACTION_SIDES, newTransactionSide)
+      return transactionSide?.[0]
     } catch (error) {
-      console.error(
-        'ERROR in transactionSide.modal createTransactionSide()',
-        error.message
-      );
+      console.error('ERROR in transactionSide.modal createTransactionSide()', error.message)
       throw {
-        message: `error while trying to createTransactionSide. error: ${error.message}`,
-      };
+        message: `error while trying to createTransactionSide. error: ${error.message}`
+      }
     }
   },
   updateTransactionSide: async (
@@ -108,20 +70,13 @@ export const transactionSideModel = {
     updatedTransactionSide: Record<string, any>
   ): Promise<ITransactionSide | undefined> => {
     try {
-      const transactionSide = await db.update(
-        Tables.TRANSACTION_SIDES,
-        updatedTransactionSide,
-        condition
-      );
-      return transactionSide?.[0];
+      const transactionSide = await db.update(Tables.TRANSACTION_SIDES, updatedTransactionSide, condition)
+      return transactionSide?.[0]
     } catch (error) {
-      console.error(
-        'ERROR in transactionSide.modal updateTransactionSide()',
-        error.message
-      );
+      console.error('ERROR in transactionSide.modal updateTransactionSide()', error.message)
       throw {
-        message: `error while trying to updateTransactionSide. error: ${error.message}`,
-      };
+        message: `error while trying to updateTransactionSide. error: ${error.message}`
+      }
     }
-  },
-};
+  }
+}

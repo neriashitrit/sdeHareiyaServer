@@ -1,227 +1,190 @@
-import { Request, Response } from 'express';
+import { Request, Response } from 'express'
+import _ from 'lodash'
+import { IUser } from 'safe-shore-common'
+import { TransactionSide, TransactionStatus } from 'safe-shore-common'
 
-import { transactionModel } from '../../models/transactions.model';
-
-import _ from 'lodash';
-import {
-  buildConditionString,
-  buildRange,
-  failureResponse,
-  successResponse,
-} from '../../utils/db.utils';
-import { isAdminApproveDisputeBody, isAdminApproveStageBody } from '../../utils/typeCheckers.utils';
-import transactionStageHelper from '../../helpers/transactionStage.helper';
-import { IUser } from 'safe-shore-common';
-import DbService from '../../services/db.service';
-import { transactionSideModel } from '../../models';
-import transactionHelper from '../../helpers/transaction.helper';
-import {
-  TransactionSide,
-  TransactionStageStatus,
-  TransactionStatus,
-} from 'safe-shore-common';
-import { conditionForTransactionsNeedAutorization, Tables } from '../../constants';
-import transactionDisputeHelper from '../../helpers/transactionDispute.helper';
+import { Tables, conditionForTransactionsNeedAuthorization } from '../../constants'
+import transactionHelper from '../../helpers/transaction.helper'
+import transactionDisputeHelper from '../../helpers/transactionDispute.helper'
+import transactionStageHelper from '../../helpers/transactionStage.helper'
+import { transactionModel } from '../../models'
+import { buildConditionString, failureResponse, successResponse } from '../../utils/db.utils'
+import { isAdminApproveDisputeBody, isAdminApproveStageBody } from '../../utils/typeCheckers.utils'
 
 export const getAllTransactions = async (req: Request, res: Response) => {
   try {
-    const { startDate, endDate } = req.body;
+    const { startDate, endDate } = req.body
     const condition = buildConditionString([
       {
-        column: Tables.TRANSACTIONS+'.updated_at',
+        column: Tables.TRANSACTIONS + '.updated_at',
         operator: '>=',
-        value: startDate,
+        value: startDate
       },
       {
-        column: Tables.TRANSACTIONS+'.updated_at',
+        column: Tables.TRANSACTIONS + '.updated_at',
         operator: '<=',
-        value: endDate,
-      },
-    ]);
+        value: endDate
+      }
+    ])
     const transactions = await transactionHelper.getFullTransactions({
-      condition,
-    });
-    res.status(200).json(successResponse(transactions));
+      condition
+    })
+    res.status(200).json(successResponse(transactions))
   } catch (error: any) {
-    console.log(error);
-    res.status(500).json(failureResponse(error));
+    console.log(error)
+    res.status(500).json(failureResponse(error))
   }
-};
+}
 
 export const getTransactionById = async (req: Request, res: Response) => {
   try {
-    const { transactionId } = req.params;
+    const { transactionId } = req.params
     const condition = buildConditionString([
       {
-        column: Tables.TRANSACTIONS+'.id',
-        value: transactionId,
-      },
-    ]);
+        column: Tables.TRANSACTIONS + '.id',
+        value: transactionId
+      }
+    ])
     const transaction = await transactionHelper.getFullTransactions({
-      condition,
-    });
+      condition
+    })
 
     if (_.isEmpty(transaction)) {
-      return res
-        .status(400)
-        .json(failureResponse('No transaction with this id'));
+      return res.status(400).json(failureResponse('No transaction with this id'))
     }
-    return res.status(200).json(successResponse(transaction[0]));
+    return res.status(200).json(successResponse(transaction[0]))
   } catch (error: any) {
-    console.log(error);
-    return res.status(500).json(failureResponse(error));
+    console.log(error)
+    return res.status(500).json(failureResponse(error))
   }
-};
+}
 
 export const getTransactionsByAccount = async (req: Request, res: Response) => {
   try {
-    const { accountId } = req.params;
+    const { accountId } = req.params
     const condition = buildConditionString([
       {
-        column: Tables.TRANSACTION_SIDES+'.user_account_id',
-        value: accountId,
-      },
-    ]);
+        column: Tables.TRANSACTION_SIDES + '.user_account_id',
+        value: accountId
+      }
+    ])
     const transactions = await transactionHelper.getFullTransactions({
-      condition,
-    });
+      condition
+    })
 
-    return res.status(200).json(successResponse(transactions));
+    return res.status(200).json(successResponse(transactions))
   } catch (error: any) {
-    console.log(error);
-    return res.status(500).json(failureResponse(error));
+    console.log(error)
+    return res.status(500).json(failureResponse(error))
   }
-};
-
+}
 
 export const settleTransactionDispute = async (req: Request, res: Response) => {
   try {
     if (!isAdminApproveDisputeBody(req.body)) {
-      return res.status(400).json(failureResponse('Invalid Parameters'));
+      return res.status(400).json(failureResponse('Invalid Parameters'))
     }
-    const { transactionId, userId, continueTransaction } = req.body;
+    const { transactionId, userId, continueTransaction } = req.body
 
-   const closeDispute = await transactionDisputeHelper.closeTransactionDispute(transactionId,userId)
-    
-    if( !continueTransaction ){ //move transaction to canceled status
+    const closeDispute = await transactionDisputeHelper.closeTransactionDispute(transactionId, userId)
+
+    if (!continueTransaction) {
+      //move transaction to canceled status
       const updateTransaction = await transactionModel.updateTransaction(
         {
-          id:transactionId
+          id: transactionId
         },
         {
-          status:TransactionStatus.Canceled
+          status: TransactionStatus.Canceled
         }
       )
     }
     const condition = buildConditionString([
       {
-        column: Tables.TRANSACTIONS+'.id',
-        value: String(transactionId),
-      },
-    ]);
+        column: Tables.TRANSACTIONS + '.id',
+        value: String(transactionId)
+      }
+    ])
     const transaction = await transactionHelper.getFullTransactions({
-      condition,
-    });
-    return res.status(200).json(successResponse(transaction[0]));
+      condition
+    })
+    return res.status(200).json(successResponse(transaction[0]))
   } catch (error: any) {
-    console.log(error);
-    return res.status(500).json(failureResponse(error));
+    console.log(error)
+    return res.status(500).json(failureResponse(error))
   }
-};
+}
 
 export const getAutorizeTransactions = async (req: Request, res: Response) => {
   try {
-    const { startDate, endDate } = req.body;
+    const { startDate, endDate } = req.body
     const condition = buildConditionString([
       {
-        column: Tables.TRANSACTIONS+'.updated_at',
+        column: Tables.TRANSACTIONS + '.updated_at',
         operator: '>=',
-        value: startDate,
+        value: startDate
       },
       {
-        column: Tables.TRANSACTIONS+'.updated_at',
+        column: Tables.TRANSACTIONS + '.updated_at',
         operator: '<=',
-        value: endDate,
+        value: endDate
       },
-      ...conditionForTransactionsNeedAutorization,
-    ]);
+      ...conditionForTransactionsNeedAuthorization
+    ])
     const transactions = await transactionHelper.getFullTransactions({
-      condition,
-    });
-    res.status(200).json(successResponse(transactions));
+      condition
+    })
+    res.status(200).json(successResponse(transactions))
   } catch (error: any) {
-    console.log(error);
-    res.status(500).json(failureResponse(error));
+    console.log(error)
+    res.status(500).json(failureResponse(error))
   }
-};
+}
 
-export const getTransactionsStatusAnalytics = async (
-  req: Request,
-  res: Response
-) => {
+export const getTransactionsStatusAnalytics = async (req: Request, res: Response) => {
   try {
-    const { startDate, endDate } = req.body;
-    const analytics = await transactionModel.getTransactionsStatusAnalytics(
-      startDate,
-      endDate
-    );
-    res.status(200).json(successResponse(analytics));
+    const { startDate, endDate } = req.body
+    const analytics = await transactionModel.getTransactionsStatusAnalytics(startDate, endDate)
+    res.status(200).json(successResponse(analytics))
   } catch (error: any) {
-    console.log(error);
-    res.status(500).json(failureResponse(error));
+    console.log(error)
+    res.status(500).json(failureResponse(error))
   }
-};
+}
 
-export const getTransactionsProductsAnalytics = async (
-  req: Request,
-  res: Response
-) => {
+export const getTransactionsProductsAnalytics = async (req: Request, res: Response) => {
   try {
-    const { startDate, endDate } = req.body;
-    const analytics = await transactionModel.getTransactionsProductsAnalytics(
-      startDate,
-      endDate
-    );
-    res.status(200).json(successResponse(analytics));
+    const { startDate, endDate } = req.body
+    const analytics = await transactionModel.getTransactionsProductsAnalytics(startDate, endDate)
+    res.status(200).json(successResponse(analytics))
   } catch (error: any) {
-    console.log(error);
-    res.status(500).json(failureResponse(error));
+    console.log(error)
+    res.status(500).json(failureResponse(error))
   }
-};
+}
 
 export const approveStage = async (req: Request, res: Response) => {
   try {
-    const user = req.user as IUser;
-    const body = req.body;
+    const user = req.user as IUser
+    const body = req.body
 
     if (!isAdminApproveStageBody(body)) {
-      return res.status(400).json(failureResponse('Invalid Parameters'));
+      return res.status(400).json(failureResponse('Invalid Parameters'))
     }
 
-    const { transactionId } = body;
+    const { transactionId } = body
 
-    const activeStage = (
-      await transactionStageHelper.getActiveStage(transactionId)
-    )[0];
+    const activeStage = (await transactionStageHelper.getActiveStage(transactionId))[0]
 
     if (!activeStage || activeStage.inCharge !== TransactionSide.Admin) {
-      return res
-        .status(400)
-        .json(failureResponse('Admin is not in charge of this stage'));
+      return res.status(400).json(failureResponse('Admin is not in charge of this stage'))
     }
 
-    const nextStage = await transactionStageHelper.adminNextStage(
-      transactionId,
-      user.id,
-      activeStage
-    );
+    const nextStage = await transactionStageHelper.adminNextStage(transactionId, user.id, activeStage)
 
-    return res.status(200).json(successResponse(nextStage!));
+    return res.status(200).json(successResponse(nextStage!))
   } catch (error) {
-    console.error(
-      'ERROR in transactions.controller approveStage()',
-      error.message
-    );
-    return res.status(500).send(failureResponse(error.message));
+    console.error('ERROR in transactions.controller approveStage()', error.message)
+    return res.status(500).send(failureResponse(error.message))
   }
-};
+}
