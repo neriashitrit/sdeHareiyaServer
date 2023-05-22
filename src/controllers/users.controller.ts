@@ -8,7 +8,6 @@ import { failureResponse, successResponse } from '../utils/db.utils'
 import { isUpdateUserBody } from '../utils/typeCheckers.utils'
 
 export const userLogin = async (req: Request, res: Response) => {
-  //  TODO make it as transaction structure
   const authInfo: AuthInfo = req?.authInfo as AuthInfo
   const userMail = authInfo.emails[0]
 
@@ -16,11 +15,15 @@ export const userLogin = async (req: Request, res: Response) => {
     const user = await userModel.getUser(userMail)
     if (!user) {
       const [newUserAccount] = await usersHelper.createUserFromToken(authInfo)
-
       return res.status(200).json(successResponse(newUserAccount))
-    } else {
-      return res.status(200).json(successResponse(user))
     }
+
+    if (!user.isActivated) {
+      const [updatedUserAccount] = await usersHelper.updateUserFromToken(authInfo)
+      return res.status(200).json(successResponse(updatedUserAccount))
+    }
+
+    return res.status(200).json(successResponse(user))
   } catch (error) {
     console.error('ERROR in users.controller userLogin()', error.message)
     return res.status(400).send({ message: 'Something went wrong', error: error.message })
