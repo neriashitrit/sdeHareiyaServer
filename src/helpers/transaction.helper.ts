@@ -1,10 +1,12 @@
 import _ from 'lodash'
 import {
+  AuthorizationStatus,
   ITransaction,
   ITransactionDispute,
   ITransactionProductProperty,
   ITransactionSide,
-  ITransactionStage
+  ITransactionStage,
+  TransactionStatus
 } from 'safe-shore-common'
 
 import { Tables } from '../constants'
@@ -165,8 +167,24 @@ const transactionHelper = {
   },
   getPendingAuthTransactions: async (userId: number): Promise<ITransaction[]> => {
     const transactions = await transactionModel.getTransactions(
-      `${Tables.USERS}.id = '${userId}' AND ${Tables.TRANSACTION_STAGES}.status = 'active' AND ${Tables.TRANSACTION_STAGES}.name IN ('authorizationSideA', 'authorizationSideB')`
+      `${Tables.USERS}.id = '${userId}' AND ${Tables.TRANSACTIONS}.status = 'stage' AND ${Tables.TRANSACTION_STAGES}.status = 'active' AND ${Tables.TRANSACTION_STAGES}.name IN ('authorizationSideA', 'authorizationSideB')`
     )
+    return transactions
+  },
+  getPendingAuthConfirmationTransactions: async (accountId: number): Promise<ITransaction[]> => {
+    const transactions = await transactionModel.getTransactions(
+      `${Tables.ACCOUNTS}.id = '${accountId}' AND ${Tables.TRANSACTIONS}.status = 'stage' AND ${Tables.TRANSACTION_STAGES}.status = 'active' AND ${Tables.TRANSACTION_STAGES}.name IN ('authorizationSideAConfirmation', 'authorizationSideBConfirmation')`
+    )
+    return transactions
+  },
+  cancelAllActiveTransactions: async (accountId: number): Promise<ITransaction[]> => {
+    const transactions = await transactionModel.getTransactions(
+      `${Tables.ACCOUNTS}.id = '${accountId}' AND ${Tables.TRANSACTIONS}.status IN ('dispute', 'stage')`
+    )
+    await transactionModel.updateTransaction(`id IN (${transactions.map((transaction) => transaction.id)})`, {
+      status: TransactionStatus.Canceled,
+      cancelReason: 'Authorization failure'
+    })
     return transactions
   }
 }

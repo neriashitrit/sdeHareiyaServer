@@ -3,15 +3,13 @@ import {
   AuthorizationStatus,
   ITransactionSide,
   ITransactionStage,
-  TransactionSide,
   TransactionStageName,
   TransactionStageStatus,
   TransactionStatus
 } from 'safe-shore-common'
 
 import { Tables, transactionStageInCharge, transactionStagePossiblePaths } from '../constants'
-import { transactionModel, transactionSideModel, transactionStageModel } from '../models/index'
-import fileHelper from './file.helper'
+import { transactionModel, transactionStageModel } from '../models/index'
 import transactionHelper from './transaction.helper'
 
 const transactionStageHelper = {

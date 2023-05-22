@@ -1,4 +1,5 @@
 import {
+  AuthorizationStatus,
   CommissionPayer,
   CommissionType,
   Currency,
@@ -147,11 +148,16 @@ export type AccountAuthorizationCompanyBody = AccountAuthorizationBaseBody & {
 export type AccountAuthorizationBody = AccountAuthorizationPrivateBody | AccountAuthorizationCompanyBody
 
 export type CreateBankDetailsBody = {
-  accountId: string
+  accountId: number
   bankName: string
   branchName: string
   branchNumber: string
   bankAccountOwnerFullName: string
   bankAccountOwnerIdNumber: string
   bankAccountNumber: string
+}
+
+export type ApproveAccountAuthorizationBody = {
+  accountId: number
+  status: AuthorizationStatus
 }

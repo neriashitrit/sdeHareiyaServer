@@ -22,9 +22,9 @@ export const submitAccountAuthorization = async (req: Request, res: Response) =>
 
     let result: boolean
     if (isAccountAuthorizationPrivateBody(body)) {
-      result = await accountHelper.privateAccountAuthorization(user.id, body)
+      result = await accountHelper.submitPrivateAccountAuthorization(user.id, body)
     } else if (isAccountAuthorizationCompanyBody(body)) {
-      result = await accountHelper.companyAccountAuthorization(user.id, body)
+      result = await accountHelper.submitCompanyAccountAuthorization(user.id, body)
     } else {
       return res.status(400).json(failureResponse('Invalid Parameters'))
     }
@@ -36,7 +36,7 @@ export const submitAccountAuthorization = async (req: Request, res: Response) =>
     const pendingAuthTransactions = await transactionHelper.getPendingAuthTransactions(user.id)
 
     for (const transaction of pendingAuthTransactions) {
-      const [transactionCurrentSide] = await transactionSideHelper.getTransactionSides(transaction.id, user.id)
+      const [transactionCurrentSide] = await transactionSideHelper.getTransactionSidesByUserId(transaction.id, user.id)
 
       const activeStage = (await transactionStageHelper.getActiveStage(transaction.id))[0]
 

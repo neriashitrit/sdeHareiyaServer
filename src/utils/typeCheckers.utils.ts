@@ -6,6 +6,7 @@ import {
   AccountAuthorizationPrivateBody,
   AdminApproveDisputeBody,
   AdminApproveStageBody,
+  ApproveAccountAuthorizationBody,
   ApproveStageBody,
   CancelDisputeBody,
   CreateBankDetailsBody,
@@ -247,5 +248,11 @@ export const isCreateBankDetailsBody = (body: any): body is CreateBankDetailsBod
     typeof body.bankAccountOwnerFullName === 'string' &&
     typeof body.bankAccountOwnerIdNumber === 'string' &&
     typeof body.bankAccountNumber === 'string'
+  )
+}
+
+export const isApproveAccountAuthorizationBody = (body: any): body is ApproveAccountAuthorizationBody => {
+  return (
+    typeof body === 'object' && !_.isNil(body) && typeof body.accountId === 'number' && typeof body.status === 'string'
   )
 }

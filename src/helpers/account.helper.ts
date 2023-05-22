@@ -2,10 +2,14 @@ import { AccountType, AuthorizationStatus } from 'safe-shore-common'
 
 import { Tables } from '../constants'
 import { accountModel, userModel } from '../models'
-import { AccountAuthorizationCompanyBody, AccountAuthorizationPrivateBody } from '../types/requestBody.types'
+import {
+  AccountAuthorizationCompanyBody,
+  AccountAuthorizationPrivateBody,
+  ApproveAccountAuthorizationBody
+} from '../types/requestBody.types'
 
 const accountHelper = {
-  privateAccountAuthorization: async (
+  submitPrivateAccountAuthorization: async (
     userId: number,
     accountAuthorizationPrivateBody: AccountAuthorizationPrivateBody
   ): Promise<boolean> => {
@@ -65,7 +69,7 @@ const accountHelper = {
     )
     return true
   },
-  companyAccountAuthorization: async (
+  submitCompanyAccountAuthorization: async (
     userId: number,
     accountAuthorizationCompanyBody: AccountAuthorizationCompanyBody
   ): Promise<boolean> => {
@@ -126,6 +130,24 @@ const accountHelper = {
         id: account[0].id
       }
     )
+    return true
+  },
+  approveAccountAuthorization: async (
+    accountId: number,
+    authorizationStatus: AuthorizationStatus
+  ): Promise<boolean> => {
+    const account = await accountModel.updateAccount(
+      {
+        authorizationStatus
+      },
+      {
+        [`${Tables.ACCOUNTS}.id`]: accountId
+      }
+    )
+
+    if (account.length === 0) {
+      return false
+    }
     return true
   }
 }

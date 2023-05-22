@@ -88,6 +88,7 @@ export const transactionModel = {
         .leftJoin(Tables.TRANSACTION_SIDES, `${Tables.TRANSACTION_SIDES}.transaction_id`, `${Tables.TRANSACTIONS}.id`)
         .leftJoin(Tables.USER_ACCOUNTS, `${Tables.USER_ACCOUNTS}.id`, `${Tables.TRANSACTION_SIDES}.user_account_id`)
         .leftJoin(Tables.USERS, `${Tables.USERS}.id`, `${Tables.USER_ACCOUNTS}.user_id`)
+        .leftJoin(Tables.ACCOUNTS, `${Tables.ACCOUNTS}.id`, `${Tables.USER_ACCOUNTS}.account_id`)
         .leftJoin(Tables.TRANSACTION_STAGES, `${Tables.TRANSACTION_STAGES}.transaction_id`, `${Tables.TRANSACTIONS}.id`)
         .where(parsedCondition)
         .groupBy(

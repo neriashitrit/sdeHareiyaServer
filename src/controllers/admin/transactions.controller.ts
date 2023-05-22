@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import _ from 'lodash'
-import { IUser } from 'safe-shore-common'
+import { IUser, TransactionStageName } from 'safe-shore-common'
 import { TransactionSide, TransactionStatus } from 'safe-shore-common'
 
 import { Tables, conditionForTransactionsNeedAuthorization } from '../../constants'
@@ -188,7 +188,14 @@ export const approveStage = async (req: Request, res: Response) => {
 
     const activeStage = (await transactionStageHelper.getActiveStage(transactionId))[0]
 
-    if (!activeStage || activeStage.inCharge !== TransactionSide.Admin) {
+    if (
+      !activeStage ||
+      [
+        TransactionStageName.AuthorizationSideAConfirmation,
+        TransactionStageName.AuthorizationSideBConfirmation
+      ].includes(activeStage.name) ||
+      activeStage.inCharge !== TransactionSide.Admin
+    ) {
       return res.status(400).json(failureResponse('Admin is not in charge of this stage'))
     }
 

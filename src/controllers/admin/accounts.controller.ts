@@ -1,9 +1,15 @@
 import { Request, Response } from 'express'
 import _ from 'lodash'
+import { AuthorizationStatus, IUser } from 'safe-shore-common'
 
 import { Tables } from '../../constants'
-import { accountModel } from '../../models/index'
+import accountHelper from '../../helpers/account.helper'
+import transactionHelper from '../../helpers/transaction.helper'
+import transactionSideHelper from '../../helpers/transactionSide.helper'
+import transactionStageHelper from '../../helpers/transactionStage.helper'
+import { accountModel, userModel } from '../../models/index'
 import { failureResponse, successResponse } from '../../utils/db.utils'
+import { isApproveAccountAuthorizationBody } from '../../utils/typeCheckers.utils'
 
 export const getAllAccounts = async (req: Request, res: Response) => {
   try {
@@ -26,6 +32,43 @@ export const getAccountById = async (req: Request, res: Response) => {
     }
     return res.status(200).json(successResponse(account[0]))
   } catch (error: any) {
+    return res.status(500).json(failureResponse(error))
+  }
+}
+
+export const approveAccountAuthorization = async (req: Request, res: Response) => {
+  try {
+    const user = req.user as IUser
+    const body = req.body
+
+    if (!isApproveAccountAuthorizationBody(body)) {
+      return res.status(400).json(failureResponse('Invalid Parameters'))
+    }
+
+    const { accountId, status } = body
+
+    const result = await accountHelper.approveAccountAuthorization(accountId, status)
+
+    if (!result) {
+      return res.status(400).json(failureResponse('Cant submit authorization form for this account'))
+    }
+
+    if (body.status === AuthorizationStatus.Authorized) {
+      const pendingAuthTransactions = await transactionHelper.getPendingAuthConfirmationTransactions(accountId)
+
+      for (const transaction of pendingAuthTransactions) {
+        const activeStage = (await transactionStageHelper.getActiveStage(transaction.id))[0]
+
+        transactionStageHelper.adminNextStage(transaction.id, user.id, activeStage)
+      }
+    } else if (body.status === AuthorizationStatus.Blocked) {
+      await transactionHelper.cancelAllActiveTransactions(accountId)
+    }
+
+    const updatedAccount = (await accountModel.getAccount({ [`${Tables.ACCOUNTS}.id`]: accountId }))[0]
+
+    return res.status(200).json(successResponse(updatedAccount))
+  } catch (error) {
     return res.status(500).json(failureResponse(error))
   }
 }

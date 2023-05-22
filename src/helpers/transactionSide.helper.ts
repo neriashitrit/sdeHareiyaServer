@@ -5,9 +5,9 @@ import { transactionSideModel, userAccountModel, userModel } from '../models/ind
 import usersHelper from './users.helper'
 
 const transactionSideHelper = {
-  getTransactionSides: async (
+  getTransactionSidesByUserId: async (
     transactionId: number,
-    currentUserId: number
+    userId: number
   ): Promise<
     [transactionCurrentSide: ITransactionSide | undefined, transactionOtherSide: ITransactionSide | undefined]
   > => {
@@ -15,7 +15,23 @@ const transactionSideHelper = {
       [`${Tables.TRANSACTION_SIDES}.transaction_id`]: transactionId
     })
 
-    if (transactionSides[0].user.id === currentUserId) {
+    if (transactionSides[0].user.id === userId) {
+      return [transactionSides[0], transactionSides[1]]
+    } else {
+      return [transactionSides[1], transactionSides[0]]
+    }
+  },
+  getTransactionSidesByAccountId: async (
+    transactionId: number,
+    accountId: number
+  ): Promise<
+    [transactionCurrentSide: ITransactionSide | undefined, transactionOtherSide: ITransactionSide | undefined]
+  > => {
+    const transactionSides = await transactionSideModel.getTransactionSides({
+      [`${Tables.TRANSACTION_SIDES}.transaction_id`]: transactionId
+    })
+
+    if (transactionSides[0].account.id === accountId) {
       return [transactionSides[0], transactionSides[1]]
     } else {
       return [transactionSides[1], transactionSides[0]]

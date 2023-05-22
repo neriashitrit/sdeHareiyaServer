@@ -168,7 +168,7 @@ export const updateTransaction = async (req: Request, res: Response) => {
     } = body
 
     //  Check user is one of the sides of the transaction
-    const [transactionCurrentSide, transactionOtherSide] = await transactionSideHelper.getTransactionSides(
+    const [transactionCurrentSide, transactionOtherSide] = await transactionSideHelper.getTransactionSidesByUserId(
       transactionId,
       user.id
     )
@@ -305,7 +305,7 @@ export const approveStage = async (req: Request, res: Response) => {
       deliveryNotes
     } = body
 
-    const [transactionCurrentSide, transactionOtherSide] = await transactionSideHelper.getTransactionSides(
+    const [transactionCurrentSide, transactionOtherSide] = await transactionSideHelper.getTransactionSidesByUserId(
       transactionId,
       user.id
     )

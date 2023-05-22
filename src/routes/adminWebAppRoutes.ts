@@ -23,6 +23,7 @@ router.post('/users/createAdminUser', adminUsersController.createAdminUser)
 
 router.post('/accounts/getAllAccounts', adminAccountsController.getAllAccounts)
 router.get('/accounts/getAccountById/:accountId', adminAccountsController.getAccountById)
+router.post('/accounts/approveAccountAuthorization', adminAccountsController.approveAccountAuthorization)
 
 ///////////////////////////
 //  Transactions         //
