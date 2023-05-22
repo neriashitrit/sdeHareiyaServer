@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import {
   AuthorizationStatus,
+  ITransaction,
   ITransactionSide,
   ITransactionStage,
   TransactionStageName,
@@ -35,10 +36,12 @@ const transactionStageHelper = {
     additionalData?: Record<string, any>
   ): Promise<ITransactionStage | undefined> => {
     try {
+      const transaction = (await transactionModel.getTransactions({ [`${Tables.TRANSACTIONS}.id`]: transactionId }))[0]
+
       const nextStages = transactionStagePossiblePaths[activeStage.name]
 
       await setPreviousStageCompleted(
-        transactionId,
+        transaction.id,
         activeStage.id,
         requestingSide.user.id,
         transactionProps,
@@ -46,9 +49,9 @@ const transactionStageHelper = {
       )
 
       if (nextStages.length === 1) {
-        return createNextStage(transactionId, nextStages)
+        return createNextStage(transaction.id, nextStages)
       } else if (nextStages.length > 1) {
-        return createNextStageFromMultiChoice(activeStage.name, requestingSide, transactionId, nextStages)
+        return createNextStageFromMultiChoice(activeStage.name, requestingSide, transaction, nextStages)
       }
       return
     } catch (error) {
@@ -214,7 +217,7 @@ const createNextStage = async (transactionId: number, nextStages: TransactionSta
 const createNextStageFromMultiChoice = async (
   activeStageName: string,
   requestingSide: ITransactionSide,
-  transactionId: number,
+  transaction: ITransaction,
   nextStages: TransactionStageName[]
 ) => {
   let sum: number
@@ -222,16 +225,16 @@ const createNextStageFromMultiChoice = async (
     case TransactionStageName.Draft:
     case TransactionStageName.ConfirmationSideB:
       sum = await transactionModel.getTransactionsAmountSumLastHalfYear(requestingSide.account.id)
-      if (sum <= 50000) {
+      if (sum + transaction.amount <= 50000) {
         return await transactionStageModel.createTransactionStage({
-          transactionId,
+          transactionId: transaction.id,
           name: nextStages[1],
           status: TransactionStageStatus.Active,
           inCharge: transactionStageInCharge[nextStages[1]]
         })
       } else {
         return await transactionStageModel.createTransactionStage({
-          transactionId,
+          transactionId: transaction.id,
           name: nextStages[0],
           status: TransactionStageStatus.Active,
           inCharge: transactionStageInCharge[nextStages[0]]

@@ -23,8 +23,54 @@ const usersHelper = {
         phoneNumber,
         newsletterSubscription,
         lastActiveAt,
-        isActive: true
+        isActive: true,
+        isActivated: true
       })
+
+      const newAccount = await accountModel.createAccount({
+        type: accountType
+      })
+
+      const newUserAccount = await userAccountModel.createUserAccount({
+        userId: newUser.id,
+        accountId: newAccount.id
+      })
+
+      return [newUser, newAccount, newUserAccount]
+    } catch (error) {
+      console.error('ERROR in users.helper createUserFromToken()', error.message)
+      throw {
+        message: `error while trying to createUserFromToken. error: ${error.message}`
+      }
+    }
+  },
+
+  updateUserFromToken: async (authInfo: AuthInfo): Promise<[IUser, IAccount, IUserAccount]> => {
+    const firstName = authInfo.given_name
+    const lastName = authInfo.family_name
+    const email = authInfo.emails[0]
+    const activeDirectoryUuid = authInfo.oid
+    const phoneNumber = ''
+    const newsletterSubscription = true
+    const lastActiveAt = new Date()
+    const accountType = authInfo.extension_account_type ?? 'private'
+
+    try {
+      const newUser = await userModel.updateUser(
+        {
+          firstName,
+          lastName,
+          activeDirectoryUuid,
+          phoneNumber,
+          newsletterSubscription,
+          lastActiveAt,
+          isActive: true,
+          isActivated: true
+        },
+        {
+          email
+        }
+      )
 
       const newAccount = await accountModel.createAccount({
         type: accountType
