@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { types } from 'pg'
-import { ITransaction, IUser } from 'safe-shore-common'
+import { ITransaction, IUser, TransactionStageName, TransactionStatus } from 'safe-shore-common'
 
 import { Tables } from '../constants'
 import DbService from '../services/db.service'
@@ -173,13 +173,27 @@ export const transactionModel = {
         .count(`${Tables.TRANSACTIONS}.status AS total`)
         .sum(`${Tables.TRANSACTIONS}.amount AS amount`)
         .sum(`${Tables.TRANSACTIONS}.commission_amount AS commission_amount`)
-        .select(`${Tables.TRANSACTION_STAGES}.name`)
+        .whereNot(`${Tables.TRANSACTIONS}.status`,TransactionStatus.Stage)
+        .modify((queryBuilder) => {
+          buildRange(queryBuilder, `${Tables.TRANSACTIONS}.updated_at`, startDate, endDate)
+        })
+        .groupBy(`${Tables.TRANSACTIONS}.status`)
+
+        const analyticsStages = await db.knex
+        .select(`${Tables.TRANSACTIONS}.status`,`${Tables.TRANSACTION_STAGES}.name`)
+        .from(Tables.TRANSACTIONS)
+        .count(`${Tables.TRANSACTIONS}.status AS total`)
+        .sum(`${Tables.TRANSACTIONS}.amount AS amount`)
+        .sum(`${Tables.TRANSACTIONS}.commission_amount AS commission_amount`)
+        .where(`${Tables.TRANSACTIONS}.status`,TransactionStatus.Stage)
+        .whereNot(`${Tables.TRANSACTION_STAGES}.name`,TransactionStageName.Completed)
         .leftJoin(Tables.TRANSACTION_STAGES, `${Tables.TRANSACTION_STAGES}.transaction_id`, `${Tables.TRANSACTIONS}.id`)
         .modify((queryBuilder) => {
           buildRange(queryBuilder, `${Tables.TRANSACTIONS}.updated_at`, startDate, endDate)
         })
+        
         .groupBy(`${Tables.TRANSACTIONS}.status`, `${Tables.TRANSACTION_STAGES}.name`)
-      return analytics
+      return [...analytics,...analyticsStages]
     } catch (error) {
       console.error('ERROR in transactionModel.modal getTransactionsStatusAnalytics()', error.message)
       throw {
