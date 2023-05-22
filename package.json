@@ -3,7 +3,6 @@
   "version": "1.22.15",
   "private": true,
   "scripts": {
-    "preinstall": "npx only-allow yarn",
     "precommit": "lint-staged",
     "start:dev": "ts-node-dev --files --transpile-only --respawn --inspect=4321 --project tsconfig.json ./src/app.ts",
     "start:prod": "rm -rf dist && tsc && node ./dist/app.js",
