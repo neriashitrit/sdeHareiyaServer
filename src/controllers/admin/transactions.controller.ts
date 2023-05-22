@@ -61,13 +61,25 @@ export const getTransactionById = async (req: Request, res: Response) => {
 
 export const getTransactionsByAccount = async (req: Request, res: Response) => {
   try {
-    const { accountId } = req.params
+    const { accountId, startDate, endDate } = req.body
+    
     const condition = buildConditionString([
       {
         column: Tables.TRANSACTION_SIDES + '.user_account_id',
         value: accountId
+      },
+      {
+        column: Tables.TRANSACTIONS + '.updated_at',
+        operator: '>=',
+        value: startDate
+      },
+      {
+        column: Tables.TRANSACTIONS + '.updated_at',
+        operator: '<=',
+        value: endDate
       }
     ])
+    console.log(condition)
     const transactions = await transactionHelper.getFullTransactions({
       condition
     })
