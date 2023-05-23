@@ -16,6 +16,7 @@ import transactionSideHelper from '../helpers/transactionSide.helper'
 import transactionStageHelper from '../helpers/transactionStage.helper'
 import {
   commissionModel,
+  fileModel,
   transactionModel,
   transactionProductPropertyModel,
   transactionStageModel
@@ -416,27 +417,44 @@ const upsertProductProperties = async (
   properties: CreateTransactionBodyProductProperty[]
 ): Promise<void> => {
   for (const property of properties) {
-    const transactionProductProperty = await transactionProductPropertyModel.getTransactionProductProperty({
+    let transactionProductProperty = await transactionProductPropertyModel.getTransactionProductProperty({
       [`${Tables.PRODUCT_PROPERTIES}.id`]: property.productPropertyId,
       [`${Tables.TRANSACTION_PRODUCT_PROPERTIES}.transaction_id`]: transactionId
     })
     if (transactionProductProperty) {
-      await transactionProductPropertyModel.updateTransactionProductProperty(
-        {
-          value: property.value
-          // TODO files
-        },
-        {
-          id: transactionProductProperty.id
+      if (property.files) {
+        for (const file of property.files) {
+          fileModel.updateFiles(
+            { url: file },
+            { rowId: transactionProductProperty.id, tableName: Tables.TRANSACTION_PRODUCT_PROPERTIES }
+          )
         }
-      )
+      } else {
+        await transactionProductPropertyModel.updateTransactionProductProperty(
+          {
+            value: property.value ?? JSON.stringify(property.files)
+          },
+          {
+            id: transactionProductProperty.id
+          }
+        )
+      }
+
       continue
     }
-    await transactionProductPropertyModel.createTransactionProductProperty({
+    transactionProductProperty = await transactionProductPropertyModel.createTransactionProductProperty({
       transactionId,
       productPropertyId: property.productPropertyId,
       value: property.value
-      // TODO files
     })
+
+    if (property.files) {
+      for (const file of property.files) {
+        fileModel.updateFiles(
+          { url: file },
+          { rowId: transactionProductProperty.id, tableName: Tables.TRANSACTION_PRODUCT_PROPERTIES }
+        )
+      }
+    }
   }
 }

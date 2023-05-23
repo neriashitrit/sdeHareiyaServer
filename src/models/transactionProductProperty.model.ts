@@ -60,7 +60,8 @@ export const transactionProductPropertyModel = {
             `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.PRODUCT_PROPERTIES, [
               Tables.PRODUCT_PROPERTIES
             ])}) as property`
-          )
+          ),
+          db.knex.raw(`JSON_AGG(${Tables.FILES}.url) as files`)
         )
         .from(Tables.TRANSACTION_PRODUCT_PROPERTIES)
         .where(parsedCondition)
@@ -69,7 +70,13 @@ export const transactionProductPropertyModel = {
           `${Tables.TRANSACTION_PRODUCT_PROPERTIES}.product_property_id`,
           `${Tables.PRODUCT_PROPERTIES}.id`
         )
-        .groupBy(`${Tables.TRANSACTION_PRODUCT_PROPERTIES}.id`, `${Tables.PRODUCT_PROPERTIES}.id`)
+        .leftJoin(Tables.FILES, function () {
+          this.on(`${Tables.TRANSACTION_PRODUCT_PROPERTIES}.id`, `${Tables.FILES}.row_id`).andOn(
+            `${Tables.FILES}.table_name`,
+            db.knex.raw(`'${Tables.TRANSACTION_PRODUCT_PROPERTIES}'`)
+          )
+        })
+        .groupBy(`${Tables.TRANSACTION_PRODUCT_PROPERTIES}.id`, `${Tables.PRODUCT_PROPERTIES}.id`, `${Tables.FILES}.id`)
 
       return transactionProductProperties
     } catch (error) {

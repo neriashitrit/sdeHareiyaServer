@@ -15,7 +15,7 @@ import {
 export type CreateTransactionBodyProductProperty = {
   productPropertyId: number
   value?: string | number | boolean
-  files?: IFile
+  files?: string[]
 }
 
 export type CreateTransactionBody = {

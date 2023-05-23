@@ -19,8 +19,8 @@ export const uploadFileToStorage = async (req: Request, res: Response) => {
   const random = generateRandomPassword(32, true, true, true, true)
   try {
     const url = await fileService.insert(file, userMail, random)
-    const newFile = await fileModel.createFile({ url })
-    return res.status(200).send({ status: 'file uploaded', FileUrl: newFile })
+    await fileModel.createFile({ url })
+    return res.status(200).send({ status: 'file uploaded', url })
   } catch (error) {
     console.error('ERROR in global.controller uploadFileToStorage()', error.message)
     return res.status(400).send({ message: 'Something went wrong', error: error.message })

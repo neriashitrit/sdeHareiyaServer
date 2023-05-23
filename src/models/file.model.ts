@@ -17,5 +17,16 @@ export const fileModel = {
         message: `error while trying to createFile. error: ${error.message}`
       }
     }
+  },
+  updateFiles: async (condition: Record<string, any> | string, updatedFile: Record<string, any>): Promise<IFile[]> => {
+    try {
+      const files = await db.update(Tables.FILES, updatedFile, condition)
+      return files
+    } catch (error) {
+      console.error('ERROR in fileModel.modal updateFiles()', error.message)
+      throw {
+        message: `error while trying to updateFiles. error: ${error.message}`
+      }
+    }
   }
 }

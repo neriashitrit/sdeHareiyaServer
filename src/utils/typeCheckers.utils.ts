@@ -30,6 +30,13 @@ export const isUpdateTransactionBody = (body: any): body is UpdateTransactionBod
     (_.isNil(body.productSubcategoryOther) || typeof body.productSubcategoryOther === 'string') &&
     (_.isNil(body.currency) || typeof body.currency === 'string') &&
     (_.isNil(body.amount) || typeof body.amount === 'number') &&
+    (_.isNil(body.endDate) || typeof body.endDate === 'string') &&
+    (_.isNil(body.commissionPayer) || typeof body.commissionPayer === 'string') &&
+    (_.isNil(body.creatorSide) || typeof body.creatorSide === 'string') &&
+    (_.isNil(body.firstName) || typeof body.firstName === 'string') &&
+    (_.isNil(body.lastName) || typeof body.lastName === 'string') &&
+    (_.isNil(body.phoneNumber) || typeof body.phoneNumber === 'string') &&
+    (_.isNil(body.email) || typeof body.email === 'string') &&
     (_.isNil(body.properties) ||
       (Array.isArray(body.properties) &&
         body.properties.every(
@@ -37,18 +44,14 @@ export const isUpdateTransactionBody = (body: any): body is UpdateTransactionBod
             typeof property === 'object' &&
             !_.isNil(property) &&
             typeof property.productPropertyId === 'number' &&
-            (typeof property.value === 'number' ||
-              typeof property.value === 'string' ||
-              typeof property.value === 'boolean' ||
-              _.isNil(property.value))
-        ))) &&
-    (_.isNil(body.endDate) || typeof body.endDate === 'string') &&
-    (_.isNil(body.commissionPayer) || typeof body.commissionPayer === 'string') &&
-    (_.isNil(body.creatorSide) || typeof body.creatorSide === 'string') &&
-    (_.isNil(body.firstName) || typeof body.firstName === 'string') &&
-    (_.isNil(body.lastName) || typeof body.lastName === 'string') &&
-    (_.isNil(body.phoneNumber) || typeof body.phoneNumber === 'string') &&
-    (_.isNil(body.email) || typeof body.email === 'string')
+            ((_.isNil(property.files) &&
+              (typeof property.value === 'number' ||
+                typeof property.value === 'string' ||
+                typeof property.value === 'boolean')) ||
+              (_.isNil(property.value) &&
+                Array.isArray(property.files) &&
+                property.files.every((file: any) => typeof file === 'string')))
+        )))
   )
 }
 
@@ -68,10 +71,13 @@ export const isCreateTransactionBody = (body: any): body is CreateTransactionBod
         typeof property === 'object' &&
         !_.isNil(property) &&
         typeof property.productPropertyId === 'number' &&
-        (typeof property.value === 'number' ||
-          typeof property.value === 'string' ||
-          typeof property.value === 'boolean' ||
-          _.isNil(property.value))
+        ((_.isNil(property.files) &&
+          (typeof property.value === 'number' ||
+            typeof property.value === 'string' ||
+            typeof property.value === 'boolean')) ||
+          (_.isNil(property.value) &&
+            Array.isArray(property.files) &&
+            property.files.every((file: any) => typeof file === 'string')))
     )
   )
 }
