@@ -198,10 +198,18 @@ export const approveStage = async (req: Request, res: Response) => {
     ) {
       return res.status(400).json(failureResponse('Admin is not in charge of this stage'))
     }
+    await transactionStageHelper.adminNextStage(transactionId, user.id, activeStage)
+    const condition = buildConditionString([
+      {
+        column: Tables.TRANSACTIONS + '.id',
+        value: String(transactionId)
+      }
+    ])
+    const transaction = await transactionHelper.getFullTransactions({
+      condition
+    })
 
-    const nextStage = await transactionStageHelper.adminNextStage(transactionId, user.id, activeStage)
-
-    return res.status(200).json(successResponse(nextStage!))
+    return res.status(200).json(successResponse(transaction[0]))
   } catch (error) {
     console.error('ERROR in transactions.controller approveStage()', error.message)
     return res.status(500).send(failureResponse(error.message))

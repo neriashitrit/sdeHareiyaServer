@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { types } from 'pg'
-import { ITransaction, IUser, TransactionStageName, TransactionStatus } from 'safe-shore-common'
+import { ITransaction, IUser, TransactionStageName, TransactionStageStatus, TransactionStatus } from 'safe-shore-common'
 
 import { Tables } from '../constants'
 import DbService from '../services/db.service'
@@ -186,6 +186,7 @@ export const transactionModel = {
         .sum(`${Tables.TRANSACTIONS}.amount AS amount`)
         .sum(`${Tables.TRANSACTIONS}.commission_amount AS commission_amount`)
         .where(`${Tables.TRANSACTIONS}.status`,TransactionStatus.Stage)
+        .where(`${Tables.TRANSACTION_STAGES}.status`,TransactionStageStatus.Active)
         .whereNot(`${Tables.TRANSACTION_STAGES}.name`,TransactionStageName.Completed)
         .leftJoin(Tables.TRANSACTION_STAGES, `${Tables.TRANSACTION_STAGES}.transaction_id`, `${Tables.TRANSACTIONS}.id`)
         .modify((queryBuilder) => {
