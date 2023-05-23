@@ -7,9 +7,9 @@ import DbService from '../services/db.service'
 const db = new DbService()
 
 export const userModel = {
-  getAllUsers: async (): Promise<IUser[]> => {
+  getAllUsers: async (condition: Record<string, any> = {}): Promise<IUser[]> => {
     try {
-      const users = await db.getAll(Tables.USERS, { is_active: true })
+      const users = await db.getAll(Tables.USERS, { is_active: true , ...condition})
       return users
     } catch (error) {
       console.error('ERROR in users.modal getAllUsers()', error.message)

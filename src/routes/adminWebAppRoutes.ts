@@ -13,7 +13,7 @@ const router = express.Router()
 //      Users            //
 ///////////////////////////
 
-router.get('/users/getAllUsers', adminUsersController.getAllUsers)
+router.get('/users/getAllUsers', adminUsersController.getAllAdminUsers)
 router.post('/users/getUser', adminUsersController.getUserById)
 router.post('/users/createAdminUser', adminUsersController.createAdminUser)
 

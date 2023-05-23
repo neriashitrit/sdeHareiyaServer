@@ -1,14 +1,15 @@
 import { Request, Response } from 'express'
+import { UserRole } from 'safe-shore-common'
+import { Tables } from '../../constants'
 
 import usersHelper from '../../helpers/users.helper'
 import { userModel } from '../../models/index'
 import { createAdminUserInB2C } from '../../services/activeDirectory.service'
 import { failureResponse, successResponse } from '../../utils/db.utils'
 
-export const getAllUsers = async (req: Request, res: Response) => {
+export const getAllAdminUsers = async (req: Request, res: Response) => {
   try {
-    const users = await userModel.getAllUsers()
-    console.log(users)
+    const users = await userModel.getAllUsers({role:UserRole.Admin})
     res.status(200).json(successResponse(users))
   } catch (error: any) {
     res.status(500).json(failureResponse(error))
