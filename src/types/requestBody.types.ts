@@ -63,6 +63,11 @@ export type AdminApproveStageBody = {
   transactionId: number
 }
 
+export type AdminApproveTransactionBody = {
+  transactionId: number
+  bankDetails:CreateBankDetailsBody
+}
+
 export type AdminApproveDisputeBody = {
   transactionId: number
   userId: number

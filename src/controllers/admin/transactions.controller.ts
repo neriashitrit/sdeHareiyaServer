@@ -4,12 +4,13 @@ import { IUser, TransactionStageName } from 'safe-shore-common'
 import { TransactionSide, TransactionStatus } from 'safe-shore-common'
 
 import { Tables, conditionForTransactionsNeedAuthorization } from '../../constants'
+import bankDetailsHelper from '../../helpers/bankDetails.helper'
 import transactionHelper from '../../helpers/transaction.helper'
 import transactionDisputeHelper from '../../helpers/transactionDispute.helper'
 import transactionStageHelper from '../../helpers/transactionStage.helper'
 import { transactionModel } from '../../models'
 import { buildConditionString, failureResponse, successResponse } from '../../utils/db.utils'
-import { isAdminApproveDisputeBody, isAdminApproveStageBody } from '../../utils/typeCheckers.utils'
+import { isAdminApproveDisputeBody, isAdminApproveStageBody, isAdminApproveTransactionBody } from '../../utils/typeCheckers.utils'
 
 export const getAllTransactions = async (req: Request, res: Response) => {
   try {
@@ -185,6 +186,48 @@ export const approveStage = async (req: Request, res: Response) => {
     }
 
     const { transactionId } = body
+
+    const activeStage = (await transactionStageHelper.getActiveStage(transactionId))[0]
+
+    if (
+      !activeStage ||
+      [
+        TransactionStageName.AuthorizationSideAConfirmation,
+        TransactionStageName.AuthorizationSideBConfirmation
+      ].includes(activeStage.name) ||
+      activeStage.inCharge !== TransactionSide.Admin
+    ) {
+      return res.status(400).json(failureResponse('Admin is not in charge of this stage'))
+    }
+    await transactionStageHelper.adminNextStage(transactionId, user.id, activeStage)
+    const condition = buildConditionString([
+      {
+        column: Tables.TRANSACTIONS + '.id',
+        value: String(transactionId)
+      }
+    ])
+    const transaction = await transactionHelper.getFullTransactions({
+      condition
+    })
+
+    return res.status(200).json(successResponse(transaction[0]))
+  } catch (error) {
+    console.error('ERROR in transactions.controller approveStage()', error.message)
+    return res.status(500).send(failureResponse(error.message))
+  }
+}
+
+export const approveTransaction = async (req: Request, res: Response) => {
+  try {
+    const user = req.user as IUser
+    const body = req.body
+
+    if (!isAdminApproveTransactionBody(body)) {
+      return res.status(400).json(failureResponse('Invalid Parameters'))
+    }
+
+    const { transactionId, bankDetails } = body
+    await bankDetailsHelper.createNewBankDetails(bankDetails);
 
     const activeStage = (await transactionStageHelper.getActiveStage(transactionId))[0]
 

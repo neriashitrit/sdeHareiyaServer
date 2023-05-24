@@ -36,6 +36,7 @@ router.post(
   adminTransactionsController.getTransactionsProductsAnalytics
 )
 router.post('/transactions/approveStage', adminTransactionsController.approveStage)
+router.post('/transactions/approveTransaction', adminTransactionsController.approveTransaction)
 router.post('/transactions/getAllTransactions', adminTransactionsController.getAllTransactions)
 router.post('/transactions/getAutorizeTransactions', adminTransactionsController.getAutorizeTransactions)
 router.get('/transactions/getTransactionById/:transactionId', adminTransactionsController.getTransactionById)

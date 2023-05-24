@@ -16,7 +16,8 @@ import {
   OpenDisputeBody,
   UpdateTransactionBody,
   UpdateUserBody,
-  updateCommissionParams
+  updateCommissionParams,
+  AdminApproveTransactionBody
 } from '../types/requestBody.types'
 
 export const isUpdateTransactionBody = (body: any): body is UpdateTransactionBody => {
@@ -103,6 +104,14 @@ export const isApproveStageBody = (body: any): body is ApproveStageBody => {
 }
 
 export const isAdminApproveStageBody = (body: any): body is AdminApproveStageBody => {
+  return (
+    typeof body === 'object' &&
+    !_.isNil(body) &&
+    (typeof body.transactionId === 'number' || typeof +body.transactionId === 'number')
+  )
+}
+
+export const isAdminApproveTransactionBody = (body: any): body is AdminApproveTransactionBody => {
   return (
     typeof body === 'object' &&
     !_.isNil(body) &&
