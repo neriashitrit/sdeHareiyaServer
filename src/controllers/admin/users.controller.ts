@@ -31,10 +31,10 @@ export const getUserById = async (req: Request, res: Response) => {
 
 export const createAdminUser = async (req: Request, res: Response) => {
   console.log('in controller createAdminUser')
-  const { firstName, lastName, email, phone } = req.body
-  if (!firstName || !lastName || !email || !phone) res.status(400).json(failureResponse('missing Params'))
+  const { firstName, lastName, email, phone, role, phonePrefix } = req.body
+  if (!firstName || !lastName || !email || !phone || !role) res.status(400).json(failureResponse('missing Params'))
   try {
-    const ADUser = await createAdminUserInB2C(firstName, lastName, email, phone)
+    const ADUser = await createAdminUserInB2C(firstName, lastName, email, phone, role, phonePrefix)
     const user = await usersHelper.createAdminUserFromADRespond(ADUser)
     res.status(200).json(successResponse(user))
   } catch (error: any) {
