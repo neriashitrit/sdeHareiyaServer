@@ -47,11 +47,12 @@ export const convertKeysToCamelCase = (object: any) => {
   return object
 }
 
-export const getFormattedPrefix = (index: number, prefixes?: string[]) => {
-  return _.isNil(prefixes) ? '' : `${prefixes[index] ? prefixes[index] + '.' : ''}`
+export const getFormattedPrefix = (index: number, prefixes?: string[]): string | null => {
+  return _.isNil(prefixes) || _.isNil(prefixes[index]) ? null : `${prefixes[index]}.`
 }
 
 export const getJsonBuildObject = (tableName: Tables, prefixes?: string[]): string => {
+  let a
   switch (tableName) {
     case Tables.BANK_DETAILS:
       return (
@@ -81,6 +82,7 @@ export const getJsonBuildObject = (tableName: Tables, prefixes?: string[]): stri
         `'is_third_party', ${getFormattedPrefix(0, prefixes)}is_third_party,` +
         `'third_party_full_name', ${getFormattedPrefix(0, prefixes)}third_party_full_name,` +
         `'is_bank_account_blocked', ${getFormattedPrefix(0, prefixes)}is_bank_account_blocked,` +
+        (getFormattedPrefix(1, prefixes) ? `'bank_details', ${getFormattedPrefix(1, prefixes)}*,` : '') +
         `'created_at', ${getFormattedPrefix(0, prefixes)}created_at,` +
         `'updated_at', ${getFormattedPrefix(0, prefixes)}updated_at`
       )
@@ -129,6 +131,7 @@ export const getJsonBuildObject = (tableName: Tables, prefixes?: string[]): stri
       return (
         `'id', ${getFormattedPrefix(0, prefixes)}id,` +
         `'product_category_id', ${getFormattedPrefix(0, prefixes)}product_category_id,` +
+        `'order', ${getFormattedPrefix(0, prefixes)}order,` +
         `'name', ${getFormattedPrefix(0, prefixes)}name,` +
         `'type', ${getFormattedPrefix(0, prefixes)}type,` +
         `'label', ${getFormattedPrefix(0, prefixes)}label,` +

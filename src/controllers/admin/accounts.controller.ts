@@ -4,17 +4,17 @@ import { AuthorizationStatus, IUser } from 'safe-shore-common'
 
 import { Tables } from '../../constants'
 import accountHelper from '../../helpers/account.helper'
+import bankDetailsHelper from '../../helpers/bankDetails.helper'
 import transactionHelper from '../../helpers/transaction.helper'
-import transactionSideHelper from '../../helpers/transactionSide.helper'
 import transactionStageHelper from '../../helpers/transactionStage.helper'
-import { accountModel, userModel } from '../../models/index'
+import { accountModel } from '../../models/index'
 import { failureResponse, successResponse } from '../../utils/db.utils'
-import { isApproveAccountAuthorizationBody } from '../../utils/typeCheckers.utils'
+import { isApproveAccountAuthorizationBody, isCreateBankDetailsBody } from '../../utils/typeCheckers.utils'
 
 export const getAllAccounts = async (req: Request, res: Response) => {
   try {
-    const { startDate, endDate } = req.body
-    const accounts = await accountModel.getAllAccounts(startDate, endDate)
+    const { startDate, endDate } = req.query
+    const accounts = await accountModel.getAllAccounts(startDate as string, endDate as string)
     res.status(200).json(successResponse(accounts))
   } catch (error: any) {
     res.status(500).json(failureResponse(error))
@@ -68,6 +68,34 @@ export const approveAccountAuthorization = async (req: Request, res: Response) =
     const updatedAccount = (await accountModel.getAccount({ [`${Tables.ACCOUNTS}.id`]: accountId }))[0]
 
     return res.status(200).json(successResponse(updatedAccount))
+  } catch (error) {
+    return res.status(500).json(failureResponse(error))
+  }
+}
+
+export const createBankDetails = async (req: Request, res: Response) => {
+  try {
+    const body = req.body
+
+    if (!isCreateBankDetailsBody(body)) {
+      return res.status(400).json(failureResponse('Invalid Parameters'))
+    }
+
+    const account = (
+      await accountModel.getAccount({
+        [`${Tables.ACCOUNTS}.id`]: body.accountId
+      })
+    )[0]
+
+    if (!account) {
+      return res.status(400).json(failureResponse('Invalid Parameters'))
+    }
+
+    const bankDetails = await bankDetailsHelper.createNewBankDetails(body)
+
+    account.bankDetails = bankDetails
+
+    return res.status(200).json(successResponse(account))
   } catch (error) {
     return res.status(500).json(failureResponse(error))
   }

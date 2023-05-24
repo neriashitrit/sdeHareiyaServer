@@ -1,16 +1,21 @@
 import _ from 'lodash'
 import {
-  AuthorizationStatus,
   ITransaction,
   ITransactionDispute,
   ITransactionProductProperty,
   ITransactionSide,
   ITransactionStage,
+  IUser,
+  TransactionSide,
+  TransactionStageName,
+  TransactionStageStatus,
   TransactionStatus
 } from 'safe-shore-common'
 
 import { Tables } from '../constants'
 import {
+  commissionModel,
+  fileModel,
   productPropertyModel,
   transactionDisputeModel,
   transactionModel,
@@ -18,8 +23,182 @@ import {
   transactionSideModel,
   transactionStageModel
 } from '../models/index'
+import {
+  CreateTransactionBody,
+  CreateTransactionBodyProductProperty,
+  UpdateTransactionBody
+} from '../types/requestBody.types'
+import { commissionCalculate } from '../utils/global.utils'
+import transactionSideHelper from './transactionSide.helper'
+import transactionStageHelper from './transactionStage.helper'
 
 const transactionHelper = {
+  createTransaction: async (
+    user: IUser,
+    {
+      productCategoryId,
+      productCategoryOther,
+      productSubcategoryId,
+      productSubcategoryOther,
+      currency,
+      amount,
+      properties
+    }: CreateTransactionBody
+  ): Promise<ITransaction | null> => {
+    const commissionObject = await getCommissionByAmount(amount)
+
+    const newTransaction = await transactionModel.createTransaction({
+      status: TransactionStatus.Stage,
+      productCategoryId,
+      productCategoryOther,
+      productSubcategoryId,
+      productSubcategoryOther,
+      amountCurrency: currency,
+      amount,
+      commissionId: commissionObject.commissionId,
+      commissionAmountCurrency: currency,
+      commissionAmount: commissionObject.amount
+    })
+
+    if (!newTransaction) {
+      return null
+    }
+
+    const transactionStage = await transactionStageModel.createTransactionStage({
+      name: TransactionStageName.Draft,
+      transactionId: newTransaction.id,
+      inCharge: TransactionSide.SideA,
+      status: TransactionStageStatus.Active,
+      userId: user.id
+    })
+
+    await upsertProductProperties(newTransaction.id, properties)
+
+    const transactionSides = await transactionSideHelper.createTransactionSideA(newTransaction.id, user.id)
+
+    return await transactionHelper.getFullTransaction({
+      transactionId: newTransaction.id,
+      sides: transactionSides,
+      stages: transactionStage ? [transactionStage] : [],
+      disputes: []
+    })
+  },
+  updateTransaction: async (
+    user: IUser,
+    {
+      transactionId,
+      productCategoryId,
+      productCategoryOther,
+      productSubcategoryId,
+      productSubcategoryOther,
+      currency,
+      amount,
+      properties,
+      endDate,
+      commissionPayer,
+      creatorSide,
+      firstName,
+      lastName,
+      phoneNumber,
+      email
+    }: UpdateTransactionBody
+  ): Promise<ITransaction | null> => {
+    //  Check user is one of the sides of the transaction
+    const [transactionCurrentSide, transactionOtherSide] = await transactionSideHelper.getTransactionSidesByUserId(
+      transactionId,
+      user.id
+    )
+
+    if (!transactionCurrentSide) {
+      return null
+    }
+
+    const activeStage = (await transactionStageHelper.getActiveStage(transactionId))[0]
+
+    if (
+      _.isNil(activeStage) ||
+      (activeStage.name !== TransactionStageName.AuthorizationSideA && activeStage.name !== TransactionStageName.Draft)
+    ) {
+      return null
+    }
+
+    const updatedFields: Record<string, any> = {}
+
+    if (amount) {
+      const commissionObject = await getCommissionByAmount(amount)
+
+      updatedFields.amount = amount
+      updatedFields.commissionId = commissionObject.commissionId
+      updatedFields.commissionAmount = commissionObject.amount
+    }
+
+    if (properties) {
+      await upsertProductProperties(transactionId, properties)
+    }
+
+    let transactionSides: ITransactionSide[] | null = null
+    if (firstName || lastName || email || phoneNumber || creatorSide) {
+      if (transactionOtherSide) {
+        transactionSides = await transactionSideHelper.updateTransactionSideB(
+          transactionId,
+          user,
+          transactionOtherSide.user,
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          creatorSide
+        )
+      } else {
+        if (_.isNil(firstName) || _.isNil(lastName) || _.isNil(email) || _.isNil(phoneNumber) || _.isNil(creatorSide)) {
+          return null
+        }
+
+        transactionSides = await transactionSideHelper.createTransactionSideB(
+          transactionId,
+          user.id,
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          creatorSide
+        )
+      }
+    }
+    if (
+      !_.isNil(productCategoryId) ||
+      !_.isNil(productCategoryOther) ||
+      !_.isNil(productSubcategoryId) ||
+      !_.isNil(productSubcategoryOther) ||
+      !_.isNil(currency) ||
+      !_.isNil(endDate) ||
+      !_.isNil(commissionPayer) ||
+      !_.isNil(productCategoryId) ||
+      Object.keys(updatedFields).length !== 0
+    ) {
+      await transactionModel.updateTransactions(
+        { id: transactionId },
+        {
+          productCategoryId,
+          productCategoryOther,
+          productSubcategoryId,
+          productSubcategoryOther,
+          amountCurrency: currency,
+          commissionAmountCurrency: currency,
+          endDate,
+          commissionPayer,
+          ...updatedFields
+        }
+      )
+    }
+
+    return await transactionHelper.getFullTransaction({
+      transactionId,
+      sides:
+        transactionSides ??
+        (transactionOtherSide !== undefined ? [transactionCurrentSide, transactionOtherSide] : [transactionCurrentSide])
+    })
+  },
   isTransactionCompleted: async (transactionId: number): Promise<boolean> => {
     const transaction = (
       await transactionModel.getTransactions({
@@ -181,11 +360,71 @@ const transactionHelper = {
     const transactions = await transactionModel.getTransactions(
       `${Tables.ACCOUNTS}.id = '${accountId}' AND ${Tables.TRANSACTIONS}.status IN ('dispute', 'stage')`
     )
-    await transactionModel.updateTransaction(`id IN (${transactions.map((transaction) => transaction.id)})`, {
+    await transactionModel.updateTransactions(`id IN (${transactions.map((transaction) => transaction.id)})`, {
       status: TransactionStatus.Canceled,
       cancelReason: 'Authorization failure'
     })
     return transactions
+  },
+  getAllActiveTransactions: (accountId: number): Promise<ITransaction[]> => {
+    return transactionModel.getTransactions(
+      `${Tables.ACCOUNTS}.id = '${accountId}' AND ${Tables.TRANSACTIONS}.status IN ('dispute', 'stage')`
+    )
+  }
+}
+
+const getCommissionByAmount = async (amount: number): Promise<{ commissionId: number | null; amount: number }> => {
+  const commissions = await commissionModel.getCommissions({
+    isActive: true
+  })
+
+  return commissionCalculate(commissions, amount)
+}
+
+const upsertProductProperties = async (
+  transactionId: number,
+  properties: CreateTransactionBodyProductProperty[]
+): Promise<void> => {
+  for (const property of properties) {
+    let transactionProductProperty = await transactionProductPropertyModel.getTransactionProductProperty({
+      [`${Tables.PRODUCT_PROPERTIES}.id`]: property.productPropertyId,
+      [`${Tables.TRANSACTION_PRODUCT_PROPERTIES}.transaction_id`]: transactionId
+    })
+    if (transactionProductProperty) {
+      if (property.files) {
+        for (const file of property.files) {
+          fileModel.updateFiles(
+            { url: file },
+            { rowId: transactionProductProperty.id, tableName: Tables.TRANSACTION_PRODUCT_PROPERTIES }
+          )
+        }
+      } else {
+        await transactionProductPropertyModel.updateTransactionProductProperty(
+          {
+            value: property.value ?? JSON.stringify(property.files)
+          },
+          {
+            id: transactionProductProperty.id
+          }
+        )
+      }
+
+      continue
+    }
+    transactionProductProperty = await transactionProductPropertyModel.createTransactionProductProperty({
+      transactionId,
+      productPropertyId: property.productPropertyId,
+      value: property.value
+    })
+
+    if (property.files) {
+      for (const file of property.files) {
+        fileModel.updateFiles(
+          { url: file },
+          { rowId: transactionProductProperty.id, tableName: Tables.TRANSACTION_PRODUCT_PROPERTIES }
+        )
+      }
+    }
   }
 }
 

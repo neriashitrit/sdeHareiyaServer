@@ -53,7 +53,7 @@ export type ApproveStageBody = {
   depositBankAccountOwnerFullName?: string
   depositTransferDate?: string
   depositReferenceNumber?: string
-  depositReferenceFile?: File
+  depositReferenceFile?: string
   deliveryDate?: Date
   deliveryType?: string
   deliveryNotes?: string
@@ -131,6 +131,7 @@ export type AccountAuthorizationPrivateBody = AccountAuthorizationBaseBody & {
   isThirdParty: boolean
   thirdPartyFullName?: string
   isBankAccountBlocked: boolean
+  files: string[]
 }
 
 export type AccountAuthorizationCompanyBody = AccountAuthorizationBaseBody & {

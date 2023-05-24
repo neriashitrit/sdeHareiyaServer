@@ -17,13 +17,24 @@ export const userAccountModel = {
           `${Tables.USER_ACCOUNTS}.created_at`,
           `${Tables.USER_ACCOUNTS}.updated_at`,
           db.knex.raw(`JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.USERS, [Tables.USERS])}) as user`),
-          db.knex.raw(`JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.ACCOUNTS, [Tables.ACCOUNTS])}) as account`)
+          db.knex.raw(
+            `JSON_BUILD_OBJECT(${getJsonBuildObject(Tables.ACCOUNTS, [
+              Tables.ACCOUNTS,
+              Tables.BANK_DETAILS
+            ])}) as account`
+          )
         )
         .from(Tables.USER_ACCOUNTS)
         .where(condition)
         .leftJoin(Tables.ACCOUNTS, `${Tables.USER_ACCOUNTS}.account_id`, `${Tables.ACCOUNTS}.id`)
+        .leftJoin(Tables.BANK_DETAILS, `${Tables.BANK_DETAILS}.account_id`, `${Tables.ACCOUNTS}.id`)
         .leftJoin(Tables.USERS, `${Tables.USER_ACCOUNTS}.user_id`, `${Tables.USERS}.id`)
-        .groupBy(`${Tables.USER_ACCOUNTS}.id`, `${Tables.USERS}.id`, `${Tables.ACCOUNTS}.id`)
+        .groupBy(
+          `${Tables.USER_ACCOUNTS}.id`,
+          `${Tables.USERS}.id`,
+          `${Tables.ACCOUNTS}.id`,
+          `${Tables.BANK_DETAILS}.id`
+        )
         .first()
 
       return userAccount

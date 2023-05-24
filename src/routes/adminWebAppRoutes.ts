@@ -21,9 +21,10 @@ router.post('/users/createAdminUser', adminUsersController.createAdminUser)
 //      Accounts         //
 ///////////////////////////
 
-router.post('/accounts/getAllAccounts', adminAccountsController.getAllAccounts)
+router.get('/accounts/getAllAccounts', adminAccountsController.getAllAccounts)
 router.get('/accounts/getAccountById/:accountId', adminAccountsController.getAccountById)
 router.post('/accounts/approveAccountAuthorization', adminAccountsController.approveAccountAuthorization)
+router.post('/accounts/createBankDetails', adminAccountsController.createBankDetails)
 
 ///////////////////////////
 //  Transactions         //

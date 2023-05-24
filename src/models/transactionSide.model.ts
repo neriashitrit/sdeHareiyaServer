@@ -66,11 +66,15 @@ export const transactionSideModel = {
     }
   },
   updateTransactionSide: async (
-    condition: Record<string, any>,
+    condition: Record<string, any> | string,
     updatedTransactionSide: Record<string, any>
   ): Promise<ITransactionSide | undefined> => {
     try {
-      const transactionSide = await db.update(Tables.TRANSACTION_SIDES, updatedTransactionSide, condition)
+      let parsedCondition = condition
+      if (typeof condition === 'string') {
+        parsedCondition = db.knex.raw(condition)
+      }
+      const transactionSide = await db.update(Tables.TRANSACTION_SIDES, updatedTransactionSide, parsedCondition)
       return transactionSide?.[0]
     } catch (error) {
       console.error('ERROR in transactionSide.modal updateTransactionSide()', error.message)

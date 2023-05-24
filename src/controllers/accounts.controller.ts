@@ -78,13 +78,22 @@ export const createBankDetails = async (req: Request, res: Response) => {
       return res.status(400).json(failureResponse('Invalid Parameters'))
     }
 
-    await bankDetailsHelper.createNewBankDetails(body)
+    const account = (
+      await accountModel.getAccount({
+        [`${Tables.USERS}.id`]: user.id,
+        [`${Tables.ACCOUNTS}.id`]: body.accountId
+      })
+    )[0]
 
-    const account = await accountModel.getAccount({
-      [`${Tables.USERS}.id`]: user.id
-    })
+    if (!account) {
+      return res.status(400).json(failureResponse('Invalid Parameters'))
+    }
 
-    return res.status(200).json(successResponse(account[0]))
+    const bankDetails = await bankDetailsHelper.createNewBankDetails(body)
+
+    account.bankDetails = bankDetails
+
+    return res.status(200).json(successResponse(account))
   } catch (error) {
     return res.status(500).json(failureResponse(error))
   }

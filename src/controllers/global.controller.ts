@@ -16,7 +16,7 @@ export const uploadFileToStorage = async (req: Request, res: Response) => {
   const { files }: any = req
   const { file } = files
   const userMail = (req.user as IUser).email
-  const random = generateRandomPassword(32, true, true, true, true)
+  const random = generateRandomPassword(32, true, false, true, true)
   try {
     const url = await fileService.insert(file, userMail, random)
     await fileModel.createFile({ url })

@@ -119,16 +119,17 @@ export const transactionModel = {
       }
     }
   },
-  updateTransaction: async (
+  updateTransactions: async (
     condition: Record<string, any> | string,
     updatedTransaction: Record<string, any>
-  ): Promise<void> => {
+  ): Promise<ITransaction[]> => {
     try {
       let parsedCondition = condition
       if (typeof condition === 'string') {
         parsedCondition = db.knex.raw(condition)
       }
-      await db.knex(Tables.TRANSACTIONS).where(parsedCondition).update(updatedTransaction)
+      const transaction = await db.update(Tables.TRANSACTIONS, updatedTransaction, parsedCondition)
+      return transaction
     } catch (error) {
       console.error('ERROR in transactions.modal updateTransaction()', error.message)
       throw {
@@ -173,28 +174,28 @@ export const transactionModel = {
         .count(`${Tables.TRANSACTIONS}.status AS total`)
         .sum(`${Tables.TRANSACTIONS}.amount AS amount`)
         .sum(`${Tables.TRANSACTIONS}.commission_amount AS commission_amount`)
-        .whereNot(`${Tables.TRANSACTIONS}.status`,TransactionStatus.Stage)
+        .whereNot(`${Tables.TRANSACTIONS}.status`, TransactionStatus.Stage)
         .modify((queryBuilder) => {
           buildRange(queryBuilder, `${Tables.TRANSACTIONS}.updated_at`, startDate, endDate)
         })
         .groupBy(`${Tables.TRANSACTIONS}.status`)
 
-        const analyticsStages = await db.knex
-        .select(`${Tables.TRANSACTIONS}.status`,`${Tables.TRANSACTION_STAGES}.name`)
+      const analyticsStages = await db.knex
+        .select(`${Tables.TRANSACTIONS}.status`, `${Tables.TRANSACTION_STAGES}.name`)
         .from(Tables.TRANSACTIONS)
         .count(`${Tables.TRANSACTIONS}.status AS total`)
         .sum(`${Tables.TRANSACTIONS}.amount AS amount`)
         .sum(`${Tables.TRANSACTIONS}.commission_amount AS commission_amount`)
-        .where(`${Tables.TRANSACTIONS}.status`,TransactionStatus.Stage)
-        .where(`${Tables.TRANSACTION_STAGES}.status`,TransactionStageStatus.Active)
-        .whereNot(`${Tables.TRANSACTION_STAGES}.name`,TransactionStageName.Completed)
+        .where(`${Tables.TRANSACTIONS}.status`, TransactionStatus.Stage)
+        .where(`${Tables.TRANSACTION_STAGES}.status`, TransactionStageStatus.Active)
+        .whereNot(`${Tables.TRANSACTION_STAGES}.name`, TransactionStageName.Completed)
         .leftJoin(Tables.TRANSACTION_STAGES, `${Tables.TRANSACTION_STAGES}.transaction_id`, `${Tables.TRANSACTIONS}.id`)
         .modify((queryBuilder) => {
           buildRange(queryBuilder, `${Tables.TRANSACTIONS}.updated_at`, startDate, endDate)
         })
-        
+
         .groupBy(`${Tables.TRANSACTIONS}.status`, `${Tables.TRANSACTION_STAGES}.name`)
-      return [...analytics,...analyticsStages]
+      return [...analytics, ...analyticsStages]
     } catch (error) {
       console.error('ERROR in transactionModel.modal getTransactionsStatusAnalytics()', error.message)
       throw {

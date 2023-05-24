@@ -33,7 +33,7 @@ const transactionDisputeHelper = {
       isCompleted: false
     })
 
-    await transactionModel.updateTransaction(
+    await transactionModel.updateTransactions(
       {
         id: transactionId
       },
@@ -53,7 +53,7 @@ const transactionDisputeHelper = {
       }
     )
 
-    await transactionModel.updateTransaction(
+    await transactionModel.updateTransactions(
       {
         id: transactionId
       },

@@ -14,7 +14,20 @@ export const accountModel = {
         .select(
           `${Tables.ACCOUNTS}.*`,
           db.knex.raw('COALESCE(summary.active_transaction_count, 0) AS active_transaction_count'),
-          db.knex.raw(`JSON_AGG(${Tables.USERS}) AS users`)
+          db.knex.raw(`JSON_AGG(${Tables.USERS}) AS users`),
+          db.knex.raw(
+            `CASE WHEN ${Tables.COMPANY_DETAILS}.id IS NULL THEN null ELSE JSON_BUILD_OBJECT(${getJsonBuildObject(
+              Tables.COMPANY_DETAILS,
+              [Tables.COMPANY_DETAILS]
+            )}) END as company_details`
+          ),
+          db.knex.raw(
+            `CASE WHEN ${Tables.BANK_DETAILS}.id IS NULL THEN null ELSE JSON_BUILD_OBJECT(${getJsonBuildObject(
+              Tables.BANK_DETAILS,
+              [Tables.BANK_DETAILS]
+            )}) END as bank_details`
+          ),
+          db.knex.raw(`CASE WHEN ${Tables.FILES}.id IS NULL THEN null ELSE JSON_AGG(${Tables.FILES}.url) END as files`)
         )
         .from(Tables.ACCOUNTS)
         .leftJoin(Tables.USER_ACCOUNTS, `${Tables.ACCOUNTS}.id`, `${Tables.USER_ACCOUNTS}.account_id`)
@@ -29,6 +42,7 @@ export const accountModel = {
               `${Tables.TRANSACTION_SIDES}.user_account_id`
             )
             .leftJoin(Tables.TRANSACTIONS, `${Tables.TRANSACTIONS}.id`, `${Tables.TRANSACTION_SIDES}.transaction_id`)
+
             .whereIn(`${Tables.TRANSACTIONS}.status`, ['stage', 'dispute'])
             .groupBy(`${Tables.USER_ACCOUNTS}.account_id`)
             .as('summary'),
@@ -36,10 +50,29 @@ export const accountModel = {
           `${Tables.ACCOUNTS}.id`
         )
         .leftJoin(Tables.USERS, `${Tables.USER_ACCOUNTS}.user_id`, `${Tables.USERS}.id`)
+        .leftJoin(Tables.COMPANY_DETAILS, `${Tables.COMPANY_DETAILS}.account_id`, `${Tables.ACCOUNTS}.id`)
+        .leftJoin(Tables.BANK_DETAILS, function () {
+          this.on(`${Tables.BANK_DETAILS}.account_id`, `${Tables.ACCOUNTS}.id`).andOn(
+            `${Tables.BANK_DETAILS}.is_active`,
+            db.knex.raw('true')
+          )
+        })
+        .leftJoin(Tables.FILES, function () {
+          this.on(`${Tables.ACCOUNTS}.id`, `${Tables.FILES}.row_id`).andOn(
+            `${Tables.FILES}.table_name`,
+            db.knex.raw(`'${Tables.ACCOUNTS}'`)
+          )
+        })
         .modify((queryBuilder) => {
           buildRange(queryBuilder, `${Tables.USERS}.last_active_at`, startDate, endDate)
         })
-        .groupBy(`${Tables.ACCOUNTS}.id`, 'summary.active_transaction_count')
+        .groupBy(
+          `${Tables.ACCOUNTS}.id`,
+          `${Tables.BANK_DETAILS}.id`,
+          `${Tables.COMPANY_DETAILS}.id`,
+          `${Tables.FILES}.id`,
+          'summary.active_transaction_count'
+        )
 
       return accounts
     } catch (error) {
@@ -66,7 +99,8 @@ export const accountModel = {
               Tables.BANK_DETAILS,
               [Tables.BANK_DETAILS]
             )}) END as bank_details`
-          )
+          ),
+          db.knex.raw(`CASE WHEN ${Tables.FILES}.id IS NULL THEN null ELSE JSON_AGG(${Tables.FILES}.url) END as files`)
         )
         .from(Tables.ACCOUNTS)
         .leftJoin(Tables.USER_ACCOUNTS, `${Tables.ACCOUNTS}.id`, `${Tables.USER_ACCOUNTS}.account_id`)
@@ -78,9 +112,19 @@ export const accountModel = {
             db.knex.raw('true')
           )
         })
-
+        .leftJoin(Tables.FILES, function () {
+          this.on(`${Tables.ACCOUNTS}.id`, `${Tables.FILES}.row_id`).andOn(
+            `${Tables.FILES}.table_name`,
+            db.knex.raw(`'${Tables.ACCOUNTS}'`)
+          )
+        })
         .where(condition)
-        .groupBy(`${Tables.ACCOUNTS}.id`, `${Tables.COMPANY_DETAILS}.id`, `${Tables.BANK_DETAILS}.id`)
+        .groupBy(
+          `${Tables.ACCOUNTS}.id`,
+          `${Tables.COMPANY_DETAILS}.id`,
+          `${Tables.BANK_DETAILS}.id`,
+          `${Tables.FILES}.id`
+        )
       return account
     } catch (error) {
       console.error('ERROR in UserAccounts.modal getUserAccount()', error.message)

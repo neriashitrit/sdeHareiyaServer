@@ -20,16 +20,16 @@ export default class FileService {
 
   static getInstance = () => FileService.instance || new FileService()
 
-  async insert(file: any, directory: string, subdirectory: string) {
+  async insert(file: any, directory: string, fileName: string) {
     try {
       const blockBlobClient = this.serviceClient
         .getContainerClient('files')
-        .getBlockBlobClient(`${directory}/${subdirectory}`)
+        .getBlockBlobClient(`${directory}/${fileName}`)
       const fileStream = new stream.Readable()
       fileStream.push(file.data)
       fileStream.push(null)
       await blockBlobClient.uploadStream(fileStream, file.data.length)
-      const url = `https://${process.env.AccountName}.blob.${process.env.EndpointSuffix}/files/${directory}/${subdirectory}`
+      const url = `https://${process.env.AccountName}.blob.${process.env.EndpointSuffix}/files/${directory}/${fileName}`
       return url
     } catch (error) {
       console.log(error)

@@ -50,7 +50,8 @@ const transactionSideHelper = {
       userAccountId: sideAUserAccount.id,
       transactionId: transactionId,
       side: TransactionSide.SideA,
-      isCreator: true
+      isCreator: true,
+      bankDetailsId: sideAUserAccount.account?.bankDetails?.id
     })
 
     return await transactionSideModel.getTransactionSides({

@@ -10,7 +10,7 @@ import {
 } from 'safe-shore-common'
 
 import { Tables, transactionStageInCharge, transactionStagePossiblePaths } from '../constants'
-import { transactionModel, transactionStageModel } from '../models/index'
+import { fileModel, transactionModel, transactionStageModel } from '../models/index'
 import transactionHelper from './transaction.helper'
 
 const transactionStageHelper = {
@@ -77,7 +77,7 @@ const transactionStageHelper = {
     depositBankAccountOwnerFullName?: string,
     depositTransferDate?: string,
     depositReferenceNumber?: string,
-    // depositReferenceFile?: File,
+    depositReferenceFile?: string,
     deliveryDate?: Date,
     deliveryType?: string,
     deliveryNotes?: string
@@ -125,19 +125,19 @@ const transactionStageHelper = {
           _.isNil(depositBankNumber) ||
           _.isNil(depositBankAccountOwnerFullName) ||
           _.isNil(depositTransferDate) ||
-          _.isNil(depositReferenceNumber)
-          // _.isNil(depositReferenceFile)
+          _.isNil(depositReferenceNumber) ||
+          _.isNil(depositReferenceFile)
         ) {
           return {
             success: false,
             errorMessage: 'Invalid Parameters'
           }
         }
-        // await fileHelper.uploadFile(
-        //   Tables.TRANSACTIONS,
-        //   transactionId,
-        //   depositReferenceFile
-        // );
+        await fileModel.updateFiles(
+          { url: depositReferenceFile },
+          { rowId: transactionId, tableName: Tables.TRANSACTIONS }
+        )
+
         transactionProps = {
           depositBankName,
           depositBankNumber,
@@ -189,7 +189,7 @@ const setPreviousStageCompleted = async (
   additionalData?: Record<string, any>
 ) => {
   if (transactionProps) {
-    await transactionModel.updateTransaction({ id: transactionId }, { ...transactionProps })
+    await transactionModel.updateTransactions({ id: transactionId }, { ...transactionProps })
   }
   await transactionStageModel.updateTransactionStage(
     { transactionId, id: activeStageId },
@@ -202,14 +202,16 @@ const setPreviousStageCompleted = async (
 }
 //  sets one choice next stage
 const createNextStage = async (transactionId: number, nextStages: TransactionStageName[]) => {
+  let status = TransactionStageStatus.Active
   if (nextStages[0] === TransactionStageName.Completed) {
-    await transactionModel.updateTransaction({ id: transactionId }, { status: TransactionStatus.Completed })
+    status = TransactionStageStatus.Completed
+    await transactionModel.updateTransactions({ id: transactionId }, { status: TransactionStatus.Completed })
   }
 
   return await transactionStageModel.createTransactionStage({
     transactionId,
     name: nextStages[0],
-    status: TransactionStageStatus.Active,
+    status,
     inCharge: transactionStageInCharge[nextStages[0]]
   })
 }
@@ -225,7 +227,10 @@ const createNextStageFromMultiChoice = async (
     case TransactionStageName.Draft:
     case TransactionStageName.ConfirmationSideB:
       sum = await transactionModel.getTransactionsAmountSumLastHalfYear(requestingSide.account.id)
-      if (sum + transaction.amount <= 50000) {
+      if (
+        sum + transaction.amount <= 50000 ||
+        requestingSide.account.authorizationStatus === AuthorizationStatus.Authorized
+      ) {
         return await transactionStageModel.createTransactionStage({
           transactionId: transaction.id,
           name: nextStages[1],

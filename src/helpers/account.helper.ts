@@ -1,12 +1,8 @@
 import { AccountType, AuthorizationStatus } from 'safe-shore-common'
 
 import { Tables } from '../constants'
-import { accountModel, userModel } from '../models'
-import {
-  AccountAuthorizationCompanyBody,
-  AccountAuthorizationPrivateBody,
-  ApproveAccountAuthorizationBody
-} from '../types/requestBody.types'
+import { accountModel, fileModel, userModel } from '../models'
+import { AccountAuthorizationCompanyBody, AccountAuthorizationPrivateBody } from '../types/requestBody.types'
 
 const accountHelper = {
   submitPrivateAccountAuthorization: async (
@@ -36,7 +32,8 @@ const accountHelper = {
       thirdPartyFullName,
       isBankAccountBlocked,
       birthday,
-      gender
+      gender,
+      files
     } = accountAuthorizationPrivateBody
 
     await accountModel.updateAccount(
@@ -57,6 +54,9 @@ const accountHelper = {
         id: account[0].id
       }
     )
+    for (const file of files) {
+      await fileModel.updateFiles({ url: file }, { rowId: account[0].id, tableName: Tables.ACCOUNTS })
+    }
     await userModel.updateUser(
       {
         birthday,

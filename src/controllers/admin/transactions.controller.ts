@@ -62,7 +62,7 @@ export const getTransactionById = async (req: Request, res: Response) => {
 export const getTransactionsByAccount = async (req: Request, res: Response) => {
   try {
     const { accountId, startDate, endDate } = req.body
-    
+
     const condition = buildConditionString([
       {
         column: Tables.TRANSACTION_SIDES + '.user_account_id',
@@ -102,7 +102,7 @@ export const settleTransactionDispute = async (req: Request, res: Response) => {
 
     if (!continueTransaction) {
       //move transaction to canceled status
-      const updateTransaction = await transactionModel.updateTransaction(
+      const updateTransaction = await transactionModel.updateTransactions(
         {
           id: transactionId
         },
