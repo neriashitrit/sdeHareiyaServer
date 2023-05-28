@@ -153,9 +153,11 @@ export const transactionModel = {
         .leftJoin(Tables.ACCOUNTS, `${Tables.USER_ACCOUNTS}.account_id`, `${Tables.ACCOUNTS}.id`)
         .leftJoin(Tables.TRANSACTION_STAGES, `${Tables.TRANSACTIONS}.id`, `${Tables.TRANSACTION_STAGES}.transaction_id`)
         .where(db.knex.raw(`${Tables.TRANSACTIONS}.created_at > (NOW() - INTERVAL '6 months')`))
-        .andWhere(db.knex.raw(`${Tables.TRANSACTIONS}.status != 'canceled'`))
-        .andWhere(db.knex.raw(`${Tables.TRANSACTION_STAGES}.status = 'active'`))
-        .andWhere(db.knex.raw(`${Tables.TRANSACTION_STAGES}.name != 'draft'`))
+        .where(db.knex.raw(`${Tables.TRANSACTIONS}.status != 'canceled'`))
+        .andWhereNot(
+          db.knex.raw(`${Tables.TRANSACTION_STAGES}.status = 'active' AND ${Tables.TRANSACTION_STAGES}.name = 'draft'`)
+        )
+        // .andWhere(db.knex.raw(`${Tables.TRANSACTION_STAGES}.name != 'draft'`))
         .andWhere(db.knex.raw(`${Tables.ACCOUNTS}.id = '${accountId}'`))
 
       return sum[0].totalAmount as unknown as number

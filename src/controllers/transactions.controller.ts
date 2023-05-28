@@ -147,9 +147,9 @@ export const approveStage = async (req: Request, res: Response) => {
     const activeStage = (await transactionStageHelper.getActiveStage(transactionId))[0]
 
     if (
-      activeStage.inCharge !== transactionCurrentSide?.side &&
-      !(activeStage.inCharge === TransactionSide.SideA && transactionCurrentSide?.isCreator) &&
-      !(activeStage.inCharge === TransactionSide.SideB && !transactionCurrentSide?.isCreator)
+      activeStage?.inCharge !== transactionCurrentSide?.side &&
+      !(activeStage?.inCharge === TransactionSide.SideA && transactionCurrentSide?.isCreator) &&
+      !(activeStage?.inCharge === TransactionSide.SideB && !transactionCurrentSide?.isCreator)
     ) {
       return res.status(400).json(failureResponse('Current user is not in charge of this stage'))
     }
