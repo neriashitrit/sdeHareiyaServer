@@ -117,7 +117,12 @@ const transactionHelper = {
 
     if (
       _.isNil(activeStage) ||
-      (activeStage.name !== TransactionStageName.AuthorizationSideA && activeStage.name !== TransactionStageName.Draft)
+      ![
+        TransactionStageName.Draft,
+        TransactionStageName.AuthorizationSideA,
+        TransactionStageName.AuthorizationSideAConfirmation,
+        TransactionStageName.ConfirmationSideB
+      ].includes(activeStage.name)
     ) {
       return null
     }
