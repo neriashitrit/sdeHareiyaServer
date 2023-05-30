@@ -6,9 +6,11 @@ import {
   AccountAuthorizationPrivateBody,
   AdminApproveDisputeBody,
   AdminApproveStageBody,
+  AdminApproveTransactionBody,
   ApproveAccountAuthorizationBody,
   ApproveStageBody,
   CancelDisputeBody,
+  CancelTransactionBody,
   CreateBankDetailsBody,
   CreateProductCategoryBody,
   CreateTransactionBody,
@@ -16,8 +18,7 @@ import {
   OpenDisputeBody,
   UpdateTransactionBody,
   UpdateUserBody,
-  updateCommissionParams,
-  AdminApproveTransactionBody
+  updateCommissionParams
 } from '../types/requestBody.types'
 
 export const isUpdateTransactionBody = (body: any): body is UpdateTransactionBody => {
@@ -272,4 +273,8 @@ export const isApproveAccountAuthorizationBody = (body: any): body is ApproveAcc
   return (
     typeof body === 'object' && !_.isNil(body) && typeof body.accountId === 'number' && typeof body.status === 'string'
   )
+}
+
+export const isCancelTransactionBody = (body: any): body is CancelTransactionBody => {
+  return typeof body === 'object' && !_.isNil(body) && typeof body.transactionId === 'number'
 }

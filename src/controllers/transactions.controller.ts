@@ -1,32 +1,16 @@
 import { Request, Response } from 'express'
 import _ from 'lodash'
-import {
-  ITransactionSide,
-  IUser,
-  TransactionSide,
-  TransactionStageName,
-  TransactionStageStatus,
-  TransactionStatus
-} from 'safe-shore-common'
+import { IUser, TransactionSide } from 'safe-shore-common'
 
-import { Tables } from '../constants'
 import transactionHelper from '../helpers/transaction.helper'
 import transactionDisputeHelper from '../helpers/transactionDispute.helper'
 import transactionSideHelper from '../helpers/transactionSide.helper'
 import transactionStageHelper from '../helpers/transactionStage.helper'
-import {
-  commissionModel,
-  fileModel,
-  transactionModel,
-  transactionProductPropertyModel,
-  transactionStageModel
-} from '../models/index'
-import { CreateTransactionBodyProductProperty } from '../types/requestBody.types'
 import { failureResponse, successResponse } from '../utils/db.utils'
-import { commissionCalculate } from '../utils/global.utils'
 import {
   isApproveStageBody,
   isCancelDisputeBody,
+  isCancelTransactionBody,
   isCreateTransactionBody,
   isGetTransactionParams,
   isOpenDisputeBody,
@@ -113,6 +97,30 @@ export const updateTransaction = async (req: Request, res: Response) => {
     return res.status(200).json(successResponse(result))
   } catch (error) {
     console.error('ERROR in transactions.controller updateTransaction()', error.message)
+    return res.status(500).send(failureResponse(error.message))
+  }
+}
+
+export const cancelTransaction = async (req: Request, res: Response) => {
+  try {
+    const user = req.user as IUser
+    const body = req.body
+
+    if (!isCancelTransactionBody(body)) {
+      return res.status(400).json(failureResponse('Invalid Parameters'))
+    }
+
+    const { transactionId } = body
+
+    const transaction = await transactionHelper.cancelTransaction(user, transactionId)
+
+    if (!transaction) {
+      return res.status(400).json(failureResponse('Couldn`t cancel transaction'))
+    }
+
+    return res.status(200).json(successResponse(transaction))
+  } catch (error) {
+    console.error('ERROR in transactions.controller cancelTransaction()', error.message)
     return res.status(500).send(failureResponse(error.message))
   }
 }

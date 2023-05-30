@@ -109,7 +109,7 @@ const transactionHelper = {
       user.id
     )
 
-    if (!transactionCurrentSide) {
+    if (!transactionCurrentSide || !transactionCurrentSide.isCreator) {
       return null
     }
 
@@ -203,6 +203,40 @@ const transactionHelper = {
         transactionSides ??
         (transactionOtherSide !== undefined ? [transactionCurrentSide, transactionOtherSide] : [transactionCurrentSide])
     })
+  },
+  cancelTransaction: async (user: IUser, transactionId: number): Promise<ITransaction | null> => {
+    const [transactionCurrentSide, transactionOtherSide] = await transactionSideHelper.getTransactionSidesByUserId(
+      transactionId,
+      user.id
+    )
+
+    if (!transactionCurrentSide || !transactionCurrentSide.isCreator) {
+      return null
+    }
+
+    const activeStage = (await transactionStageHelper.getActiveStage(transactionId))[0]
+
+    if (
+      _.isNil(activeStage) ||
+      ![
+        TransactionStageName.Draft,
+        TransactionStageName.AuthorizationSideA,
+        TransactionStageName.AuthorizationSideAConfirmation,
+        TransactionStageName.ConfirmationSideB
+      ].includes(activeStage.name)
+    ) {
+      return null
+    }
+
+    const canceledTransaction = (
+      await transactionModel.updateTransactions(
+        { id: transactionId },
+        {
+          status: TransactionStatus.Canceled
+        }
+      )
+    )[0]
+    return canceledTransaction
   },
   isTransactionCompleted: async (transactionId: number): Promise<boolean> => {
     const transaction = (
