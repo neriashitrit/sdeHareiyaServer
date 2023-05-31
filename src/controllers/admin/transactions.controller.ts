@@ -80,7 +80,7 @@ export const getTransactionsByAccount = async (req: Request, res: Response) => {
         value: endDate
       }
     ])
-    console.log(condition)
+
     const transactions = await transactionHelper.getFullTransactions({
       condition
     })

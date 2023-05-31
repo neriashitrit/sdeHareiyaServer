@@ -8,7 +8,7 @@ import { buildRange, getJsonBuildObject } from '../utils/db.utils'
 const db = new DbService()
 
 export const accountModel = {
-  getAllAccounts: async (startDate?: string, endDate?: string): Promise<IAccount[]> => {
+  getAllAccounts: async (condition?:string): Promise<IAccount[]> => {
     try {
       const accounts = await db.knex
         .select(
@@ -64,7 +64,10 @@ export const accountModel = {
           )
         })
         .modify((queryBuilder) => {
-          buildRange(queryBuilder, `${Tables.USERS}.last_active_at`, startDate, endDate)
+          if(condition){
+            const parsedCondition = db.knex.raw(condition)
+            queryBuilder.where(parsedCondition)
+          }
         })
         .groupBy(
           `${Tables.ACCOUNTS}.id`,
@@ -73,7 +76,6 @@ export const accountModel = {
           `${Tables.FILES}.id`,
           'summary.active_transaction_count'
         )
-
       return accounts
     } catch (error) {
       console.error('ERROR in UserAccounts.modal getAllAccounts()', error.message)

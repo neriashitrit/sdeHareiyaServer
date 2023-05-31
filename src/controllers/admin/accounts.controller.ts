@@ -8,13 +8,34 @@ import bankDetailsHelper from '../../helpers/bankDetails.helper'
 import transactionHelper from '../../helpers/transaction.helper'
 import transactionStageHelper from '../../helpers/transactionStage.helper'
 import { accountModel } from '../../models/index'
-import { failureResponse, successResponse } from '../../utils/db.utils'
+import { buildConditionString, conditionTerm, failureResponse, successResponse } from '../../utils/db.utils'
 import { isApproveAccountAuthorizationBody, isCreateBankDetailsBody } from '../../utils/typeCheckers.utils'
 
 export const getAllAccounts = async (req: Request, res: Response) => {
   try {
-    const { startDate, endDate } = req.query
-    const accounts = await accountModel.getAllAccounts(startDate as string, endDate as string)
+    const startDate = req.body.startDate as string
+    const endDate = req.body.endDate as string
+    const conditions:conditionTerm[] = [{
+      column: Tables.USERS + '.role',
+      operator: '<>',
+      value: 'admin'
+    }];
+    if(startDate){
+      conditions.push({
+        column: Tables.USERS + '.last_active_at',
+        operator: '>=',
+        value: startDate
+      })
+    }
+    if(endDate){
+      conditions.push({
+        column: Tables.USERS + '.last_active_at',
+        operator: '<=',
+        value: endDate
+      })
+    }
+    const condition = buildConditionString(conditions)
+    const accounts = await accountModel.getAllAccounts(condition)
     res.status(200).json(successResponse(accounts))
   } catch (error: any) {
     res.status(500).json(failureResponse(error))

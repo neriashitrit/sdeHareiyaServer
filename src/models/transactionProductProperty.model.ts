@@ -61,7 +61,7 @@ export const transactionProductPropertyModel = {
               Tables.PRODUCT_PROPERTIES
             ])}) as property`
           ),
-          db.knex.raw(`JSON_AGG(${Tables.FILES}.url) as files`)
+          db.knex.raw(`CASE WHEN ${Tables.FILES}.id IS NULL THEN null ELSE JSON_AGG(${Tables.FILES}.url) END as files`)
         )
         .from(Tables.TRANSACTION_PRODUCT_PROPERTIES)
         .where(parsedCondition)
