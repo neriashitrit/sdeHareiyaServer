@@ -68,10 +68,10 @@ export type AdminApproveTransactionBody = {
   bankDetails: CreateBankDetailsBody
 }
 
-export type AdminApproveDisputeBody = {
-  transactionId: number
-  userId: number
+export type AdminSettleTransactionDisputeBody = {
+  disputeId: number
   continueTransaction: boolean
+  adminNotes: string
 }
 
 export type updateCommissionParams = {

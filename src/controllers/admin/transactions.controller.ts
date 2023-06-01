@@ -10,7 +10,11 @@ import transactionDisputeHelper from '../../helpers/transactionDispute.helper'
 import transactionStageHelper from '../../helpers/transactionStage.helper'
 import { transactionModel } from '../../models'
 import { buildConditionString, failureResponse, successResponse } from '../../utils/db.utils'
-import { isAdminApproveDisputeBody, isAdminApproveStageBody, isAdminApproveTransactionBody } from '../../utils/typeCheckers.utils'
+import {
+  isAdminApproveDisputeBody,
+  isAdminApproveStageBody,
+  isAdminApproveTransactionBody
+} from '../../utils/typeCheckers.utils'
 
 export const getAllTransactions = async (req: Request, res: Response) => {
   try {
@@ -97,15 +101,15 @@ export const settleTransactionDispute = async (req: Request, res: Response) => {
     if (!isAdminApproveDisputeBody(req.body)) {
       return res.status(400).json(failureResponse('Invalid Parameters'))
     }
-    const { transactionId, userId, continueTransaction } = req.body
+    const { disputeId, adminNotes, continueTransaction } = req.body
 
-    const closeDispute = await transactionDisputeHelper.closeTransactionDispute(transactionId, userId)
+    const transactionDispute = await transactionDisputeHelper.cancelTransactionDisputeById(disputeId, adminNotes)
 
     if (!continueTransaction) {
       //move transaction to canceled status
       const updateTransaction = await transactionModel.updateTransactions(
         {
-          id: transactionId
+          id: transactionDispute?.id
         },
         {
           status: TransactionStatus.Canceled
@@ -115,7 +119,7 @@ export const settleTransactionDispute = async (req: Request, res: Response) => {
     const condition = buildConditionString([
       {
         column: Tables.TRANSACTIONS + '.id',
-        value: String(transactionId)
+        value: String(transactionDispute?.id)
       }
     ])
     const transaction = await transactionHelper.getFullTransactions({
@@ -128,7 +132,7 @@ export const settleTransactionDispute = async (req: Request, res: Response) => {
   }
 }
 
-export const getAutorizeTransactions = async (req: Request, res: Response) => {
+export const getAuthorizedTransactions = async (req: Request, res: Response) => {
   try {
     const { startDate, endDate } = req.body
     const condition = buildConditionString([
@@ -227,7 +231,7 @@ export const approveTransaction = async (req: Request, res: Response) => {
     }
 
     const { transactionId, bankDetails } = body
-    await bankDetailsHelper.createNewBankDetails(bankDetails);
+    await bankDetailsHelper.createNewBankDetails(bankDetails)
 
     const activeStage = (await transactionStageHelper.getActiveStage(transactionId))[0]
 

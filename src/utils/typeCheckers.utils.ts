@@ -4,9 +4,9 @@ import { CommissionType } from 'safe-shore-common'
 import {
   AccountAuthorizationCompanyBody,
   AccountAuthorizationPrivateBody,
-  AdminApproveDisputeBody,
   AdminApproveStageBody,
   AdminApproveTransactionBody,
+  AdminSettleTransactionDisputeBody,
   ApproveAccountAuthorizationBody,
   ApproveStageBody,
   CancelDisputeBody,
@@ -120,13 +120,13 @@ export const isAdminApproveTransactionBody = (body: any): body is AdminApproveTr
   )
 }
 
-export const isAdminApproveDisputeBody = (body: any): body is AdminApproveDisputeBody => {
+export const isAdminApproveDisputeBody = (body: any): body is AdminSettleTransactionDisputeBody => {
   return (
     typeof body === 'object' &&
     !_.isNil(body) &&
-    typeof body.transactionId === 'number' &&
-    typeof body.userId === 'number' &&
-    typeof body.continueTransaction === 'boolean'
+    typeof body.disputeId === 'number' &&
+    typeof body.continueTransaction === 'boolean' &&
+    typeof body.adminNotes === 'string'
   )
 }
 

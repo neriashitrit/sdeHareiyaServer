@@ -232,13 +232,13 @@ export const cancelDispute = async (req: Request, res: Response) => {
 
     const { transactionId } = body
 
-    const result = await transactionDisputeHelper.closeTransactionDispute(transactionId, user.id)
+    const result = await transactionDisputeHelper.cancelTransactionDispute(transactionId, user.id)
 
     if (!result) {
       return res.status(400).json(failureResponse('Could not cancel dispute'))
     }
 
-    return res.status(200).json(successResponse({}))
+    return res.status(200).json(successResponse())
   } catch (error) {
     console.error('ERROR in transactions.controller cancelDispute()', error.message)
     return res.status(500).send(failureResponse(error.message))

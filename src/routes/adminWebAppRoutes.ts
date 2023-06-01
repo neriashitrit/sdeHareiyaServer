@@ -40,7 +40,7 @@ router.post(
 router.post('/transactions/approveStage', adminTransactionsController.approveStage)
 router.post('/transactions/approveTransaction', adminTransactionsController.approveTransaction)
 router.post('/transactions/getAllTransactions', adminTransactionsController.getAllTransactions)
-router.post('/transactions/getAutorizeTransactions', adminTransactionsController.getAutorizeTransactions)
+router.post('/transactions/getAuthorizeTransactions', adminTransactionsController.getAuthorizedTransactions)
 router.get('/transactions/getTransactionById/:transactionId', adminTransactionsController.getTransactionById)
 router.post('/transactions/approveStage', adminTransactionsController.approveStage)
 router.post('/transactions/settleTransactionDispute', adminTransactionsController.settleTransactionDispute)

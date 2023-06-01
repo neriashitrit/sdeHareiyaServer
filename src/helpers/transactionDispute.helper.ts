@@ -1,4 +1,4 @@
-import { TransactionStatus } from 'safe-shore-common'
+import { ITransactionDispute, TransactionStatus } from 'safe-shore-common'
 
 import { Tables } from '../constants'
 import { transactionDisputeModel, transactionModel, transactionSideModel } from '../models/index'
@@ -42,7 +42,32 @@ const transactionDisputeHelper = {
       }
     )
   },
-  closeTransactionDispute: async (transactionId: number, userId: number): Promise<boolean> => {
+  cancelTransactionDisputeById: async (
+    disputeId: number,
+    adminNotes: string
+  ): Promise<ITransactionDispute | undefined> => {
+    const transactionDispute = await transactionDisputeModel.updateTransactionDispute(
+      {
+        id: disputeId
+      },
+      {
+        isCompleted: true,
+        adminNotes
+      }
+    )
+
+    await transactionModel.updateTransactions(
+      {
+        id: transactionDispute?.transactionId
+      },
+      {
+        status: TransactionStatus.Stage
+      }
+    )
+
+    return transactionDispute
+  },
+  cancelTransactionDispute: async (transactionId: number, userId: number): Promise<boolean> => {
     const transactionDispute = await transactionDisputeModel.updateTransactionDispute(
       {
         transactionId,
