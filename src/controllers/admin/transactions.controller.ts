@@ -3,7 +3,10 @@ import _ from 'lodash'
 import { IUser, TransactionStageName } from 'safe-shore-common'
 import { TransactionSide, TransactionStatus } from 'safe-shore-common'
 
-import { Tables, conditionForTransactionsNeedAuthorization } from '../../constants'
+import { Tables, 
+        conditionForTransactionsNeedDisputeAuthorization,
+        conditionForTransactionsNeedStageAuthorization
+} from '../../constants'
 import bankDetailsHelper from '../../helpers/bankDetails.helper'
 import transactionHelper from '../../helpers/transaction.helper'
 import transactionDisputeHelper from '../../helpers/transactionDispute.helper'
@@ -119,9 +122,10 @@ export const settleTransactionDispute = async (req: Request, res: Response) => {
     const condition = buildConditionString([
       {
         column: Tables.TRANSACTIONS + '.id',
-        value: String(transactionDispute?.id)
+        value: String(transactionDispute?.transactionId)
       }
     ])
+    
     const transaction = await transactionHelper.getFullTransactions({
       condition
     })
@@ -135,7 +139,7 @@ export const settleTransactionDispute = async (req: Request, res: Response) => {
 export const getAuthorizedTransactions = async (req: Request, res: Response) => {
   try {
     const { startDate, endDate } = req.body
-    const condition = buildConditionString([
+    let condition = buildConditionString([
       {
         column: Tables.TRANSACTIONS + '.updated_at',
         operator: '>=',
@@ -145,9 +149,11 @@ export const getAuthorizedTransactions = async (req: Request, res: Response) => 
         column: Tables.TRANSACTIONS + '.updated_at',
         operator: '<=',
         value: endDate
-      },
-      ...conditionForTransactionsNeedAuthorization
+      }
     ])
+    condition = condition +'and ('+
+    buildConditionString([...conditionForTransactionsNeedDisputeAuthorization])+' or ' + 
+    buildConditionString([...conditionForTransactionsNeedStageAuthorization])+')'
     const transactions = await transactionHelper.getFullTransactions({
       condition
     })

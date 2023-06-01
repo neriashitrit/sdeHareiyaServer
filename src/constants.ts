@@ -56,11 +56,11 @@ export const transactionStageInCharge: {
   [TransactionStageName.Completed]: TransactionSide.Admin
 }
 
-export const conditionForTransactionsNeedAuthorization = [
+export const conditionForTransactionsNeedStageAuthorization = [
   {
     column: Tables.TRANSACTIONS + '.status',
     operator: 'in',
-    value: [TransactionStatus.Stage, TransactionStatus.Dispute]
+    value: [TransactionStatus.Stage]
   },
   {
     column: Tables.TRANSACTION_STAGES + '.in_charge',
@@ -69,5 +69,13 @@ export const conditionForTransactionsNeedAuthorization = [
   {
     column: Tables.TRANSACTION_STAGES + '.status',
     value: TransactionStageStatus.Active
+  }
+]
+
+export const conditionForTransactionsNeedDisputeAuthorization = [
+  {
+    column: Tables.TRANSACTIONS + '.status',
+    operator: 'in',
+    value: [TransactionStatus.Dispute]
   }
 ]
