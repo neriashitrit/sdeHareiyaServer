@@ -72,7 +72,7 @@ const transactionSideHelper = {
     })
 
     let sideBUserAccount = await userAccountModel.getUserAccount({
-      [`${Tables.USERS}.email`]: email
+      [`${Tables.USERS}.phone_number`]: phoneNumber
     })
 
     if (!sideBUserAccount) {
@@ -131,7 +131,7 @@ const transactionSideHelper = {
       })
 
       const sideBUserAccount = await userAccountModel.getUserAccount({
-        [`${Tables.USERS}.email`]: email
+        [`${Tables.USERS}.phone_number`]: phoneNumber
       })
 
       await transactionSideModel.updateTransactionSide(

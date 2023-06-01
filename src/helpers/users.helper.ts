@@ -13,7 +13,7 @@ const usersHelper = {
     const lastActiveAt = new Date()
     const accountType = authInfo.extension_account_type ?? 'private'
     const idNumber = authInfo.extension_IDnumber
-    const phoneNumber = `+972${+authInfo.extension_phone}`
+    const phoneNumber = authInfo.extension_phone
 
     try {
       const newUser = await userModel.createUser({
@@ -56,7 +56,7 @@ const usersHelper = {
     const lastActiveAt = new Date()
     const accountType = authInfo.extension_account_type ?? 'private'
     const idNumber = authInfo.extension_IDnumber
-    const phoneNumber = `+972${+authInfo.extension_phone}`
+    const phoneNumber = authInfo.extension_phone
 
     try {
       const newUser = await userModel.updateUser(
@@ -64,7 +64,7 @@ const usersHelper = {
           firstName,
           lastName,
           activeDirectoryUuid,
-          phoneNumber,
+          email,
           idNumber,
           newsletterSubscription,
           lastActiveAt,
@@ -72,7 +72,7 @@ const usersHelper = {
           isActivated: true
         },
         {
-          email
+          phoneNumber
         }
       )
 

@@ -35,7 +35,7 @@ export const createAdminUserInB2C = async (
   email: string,
   phone: string,
   role: string,
-  phonePrefix?:string
+  phonePrefix?: string
 ): Promise<any> => {
   const tenantName = process.env.AZURE_TENANT_NAME
   if (!tenantName) throw new Error('Define AZURE_TENANT_NAME in env')
@@ -72,7 +72,7 @@ export const createAdminUserInB2C = async (
   const createUserUrl = 'https://graph.microsoft.com/v1.0/users'
   try {
     const newUser = await axios.post(createUserUrl, data, { headers })
-    updateADUserRegisteredPhone(phone, newUser?.data?.id, phonePrefix || '+972', accessToken )
+    updateADUserRegisteredPhone(phone, newUser?.data?.id, phonePrefix || '+972', accessToken)
     return newUser.data
   } catch (error) {
     console.log(error?.response?.data)
@@ -82,18 +82,18 @@ export const createAdminUserInB2C = async (
 
 export const updateADUserRegisteredPhone = async (
   phone: string,
-  ADUserID:string,
+  ADUserID: string,
   phonePrefix: string,
-  ADToken?:string
+  ADToken?: string
 ): Promise<any> => {
-  const accessToken = ADToken || await getAccessToken()
+  const accessToken = ADToken || (await getAccessToken())
   const headers = {
     Authorization: `Bearer ${accessToken}`,
     'Content-Type': 'application/json'
   }
   const data = {
     phoneNumber: `${phonePrefix} ${phone}`,
-    phoneType: 'mobile',
+    phoneType: 'mobile'
   }
   const updateUserPhoneUrl = `https://graph.microsoft.com/v1.0/users/${ADUserID}/authentication/phoneMethods`
   try {

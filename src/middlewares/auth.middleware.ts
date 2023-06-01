@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
+import { parsePhoneNumber } from 'libphonenumber-js'
 import { BearerStrategy, IBearerStrategyOptionWithRequest, ITokenPayload, VerifyCallback } from 'passport-azure-ad'
 import { AuthInfo } from 'types'
 
@@ -27,13 +28,15 @@ export const bearerStrategy = new BearerStrategy(
   bearerStrategyOptions,
   async (token: ITokenPayload, done: VerifyCallback) => {
     try {
-      const email = (token as AuthInfo).emails[0]
-      const user = await userModel.getUser(email)
+      const authInfo = { ...(token as AuthInfo) }
+      const parsedPhoneNumber = parsePhoneNumber(authInfo.extension_phone, 'IL')
+      authInfo.extension_phone = parsedPhoneNumber.number
+      const user = await userModel.getUser(authInfo.extension_phone)
       if (user) {
-        return done(null, user, token)
+        return done(null, user, authInfo)
       } else {
         //  TODo check if no user exist - allow only to login
-        return done(null, {}, token)
+        return done(null, {}, authInfo)
       }
     } catch (error) {
       return done(error)

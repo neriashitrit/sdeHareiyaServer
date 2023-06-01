@@ -9,10 +9,10 @@ import { isUpdateUserBody } from '../utils/typeCheckers.utils'
 
 export const userLogin = async (req: Request, res: Response) => {
   const authInfo: AuthInfo = req?.authInfo as AuthInfo
-  const userMail = authInfo.emails[0]
+  const phoneNumber = authInfo.extension_phone
 
   try {
-    const user = await userModel.getUser(userMail)
+    const user = await userModel.getUser(phoneNumber)
     if (!user) {
       const [newUserAccount] = await usersHelper.createUserFromToken(authInfo)
       return res.status(200).json(successResponse(newUserAccount))

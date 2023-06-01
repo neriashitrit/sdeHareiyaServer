@@ -9,7 +9,7 @@ const db = new DbService()
 export const userModel = {
   getAllUsers: async (condition: Record<string, any> = {}): Promise<IUser[]> => {
     try {
-      const users = await db.getAll(Tables.USERS, { is_active: true , ...condition})
+      const users = await db.getAll(Tables.USERS, { is_active: true, ...condition })
       return users
     } catch (error) {
       console.error('ERROR in users.modal getAllUsers()', error.message)
@@ -29,10 +29,10 @@ export const userModel = {
       }
     }
   },
-  getUser: async (email: string): Promise<IUser> => {
+  getUser: async (phoneNumber: string): Promise<IUser> => {
     const lastActiveAt = new Date()
     try {
-      const user = await db.update(Tables.USERS, { lastActiveAt }, { email })
+      const user = await db.update(Tables.USERS, { lastActiveAt }, { phoneNumber })
       return user?.[0]
     } catch (error) {
       console.error('ERROR in users.modal getUser()', error.message)
