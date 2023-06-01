@@ -1,9 +1,10 @@
 import { Request, Response } from 'express'
-import { UserRole } from 'safe-shore-common'
+import _ from 'lodash'
+import { IUser, UserRole } from 'safe-shore-common'
 import { Tables } from '../../constants'
 
 import usersHelper from '../../helpers/users.helper'
-import { userModel } from '../../models/index'
+import { accountModel, userModel } from '../../models/index'
 import { createAdminUserInB2C } from '../../services/activeDirectory.service'
 import { failureResponse, successResponse } from '../../utils/db.utils'
 
@@ -40,5 +41,16 @@ export const createAdminUser = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.log(error)
     res.status(500).json(failureResponse(error))
+  }
+}
+
+export const updateAccountUser = async (req: Request, res: Response) => {
+  try {
+    const user = req.body
+    await userModel.updateUser(_.omit(user,['userId','accountId']), { id: user.userId })
+    const updatedAccount = await accountModel.getAccount({ [Tables.ACCOUNTS+'.id']: user.accountId })
+    return res.status(200).json(successResponse(updatedAccount[0]))
+  } catch (error) {
+    return res.status(500).json(failureResponse(error))
   }
 }

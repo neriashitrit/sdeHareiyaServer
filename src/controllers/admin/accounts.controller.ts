@@ -7,6 +7,7 @@ import accountHelper from '../../helpers/account.helper'
 import bankDetailsHelper from '../../helpers/bankDetails.helper'
 import transactionHelper from '../../helpers/transaction.helper'
 import transactionStageHelper from '../../helpers/transactionStage.helper'
+import { bankDetailsModel } from '../../models/bankDetails.model'
 import { accountModel } from '../../models/index'
 import { buildConditionString, conditionTerm, failureResponse, successResponse } from '../../utils/db.utils'
 import { isApproveAccountAuthorizationBody, isCreateBankDetailsBody } from '../../utils/typeCheckers.utils'
@@ -117,6 +118,30 @@ export const createBankDetails = async (req: Request, res: Response) => {
     account.bankDetails = bankDetails
 
     return res.status(200).json(successResponse(account))
+  } catch (error) {
+    return res.status(500).json(failureResponse(error))
+  }
+}
+
+export const updateAccountBankDetails = async (req: Request, res: Response) => {
+  try {
+    const body = req.body
+
+    if (!isCreateBankDetailsBody(body)) {
+      return res.status(400).json(failureResponse('Invalid Parameters'))
+    }
+
+    await bankDetailsModel.updateBankDetails(
+      { accountId: body.accountId, isActive: true },
+      { isActive: false }
+    )
+    await bankDetailsModel.createBankDetails({
+      ...body,
+      isActive: true
+    })
+    
+    const updatedAccount = await accountModel.getAccount({ [Tables.ACCOUNTS+'.id']: body.accountId })
+    return res.status(200).json(successResponse(updatedAccount))
   } catch (error) {
     return res.status(500).json(failureResponse(error))
   }
