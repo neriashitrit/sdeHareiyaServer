@@ -16,6 +16,7 @@ const router = express.Router()
 router.get('/users/getAllUsers', adminUsersController.getAllAdminUsers)
 router.post('/users/getUser', adminUsersController.getUserById)
 router.post('/users/createAdminUser', adminUsersController.createAdminUser)
+router.post('/users/updateAccountUser', adminUsersController.updateAccountUser)
 
 ///////////////////////////
 //      Accounts         //
@@ -25,6 +26,7 @@ router.post('/accounts/getAllAccounts', adminAccountsController.getAllAccounts)
 router.get('/accounts/getAccountById/:accountId', adminAccountsController.getAccountById)
 router.post('/accounts/approveAccountAuthorization', adminAccountsController.approveAccountAuthorization)
 router.post('/accounts/createBankDetails', adminAccountsController.createBankDetails)
+router.post('/accounts/updateAccountBankDetails', adminAccountsController.updateAccountBankDetails)
 
 ///////////////////////////
 //  Transactions         //

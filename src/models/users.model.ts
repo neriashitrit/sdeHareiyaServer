@@ -54,6 +54,7 @@ export const userModel = {
   },
   updateUser: async (updatedUser: Record<string, any>, condition: Record<string, any> | string): Promise<IUser> => {
     try {
+      console.log(updatedUser)
       const users = await db.update(Tables.USERS, updatedUser, condition)
       return users?.[0]
     } catch (error) {
