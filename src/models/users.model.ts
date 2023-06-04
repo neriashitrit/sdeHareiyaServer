@@ -29,10 +29,10 @@ export const userModel = {
       }
     }
   },
-  getUser: async (phoneNumber: string): Promise<IUser> => {
+  getUser: async (activeDirectoryUuid: string): Promise<IUser> => {
     const lastActiveAt = new Date()
     try {
-      const user = await db.update(Tables.USERS, { lastActiveAt }, { phoneNumber })
+      const user = await db.update(Tables.USERS, { lastActiveAt }, { activeDirectoryUuid })
       return user?.[0]
     } catch (error) {
       console.error('ERROR in users.modal getUser()', error.message)

@@ -29,13 +29,15 @@ export const bearerStrategy = new BearerStrategy(
   async (token: ITokenPayload, done: VerifyCallback) => {
     try {
       const authInfo = { ...(token as AuthInfo) }
-      const parsedPhoneNumber = parsePhoneNumber(authInfo.extension_phone, 'IL')
-      authInfo.extension_phone = parsedPhoneNumber.number
-      const user = await userModel.getUser(authInfo.extension_phone)
+      if (authInfo.extension_phone) {
+        const parsedPhoneNumber = parsePhoneNumber(authInfo.extension_phone, 'IL')
+        authInfo.extension_phone = parsedPhoneNumber.number
+      }
+      const activeDirectoryUuid = authInfo.oid!
+      const user = await userModel.getUser(activeDirectoryUuid)
       if (user) {
         return done(null, user, authInfo)
       } else {
-        //  TODo check if no user exist - allow only to login
         return done(null, {}, authInfo)
       }
     } catch (error) {
