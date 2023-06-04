@@ -1,5 +1,7 @@
 import { globalModel } from '../models/index'
-import { AuthInfo } from '../types'
 
-const globalHelper = {}
+const globalHelper = {
+  sendContactUsEmail: () => {}
+}
+
 export default globalHelper

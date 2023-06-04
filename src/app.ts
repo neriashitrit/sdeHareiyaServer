@@ -12,12 +12,10 @@ import adminRouter from './routes/adminWebAppRoutes'
 import backOfficeRouter from './routes/backOfficeRoutes'
 import openRouter from './routes/openRoutes'
 import webAppRouter from './routes/webAppRoutes'
-import emailService from './services/email.service'
 
 dotenv.config()
 const app = express()
 
-emailService.start(process.env.SENDGRID_API_KEY || '')
 app.use(helmet())
 app.use(cors())
 app.use(fileupload())

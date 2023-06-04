@@ -21,4 +21,9 @@ router.get('/getCommissions', commissionsController.getActiveCommissions)
 ///////////////////////////
 router.get('/productCategories', productCategoriesController.getActiveProductCategories)
 
+///////////////////////////
+//       Contact Us      //
+///////////////////////////
+router.post('/sendContactUs', globalController.sendContactUs)
+
 export default router

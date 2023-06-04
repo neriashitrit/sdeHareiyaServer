@@ -16,6 +16,7 @@ import {
   CreateTransactionBody,
   GetTransactionParams,
   OpenDisputeBody,
+  SendContactUsBody,
   UpdateTransactionBody,
   UpdateUserBody,
   updateCommissionParams
@@ -252,6 +253,18 @@ export const isAccountAuthorizationCompanyBody = (body: any): body is AccountAut
     body.contacts.length > 0 &&
     typeof body.activeYears === 'string' &&
     typeof body.purpose === 'string'
+  )
+}
+
+export const isSendContactUsBody = (body: any): body is SendContactUsBody => {
+  return (
+    typeof body === 'object' &&
+    !_.isNil(body) &&
+    typeof body.firstName === 'string' &&
+    typeof body.lastName === 'string' &&
+    typeof body.phoneNumber === 'string' &&
+    typeof body.email === 'string' &&
+    (_.isNil(body.notes) || typeof body.notes === 'string')
   )
 }
 

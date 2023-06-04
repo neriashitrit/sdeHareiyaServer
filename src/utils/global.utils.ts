@@ -1,5 +1,8 @@
 import { CommissionType, ICommission } from 'safe-shore-common'
 
+import { emailTemplates } from '../constants'
+import { EmailTemplateName } from '../constants'
+
 export const commissionCalculate = (
   commissions: ICommission[],
   amount: number
@@ -19,4 +22,17 @@ export const commissionCalculate = (
         ? currentCommission.amount
         : Math.round((amount * (currentCommission.amount / 100) + Number.EPSILON) * 100) / 100
   }
+}
+
+export const buildEmailBody = (
+  emailTemplateName: EmailTemplateName,
+  params: Record<string, string | number | undefined>
+) => {
+  const emailTemplate = emailTemplates[emailTemplateName]
+
+  let emailBody = emailTemplate
+  Object.entries(params).forEach(([key, param]) => {
+    emailBody = emailBody.replace(`{{${key}}}`, param ? `${param}` : '')
+  })
+  return emailBody
 }

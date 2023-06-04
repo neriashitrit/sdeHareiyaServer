@@ -153,6 +153,14 @@ export type AccountAuthorizationCompanyBody = AccountAuthorizationBaseBody & {
 
 export type AccountAuthorizationBody = AccountAuthorizationPrivateBody | AccountAuthorizationCompanyBody
 
+export type SendContactUsBody = {
+  firstName: string
+  lastName: string
+  phoneNumber: string
+  email: string
+  notes?: string
+}
+
 export type CreateBankDetailsBody = {
   accountId: number
   bankName: string

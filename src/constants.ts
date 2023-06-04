@@ -72,6 +72,13 @@ export const conditionForTransactionsNeedStageAuthorization = [
   }
 ]
 
+export type EmailTemplateName = 'contactUs'
+
+export const emailTemplates: { [key in EmailTemplateName]: string } = {
+  contactUs:
+    'Hello SafeShore, My name is {{firstName}} {{lastName}}, my phone number - {{phoneNumber}}, my email - {{email}}. {{notes}}'
+}
+
 export const conditionForTransactionsNeedDisputeAuthorization = [
   {
     column: Tables.TRANSACTIONS + '.status',

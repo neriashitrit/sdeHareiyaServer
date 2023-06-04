@@ -1,34 +1,30 @@
 import sgMail, { MailDataRequired } from '@sendgrid/mail'
-import dotenv from 'dotenv'
 
-dotenv.config()
+export default class EmailService {
+  static instance: EmailService
 
-const shouldSendEmail = process.env.NODE_ENV === 'prod' || process.env.NODE_ENV === 'staging'
+  static defaultMailSender = 'guyd@spectory.com' //'no-reply@safeShore.com'
+  static shouldSendEmail = true //process.env.NODE_ENV === 'prod' || process.env.NODE_ENV === 'staging'
 
-const DEFAULT_MAIL_SENDER = 'no-reply@safeShore.com'
+  constructor() {
+    if (EmailService.instance) {
+      return EmailService.instance
+    }
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY || '')
+    EmailService.instance = this
+  }
 
-const start = (apiKey: string) => {
-  sgMail.setApiKey(apiKey)
-}
+  static getInstance = () => EmailService.instance || new EmailService()
 
-const sendEmail = async (msg: MailDataRequired) => {
-  try {
-    shouldSendEmail
-      ? await sgMail.send({
-          ...msg,
-          from: msg.from || DEFAULT_MAIL_SENDER
-        })
-      : console.log(msg)
-  } catch (error) {
-    console.error(error)
-
-    if (error.response) {
-      console.error(error.response.body)
+  sendEmail = async (msg: MailDataRequired) => {
+    try {
+      await sgMail.send({
+        ...msg,
+        subject: 'subject',
+        from: msg.from || EmailService.defaultMailSender
+      })
+    } catch (error) {
+      throw `cant send email error: ${error}`
     }
   }
-}
-
-export default {
-  sendEmail,
-  start
 }

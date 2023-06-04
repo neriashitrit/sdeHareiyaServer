@@ -3,9 +3,10 @@ import _ from 'lodash'
 import { IUser, TransactionStageName } from 'safe-shore-common'
 import { TransactionSide, TransactionStatus } from 'safe-shore-common'
 
-import { Tables, 
-        conditionForTransactionsNeedDisputeAuthorization,
-        conditionForTransactionsNeedStageAuthorization
+import {
+  Tables,
+  conditionForTransactionsNeedDisputeAuthorization,
+  conditionForTransactionsNeedStageAuthorization
 } from '../../constants'
 import bankDetailsHelper from '../../helpers/bankDetails.helper'
 import transactionHelper from '../../helpers/transaction.helper'
@@ -125,7 +126,7 @@ export const settleTransactionDispute = async (req: Request, res: Response) => {
         value: String(transactionDispute?.transactionId)
       }
     ])
-    
+
     const transaction = await transactionHelper.getFullTransactions({
       condition
     })
@@ -151,9 +152,13 @@ export const getAuthorizedTransactions = async (req: Request, res: Response) => 
         value: endDate
       }
     ])
-    condition = condition +'and ('+
-    buildConditionString([...conditionForTransactionsNeedDisputeAuthorization])+' or ' + 
-    buildConditionString([...conditionForTransactionsNeedStageAuthorization])+')'
+    condition =
+      condition +
+      'and (' +
+      buildConditionString([...conditionForTransactionsNeedDisputeAuthorization]) +
+      ' or ' +
+      buildConditionString([...conditionForTransactionsNeedStageAuthorization]) +
+      ')'
     const transactions = await transactionHelper.getFullTransactions({
       condition
     })
