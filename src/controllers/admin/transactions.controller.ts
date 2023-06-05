@@ -109,16 +109,8 @@ export const settleTransactionDispute = async (req: Request, res: Response) => {
 
     const transactionDispute = await transactionDisputeHelper.cancelTransactionDisputeById(disputeId, adminNotes)
 
-    if (!continueTransaction) {
-      //move transaction to canceled status
-      const updateTransaction = await transactionModel.updateTransactions(
-        {
-          id: transactionDispute?.id
-        },
-        {
-          status: TransactionStatus.Canceled
-        }
-      )
+    if (!continueTransaction && transactionDispute?.transactionId) {
+      await transactionHelper.adminCancelTransaction(transactionDispute.transactionId)
     }
     const condition = buildConditionString([
       {

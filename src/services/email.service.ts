@@ -1,9 +1,10 @@
 import sgMail, { MailDataRequired } from '@sendgrid/mail'
+import { convert } from 'html-to-text'
 
 export default class EmailService {
   static instance: EmailService
 
-  static defaultMailSender = 'guyd@spectory.com' //'no-reply@safeShore.com'
+  static defaultMailSender = process.env.SENDGRID_DEFAULT_SENDER!
   static shouldSendEmail = true //process.env.NODE_ENV === 'prod' || process.env.NODE_ENV === 'staging'
 
   constructor() {
@@ -16,15 +17,36 @@ export default class EmailService {
 
   static getInstance = () => EmailService.instance || new EmailService()
 
-  sendEmail = async (msg: MailDataRequired) => {
+  sendEmail = async ({
+    email,
+    subject,
+    html,
+    from,
+    text
+  }: {
+    email: string | string[]
+    subject: string
+    html: string
+    from?: string
+    text?: string
+  }): Promise<any> => {
     try {
-      await sgMail.send({
-        ...msg,
-        subject: 'subject',
-        from: msg.from || EmailService.defaultMailSender
+      const msg = text || convert(html)
+      if (Array.isArray(email)) {
+        console.log(`Sending ${email.join(', ')} subject "${subject}"`)
+      } else {
+        console.log(`Sending ${email} subject "${subject}"`)
+      }
+      return await sgMail.send({
+        from: from || EmailService.defaultMailSender,
+        to: email,
+        subject,
+        text: msg,
+        html
       })
     } catch (error) {
-      throw `cant send email error: ${error}`
+      console.log(error.response?.body)
+      return Promise.reject({ code: 500, message: "can't send email" })
     }
   }
 }

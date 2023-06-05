@@ -34,7 +34,7 @@ export const bearerStrategy = new BearerStrategy(
         authInfo.extension_phone = parsedPhoneNumber.number
       }
       const activeDirectoryUuid = authInfo.oid!
-      const user = await userModel.getUser(activeDirectoryUuid)
+      const user = await userModel.getUser(activeDirectoryUuid, authInfo.extension_phone)
       if (user) {
         return done(null, user, authInfo)
       } else {

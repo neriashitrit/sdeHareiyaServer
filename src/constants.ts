@@ -56,6 +56,118 @@ export const transactionStageInCharge: {
   [TransactionStageName.Completed]: TransactionSide.Admin
 }
 
+export enum EmailTemplateName {
+  SIGN_UP_COMPLETED = 'signUpCompleted',
+  PROFILE_UPDATE = 'profileUpdate',
+  CONTACT_US = 'contactUs',
+
+  TRANSACTION_OPEN = 'transactionOpen',
+  ACCOUNT_AUTHORIZED = 'accountAuthorized',
+  TRANSACTION_INVITE_CONFIRMATION = 'transactionInviteConfirmation',
+  TRANSACTION_ACCEPTED_CONFIRMATION = 'transactionAcceptedConfirmation',
+  DEPOSIT_TRANSFER = 'depositTransfer',
+  DEPOSIT_TRANSFER_SUCCESSFUL = 'depositTransferSuccessful',
+  PRODUCT_TRANSFER = 'productTransfer',
+  PRODUCT_TRANSFER_COMPLETED = 'productTransferCompleted',
+  TRANSACTION_COMPLETED = 'transactionCompleted',
+
+  OPEN_DISPUTE = 'openDispute',
+  RESOLVED_DISPUTE = 'resolvedDispute',
+  TRANSACTION_CANCEL = 'transactionCancel'
+}
+
+export const transactionStageToEmailTriggerMapping: {
+  [key in TransactionStageName]: { to: TransactionSide; subject: string; template: EmailTemplateName }[] | null
+} = {
+  [TransactionStageName.Draft]: null,
+  [TransactionStageName.AuthorizationSideA]: [
+    {
+      to: TransactionSide.SideA,
+      subject: `${EmailTemplateName.TRANSACTION_OPEN}`,
+      template: EmailTemplateName.TRANSACTION_OPEN
+    }
+  ],
+  [TransactionStageName.AuthorizationSideAConfirmation]: [
+    {
+      to: TransactionSide.SideA,
+      subject: `${EmailTemplateName.ACCOUNT_AUTHORIZED}`,
+      template: EmailTemplateName.ACCOUNT_AUTHORIZED
+    }
+  ],
+  [TransactionStageName.AuthorizationSideB]: null,
+  [TransactionStageName.AuthorizationSideBConfirmation]: [
+    {
+      to: TransactionSide.SideB,
+      subject: `${EmailTemplateName.ACCOUNT_AUTHORIZED}`,
+      template: EmailTemplateName.ACCOUNT_AUTHORIZED
+    }
+  ],
+  [TransactionStageName.ConfirmationSideB]: [
+    {
+      to: TransactionSide.SideA,
+      subject: `${EmailTemplateName.TRANSACTION_OPEN}`,
+      template: EmailTemplateName.TRANSACTION_OPEN
+    },
+    {
+      to: TransactionSide.SideB,
+      subject: `${EmailTemplateName.TRANSACTION_INVITE_CONFIRMATION}`,
+      template: EmailTemplateName.TRANSACTION_INVITE_CONFIRMATION
+    }
+  ],
+  [TransactionStageName.BuyerDeposit]: [
+    {
+      to: TransactionSide.SideA,
+      subject: `${EmailTemplateName.TRANSACTION_ACCEPTED_CONFIRMATION}`,
+      template: EmailTemplateName.TRANSACTION_ACCEPTED_CONFIRMATION
+    }
+  ],
+  [TransactionStageName.DepositConfirmation]: [
+    {
+      to: TransactionSide.Admin,
+      subject: `${EmailTemplateName.DEPOSIT_TRANSFER}`,
+      template: EmailTemplateName.DEPOSIT_TRANSFER
+    }
+  ],
+  [TransactionStageName.SellerProductTransfer]: [
+    {
+      to: TransactionSide.Buyer,
+      subject: `${EmailTemplateName.DEPOSIT_TRANSFER_SUCCESSFUL}`,
+      template: EmailTemplateName.DEPOSIT_TRANSFER_SUCCESSFUL
+    },
+    {
+      to: TransactionSide.Seller,
+      subject: `${EmailTemplateName.DEPOSIT_TRANSFER_SUCCESSFUL}`,
+      template: EmailTemplateName.DEPOSIT_TRANSFER_SUCCESSFUL
+    }
+  ],
+  [TransactionStageName.BuyerProductConfirmation]: [
+    {
+      to: TransactionSide.Buyer,
+      subject: `${EmailTemplateName.PRODUCT_TRANSFER}`,
+      template: EmailTemplateName.PRODUCT_TRANSFER
+    }
+  ],
+  [TransactionStageName.SellerPayment]: [
+    {
+      to: TransactionSide.Seller,
+      subject: `${EmailTemplateName.PRODUCT_TRANSFER_COMPLETED}`,
+      template: EmailTemplateName.PRODUCT_TRANSFER_COMPLETED
+    }
+  ],
+  [TransactionStageName.Completed]: [
+    {
+      to: TransactionSide.Buyer,
+      subject: `${EmailTemplateName.TRANSACTION_COMPLETED}`,
+      template: EmailTemplateName.TRANSACTION_COMPLETED
+    },
+    {
+      to: TransactionSide.Seller,
+      subject: `${EmailTemplateName.TRANSACTION_COMPLETED}`,
+      template: EmailTemplateName.TRANSACTION_COMPLETED
+    }
+  ]
+}
+
 export const conditionForTransactionsNeedStageAuthorization = [
   {
     column: Tables.TRANSACTIONS + '.status',
@@ -71,13 +183,6 @@ export const conditionForTransactionsNeedStageAuthorization = [
     value: TransactionStageStatus.Active
   }
 ]
-
-export type EmailTemplateName = 'contactUs'
-
-export const emailTemplates: { [key in EmailTemplateName]: string } = {
-  contactUs:
-    'Hello SafeShore, My name is {{firstName}} {{lastName}}, my phone number - {{phoneNumber}}, my email - {{email}}. {{notes}}'
-}
 
 export const conditionForTransactionsNeedDisputeAuthorization = [
   {

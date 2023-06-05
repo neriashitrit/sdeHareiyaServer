@@ -12,8 +12,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createType('commission_payer', Object.values(CommissionPayer))
   pgm.createType('transaction_side', Object.values(TransactionSide))
 
-  pgm.func("SETVAL('transactions_id_seq', 10000)")
-
   pgm.createTable(Tables.TRANSACTIONS, {
     id: 'id',
     status: { type: 'transaction_status', notNull: true },

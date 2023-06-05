@@ -12,7 +12,7 @@ import {
   TransactionStatus
 } from 'safe-shore-common'
 
-import { Tables } from '../constants'
+import { EmailTemplateName, Tables } from '../constants'
 import {
   commissionModel,
   fileModel,
@@ -23,12 +23,14 @@ import {
   transactionSideModel,
   transactionStageModel
 } from '../models/index'
+import EmailService from '../services/email.service'
 import {
   CreateTransactionBody,
   CreateTransactionBodyProductProperty,
   UpdateTransactionBody
 } from '../types/requestBody.types'
 import { commissionCalculate } from '../utils/global.utils'
+import globalHelper from './global.helper'
 import transactionSideHelper from './transactionSide.helper'
 import transactionStageHelper from './transactionStage.helper'
 
@@ -204,13 +206,10 @@ const transactionHelper = {
         (transactionOtherSide !== undefined ? [transactionCurrentSide, transactionOtherSide] : [transactionCurrentSide])
     })
   },
-  cancelTransaction: async (user: IUser, transactionId: number): Promise<ITransaction | null> => {
-    const [transactionCurrentSide, transactionOtherSide] = await transactionSideHelper.getTransactionSidesByUserId(
-      transactionId,
-      user.id
-    )
+  userCancelTransaction: async (user: IUser, transactionId: number): Promise<ITransaction | null> => {
+    const transactionSides = await transactionSideHelper.getTransactionSidesByUserId(transactionId, user.id)
 
-    if (!transactionCurrentSide || !transactionCurrentSide.isCreator) {
+    if (!transactionSides[0] || !transactionSides[0].isCreator) {
       return null
     }
 
@@ -236,6 +235,35 @@ const transactionHelper = {
         }
       )
     )[0]
+
+    globalHelper.sendEmailTrigger(
+      EmailTemplateName.TRANSACTION_CANCEL,
+      [...transactionSides.map((side) => side!.user.email), EmailService.defaultMailSender],
+      `${EmailTemplateName.TRANSACTION_CANCEL}`
+    )
+
+    return canceledTransaction
+  },
+  adminCancelTransaction: async (transactionId: number): Promise<ITransaction | null> => {
+    const transactionSides = await transactionSideModel.getTransactionSides({
+      [`${Tables.TRANSACTION_SIDES}.transaction_id`]: transactionId
+    })
+
+    const canceledTransaction = (
+      await transactionModel.updateTransactions(
+        { id: transactionId },
+        {
+          status: TransactionStatus.Canceled
+        }
+      )
+    )[0]
+
+    globalHelper.sendEmailTrigger(
+      EmailTemplateName.TRANSACTION_CANCEL,
+      [...transactionSides.map((side) => side!.user.email), EmailService.defaultMailSender],
+      `${EmailTemplateName.TRANSACTION_CANCEL}`
+    )
+
     return canceledTransaction
   },
   isTransactionCompleted: async (transactionId: number): Promise<boolean> => {

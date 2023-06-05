@@ -4,13 +4,21 @@ import {
   ITransaction,
   ITransactionSide,
   ITransactionStage,
+  TransactionSide,
   TransactionStageName,
   TransactionStageStatus,
   TransactionStatus
 } from 'safe-shore-common'
 
-import { Tables, transactionStageInCharge, transactionStagePossiblePaths } from '../constants'
-import { fileModel, transactionModel, transactionStageModel } from '../models/index'
+import {
+  Tables,
+  transactionStageInCharge,
+  transactionStagePossiblePaths,
+  transactionStageToEmailTriggerMapping
+} from '../constants'
+import { fileModel, transactionModel, transactionSideModel, transactionStageModel } from '../models/index'
+import EmailService from '../services/email.service'
+import globalHelper from './global.helper'
 import transactionHelper from './transaction.helper'
 
 const transactionStageHelper = {
@@ -20,7 +28,23 @@ const transactionStageHelper = {
 
       await setPreviousStageCompleted(transactionId, activeStage.id, userId)
 
-      return createNextStage(transactionId, nextStages)
+      const nextStage = await createNextStage(transactionId, nextStages)
+
+      const transactionSides = await transactionSideModel.getTransactionSides({
+        [`${Tables.TRANSACTION_SIDES}.transaction_id`]: transactionId
+      })
+
+      const emailTriggers = transactionStageToEmailTriggerMapping[nextStage.name]
+      if (emailTriggers) {
+        emailTriggers.forEach(({ to, subject, template }) => {
+          globalHelper.sendEmailTrigger(
+            template,
+            [emailTriggerRecipient(to, transactionSides)?.user.email ?? EmailService.defaultMailSender],
+            subject
+          )
+        })
+      }
+      return nextStage
     } catch (error) {
       console.error('ERROR in transaction.helper nextStage()', error.message)
       throw {
@@ -31,6 +55,7 @@ const transactionStageHelper = {
   nextStage: async (
     transactionId: number,
     requestingSide: ITransactionSide,
+    otherSide: ITransactionSide,
     activeStage: ITransactionStage,
     transactionProps?: Record<string, any>,
     additionalData?: Record<string, any>
@@ -48,12 +73,26 @@ const transactionStageHelper = {
         additionalData
       )
 
+      let nextStage: ITransactionStage | undefined
       if (nextStages.length === 1) {
-        return createNextStage(transaction.id, nextStages)
+        nextStage = await createNextStage(transaction.id, nextStages)
       } else if (nextStages.length > 1) {
-        return createNextStageFromMultiChoice(activeStage.name, requestingSide, transaction, nextStages)
+        nextStage = await createNextStageFromMultiChoice(activeStage.name, requestingSide, transaction, nextStages)
       }
-      return
+      if (nextStage) {
+        const emailTriggers = transactionStageToEmailTriggerMapping[nextStage.name]
+
+        if (emailTriggers) {
+          emailTriggers.forEach(({ to, subject, template }) => {
+            globalHelper.sendEmailTrigger(
+              template,
+              [emailTriggerRecipient(to, [requestingSide, otherSide])?.user.email ?? EmailService.defaultMailSender],
+              subject
+            )
+          })
+        }
+      }
+      return nextStage
     } catch (error) {
       console.error('ERROR in transaction.helper nextStage()', error.message)
       throw {
@@ -247,6 +286,25 @@ const createNextStageFromMultiChoice = async (
       }
     default:
       throw 'error!'
+  }
+}
+
+const emailTriggerRecipient = (side: TransactionSide, sides: ITransactionSide[]): ITransactionSide | null => {
+  const [sideA, sideB] = sides[0].isCreator ? sides : sides.reverse()
+  const [buyer, seller] = sides[0].side === TransactionSide.Buyer ? sides : sides.reverse()
+
+  switch (side) {
+    case TransactionSide.SideA:
+      return sideA
+    case TransactionSide.SideB:
+      return sideB
+    case TransactionSide.Buyer:
+      return buyer
+    case TransactionSide.Seller:
+      return seller
+    default:
+    case TransactionSide.Admin:
+      return null
   }
 }
 

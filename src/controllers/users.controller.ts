@@ -2,6 +2,8 @@ import { Request, Response } from 'express'
 import { IUser } from 'safe-shore-common'
 import { AuthInfo } from 'types'
 
+import { EmailTemplateName } from '../constants'
+import globalHelper from '../helpers/global.helper'
 import usersHelper from '../helpers/users.helper'
 import { userModel } from '../models/index'
 import { failureResponse, successResponse } from '../utils/db.utils'
@@ -13,13 +15,27 @@ export const userLogin = async (req: Request, res: Response) => {
 
   try {
     if (!user.id) {
-      const [newUserAccount] = await usersHelper.createUserFromToken(authInfo)
-      return res.status(200).json(successResponse(newUserAccount))
+      const [newUser] = await usersHelper.createUserFromToken(authInfo)
+
+      globalHelper.sendEmailTrigger(
+        EmailTemplateName.SIGN_UP_COMPLETED,
+        [newUser.email],
+        `${EmailTemplateName.SIGN_UP_COMPLETED}`
+      )
+
+      return res.status(200).json(successResponse(newUser))
     }
 
     if (!user.isActivated) {
-      const [updatedUserAccount] = await usersHelper.updateUserFromToken(authInfo)
-      return res.status(200).json(successResponse(updatedUserAccount))
+      const [updatedUser] = await usersHelper.updateUserFromToken(authInfo)
+
+      globalHelper.sendEmailTrigger(
+        EmailTemplateName.SIGN_UP_COMPLETED,
+        [updatedUser.email],
+        `${EmailTemplateName.SIGN_UP_COMPLETED}`
+      )
+
+      return res.status(200).json(successResponse(updatedUser))
     }
 
     return res.status(200).json(successResponse(user))
@@ -51,6 +67,12 @@ export const updateUser = async (req: Request, res: Response) => {
     const { firstName, lastName } = body
 
     const updatedUser = await userModel.updateUser({ firstName, lastName }, { id: user.id })
+
+    globalHelper.sendEmailTrigger(
+      EmailTemplateName.PROFILE_UPDATE,
+      [updatedUser.email],
+      `${EmailTemplateName.PROFILE_UPDATE}`
+    )
 
     return res.status(200).json(successResponse(updatedUser))
   } catch (error) {

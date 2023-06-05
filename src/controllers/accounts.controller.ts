@@ -36,15 +36,18 @@ export const submitAccountAuthorization = async (req: Request, res: Response) =>
     const pendingAuthTransactions = await transactionHelper.getPendingAuthTransactions(user.id)
 
     for (const transaction of pendingAuthTransactions) {
-      const [transactionCurrentSide] = await transactionSideHelper.getTransactionSidesByUserId(transaction.id, user.id)
+      const [transactionCurrentSide, transactionOtherSide] = await transactionSideHelper.getTransactionSidesByUserId(
+        transaction.id,
+        user.id
+      )
 
       const activeStage = (await transactionStageHelper.getActiveStage(transaction.id))[0]
 
-      if (!transactionCurrentSide) {
+      if (!transactionCurrentSide || !transactionOtherSide) {
         throw Error('transactionCurrentSide in accountAuthorization.controller is undefined')
       }
 
-      transactionStageHelper.nextStage(transaction.id, transactionCurrentSide, activeStage)
+      transactionStageHelper.nextStage(transaction.id, transactionCurrentSide, transactionOtherSide, activeStage)
     }
 
     const updatedUser = await userModel.getUserById(user.id)

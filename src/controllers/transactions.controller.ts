@@ -112,7 +112,7 @@ export const cancelTransaction = async (req: Request, res: Response) => {
 
     const { transactionId } = body
 
-    const transaction = await transactionHelper.cancelTransaction(user, transactionId)
+    const transaction = await transactionHelper.userCancelTransaction(user, transactionId)
 
     if (!transaction) {
       return res.status(400).json(failureResponse('Couldn`t cancel transaction'))
@@ -188,7 +188,8 @@ export const approveStage = async (req: Request, res: Response) => {
 
     const nextStage = await transactionStageHelper.nextStage(
       transactionId,
-      transactionCurrentSide!,
+      transactionCurrentSide,
+      transactionOtherSide,
       activeStage,
       transactionProps,
       additionalData

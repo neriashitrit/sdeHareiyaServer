@@ -1,8 +1,10 @@
 import { ITransactionDispute, TransactionStatus } from 'safe-shore-common'
 
-import { Tables } from '../constants'
+import { EmailTemplateName, Tables } from '../constants'
 import { transactionDisputeModel, transactionModel, transactionSideModel } from '../models/index'
 import '../models/transactionDispute.model'
+import EmailService from '../services/email.service'
+import globalHelper from './global.helper'
 
 const transactionDisputeHelper = {
   createTransactionDispute: async (
@@ -41,6 +43,16 @@ const transactionDisputeHelper = {
         status: TransactionStatus.Dispute
       }
     )
+
+    const transactionSides = await transactionSideModel.getTransactionSides({
+      [`${Tables.TRANSACTION_SIDES}.transaction_id`]: transactionId
+    })
+
+    globalHelper.sendEmailTrigger(
+      EmailTemplateName.OPEN_DISPUTE,
+      [...transactionSides.map((side) => side!.user.email), EmailService.defaultMailSender],
+      `${EmailTemplateName.OPEN_DISPUTE}`
+    )
   },
   cancelTransactionDisputeById: async (
     disputeId: number,
@@ -65,6 +77,16 @@ const transactionDisputeHelper = {
       }
     )
 
+    const transactionSides = await transactionSideModel.getTransactionSides({
+      [`${Tables.TRANSACTION_SIDES}.transaction_id`]: transactionDispute?.transactionId
+    })
+
+    globalHelper.sendEmailTrigger(
+      EmailTemplateName.RESOLVED_DISPUTE,
+      [...transactionSides.map((side) => side!.user.email), EmailService.defaultMailSender],
+      `${EmailTemplateName.RESOLVED_DISPUTE}`
+    )
+
     return transactionDispute
   },
   cancelTransactionDispute: async (transactionId: number, userId: number): Promise<boolean> => {
@@ -85,6 +107,16 @@ const transactionDisputeHelper = {
       {
         status: TransactionStatus.Stage
       }
+    )
+
+    const transactionSides = await transactionSideModel.getTransactionSides({
+      [`${Tables.TRANSACTION_SIDES}.transaction_id`]: transactionDispute?.transactionId
+    })
+
+    globalHelper.sendEmailTrigger(
+      EmailTemplateName.RESOLVED_DISPUTE,
+      [...transactionSides.map((side) => side!.user.email), EmailService.defaultMailSender],
+      `${EmailTemplateName.RESOLVED_DISPUTE}`
     )
 
     return transactionDispute !== undefined
