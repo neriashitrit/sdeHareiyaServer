@@ -28,5 +28,35 @@ export const fileModel = {
         message: `error while trying to updateFiles. error: ${error.message}`
       }
     }
+  },
+  getFiles: async (condition: Record<string, any> | string): Promise<IFile[]> => {
+    try {
+      let parsedCondition = condition
+      if (typeof condition === 'string') {
+        parsedCondition = db.knex.raw(condition)
+      }
+      const files = await db.getAll(Tables.FILES, parsedCondition)
+      return files
+    } catch (error) {
+      console.error('ERROR in fileModel.modal updateFiles()', error.message)
+      throw {
+        message: `error while trying to updateFiles. error: ${error.message}`
+      }
+    }
+  },
+  removeFiles: async (condition: Record<string, any> | string): Promise<IFile[]> => {
+    try {
+      let parsedCondition = condition
+      if (typeof condition === 'string') {
+        parsedCondition = db.knex.raw(condition)
+      }
+      const files = await db.update(Tables.FILES, { row_id: null, table_name: null }, parsedCondition)
+      return files
+    } catch (error) {
+      console.error('ERROR in fileModel.modal updateFiles()', error.message)
+      throw {
+        message: `error while trying to updateFiles. error: ${error.message}`
+      }
+    }
   }
 }

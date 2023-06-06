@@ -459,9 +459,21 @@ const upsertProductProperties = async (
     })
     if (transactionProductProperty) {
       if (property.files) {
-        for (const file of property.files) {
+        const existingFiles = await fileModel.getFiles({
+          rowId: transactionProductProperty.id,
+          tableName: Tables.TRANSACTION_PRODUCT_PROPERTIES
+        })
+        const filesToDelete = existingFiles.filter(
+          (existingFile) => property.files?.findIndex((propertyFile) => propertyFile === existingFile.url) === -1
+        )
+
+        if (filesToDelete.length > 0) {
+          await fileModel.removeFiles(`id IN (${filesToDelete.map((fileToDelete) => fileToDelete.id)})`)
+        }
+
+        for (const propertyFile of property.files) {
           fileModel.updateFiles(
-            { url: file },
+            { url: propertyFile },
             { rowId: transactionProductProperty.id, tableName: Tables.TRANSACTION_PRODUCT_PROPERTIES }
           )
         }
