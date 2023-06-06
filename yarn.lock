@@ -3769,8 +3769,8 @@ safe-regex-test@^1.0.0:
     is-regex "^1.1.4"
 
 "safe-shore-common@https://x-token-auth:ATCTT3xFfGN0MWpLYVzn8PcB3EIxpNJE69yA-onLv7VMnQjX9wMuRz8JNCHBGmnKCuVCdH2lVOhpvbGXKNzk-afFvHS581DzqZIwhJuoOL3LTEumCT5AvMJWGdAPBjkuj6lWifgQ7GAQ85DRRSNKTs_aJ4pCWEOGE5wMy5MfuzUUN7aSaLzEWNQ=7A8A2DEF@bitbucket.org/digitaltingz/safe-shore-common.git":
-  version "0.0.57"
-  resolved "https://x-token-auth:ATCTT3xFfGN0MWpLYVzn8PcB3EIxpNJE69yA-onLv7VMnQjX9wMuRz8JNCHBGmnKCuVCdH2lVOhpvbGXKNzk-afFvHS581DzqZIwhJuoOL3LTEumCT5AvMJWGdAPBjkuj6lWifgQ7GAQ85DRRSNKTs_aJ4pCWEOGE5wMy5MfuzUUN7aSaLzEWNQ=7A8A2DEF@bitbucket.org/digitaltingz/safe-shore-common.git#493fa947444f1acdb5c4cffb9005d52433b9bf3a"
+  version "0.0.58"
+  resolved "https://x-token-auth:ATCTT3xFfGN0MWpLYVzn8PcB3EIxpNJE69yA-onLv7VMnQjX9wMuRz8JNCHBGmnKCuVCdH2lVOhpvbGXKNzk-afFvHS581DzqZIwhJuoOL3LTEumCT5AvMJWGdAPBjkuj6lWifgQ7GAQ85DRRSNKTs_aJ4pCWEOGE5wMy5MfuzUUN7aSaLzEWNQ=7A8A2DEF@bitbucket.org/digitaltingz/safe-shore-common.git#55783ff5d27967253f87ca93ffaa126a48bb68a8"
 
 "safer-buffer@>= 2.1.2 < 3", safer-buffer@^2.0.2, safer-buffer@^2.1.0, safer-buffer@~2.1.0:
   version "2.1.2"

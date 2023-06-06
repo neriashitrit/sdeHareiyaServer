@@ -238,7 +238,7 @@ const transactionHelper = {
 
     globalHelper.sendEmailTrigger(
       EmailTemplateName.TRANSACTION_CANCEL,
-      [...transactionSides.map((side) => side!.user.email), EmailService.defaultMailSender],
+      [...transactionSides.filter((side) => side).map((side) => side!.user.email), EmailService.defaultMailSender],
       `${EmailTemplateName.TRANSACTION_CANCEL}`
     )
 

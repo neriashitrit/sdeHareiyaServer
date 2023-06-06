@@ -61,7 +61,11 @@ export const transactionProductPropertyModel = {
               Tables.PRODUCT_PROPERTIES
             ])}) as property`
           ),
-          db.knex.raw(`CASE WHEN ${Tables.FILES}.id IS NULL THEN null ELSE JSON_AGG(${Tables.FILES}.url) END as files`)
+          // db.knex.raw(`JSON_AGG(${Tables.FILES}.url) as files`)
+
+          db.knex.raw(
+            `CASE WHEN MAX(${Tables.FILES}.id) IS NULL THEN null ELSE JSON_AGG(${Tables.FILES}.url) END as files`
+          )
         )
         .from(Tables.TRANSACTION_PRODUCT_PROPERTIES)
         .where(parsedCondition)
@@ -76,7 +80,7 @@ export const transactionProductPropertyModel = {
             db.knex.raw(`'${Tables.TRANSACTION_PRODUCT_PROPERTIES}'`)
           )
         })
-        .groupBy(`${Tables.TRANSACTION_PRODUCT_PROPERTIES}.id`, `${Tables.PRODUCT_PROPERTIES}.id`, `${Tables.FILES}.id`)
+        .groupBy(`${Tables.TRANSACTION_PRODUCT_PROPERTIES}.id`, `${Tables.PRODUCT_PROPERTIES}.id`)
 
       return transactionProductProperties
     } catch (error) {
