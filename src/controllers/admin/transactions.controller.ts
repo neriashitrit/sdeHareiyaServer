@@ -74,7 +74,7 @@ export const getTransactionsByAccount = async (req: Request, res: Response) => {
 
     const condition = buildConditionString([
       {
-        column: Tables.TRANSACTION_SIDES + '.user_account_id',
+        column: Tables.ACCOUNTS + '.id',
         value: accountId
       },
       {
