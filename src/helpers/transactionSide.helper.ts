@@ -131,7 +131,7 @@ const transactionSideHelper = {
       })
 
       const sideBUserAccount = await userAccountModel.getUserAccount({
-        [`${Tables.USERS}.phone_number`]: phoneNumber
+        [`${Tables.USERS}.id`]: sideBUser.id
       })
 
       await transactionSideModel.updateTransactionSide(
@@ -156,6 +156,9 @@ const transactionSideHelper = {
     return await transactionSideModel.getTransactionSides({
       transactionId
     })
+  },
+  deleteTransactionSideB: async (transactionId: number, transactionSideBId: number): Promise<void> => {
+    await transactionSideModel.deleteTransactionSide({ id: transactionSideBId })
   }
 }
 export default transactionSideHelper

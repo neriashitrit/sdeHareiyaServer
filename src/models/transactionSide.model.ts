@@ -82,5 +82,20 @@ export const transactionSideModel = {
         message: `error while trying to updateTransactionSide. error: ${error.message}`
       }
     }
+  },
+  deleteTransactionSide: async (condition: Record<string, any> | string): Promise<void> => {
+    try {
+      let parsedCondition = condition
+      if (typeof condition === 'string') {
+        parsedCondition = db.knex.raw(condition)
+      }
+      await db.delete(Tables.TRANSACTION_SIDES, parsedCondition)
+      return
+    } catch (error) {
+      console.error('ERROR in transactionSide.modal deleteTransactionSide()', error.message)
+      throw {
+        message: `error while trying to deleteTransactionSide. error: ${error.message}`
+      }
+    }
   }
 }

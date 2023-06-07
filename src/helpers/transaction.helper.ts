@@ -145,11 +145,26 @@ const transactionHelper = {
 
     let transactionSides: ITransactionSide[] | null = null
     if (firstName || lastName || email || phoneNumber || creatorSide) {
-      if (transactionOtherSide) {
+      if (transactionOtherSide && transactionOtherSide.user.phoneNumber === phoneNumber) {
         transactionSides = await transactionSideHelper.updateTransactionSideB(
           transactionId,
           user,
           transactionOtherSide.user,
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          creatorSide
+        )
+      } else if (transactionOtherSide) {
+        if (_.isNil(firstName) || _.isNil(lastName) || _.isNil(email) || _.isNil(phoneNumber) || _.isNil(creatorSide)) {
+          return null
+        }
+
+        await transactionSideHelper.deleteTransactionSideB(transactionId, transactionOtherSide.id)
+        transactionSides = await transactionSideHelper.createTransactionSideB(
+          transactionId,
+          user.id,
           firstName,
           lastName,
           email,

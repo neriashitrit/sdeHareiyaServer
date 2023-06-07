@@ -35,7 +35,7 @@ export default class DbService {
   updateOneById = (tableName: string, updatedRecord: Record<string, any>, id: number) =>
     this.update(tableName, updatedRecord, { id })
 
-  delete = (tableName: string, condition: Record<string, any> = {}) =>
+  delete = (tableName: string, condition: Record<string, any> | string) =>
     this.knex.delete().from(tableName).where(condition)
 
   deleteAll = (tableName: string) => this.knex.delete().from(tableName)
