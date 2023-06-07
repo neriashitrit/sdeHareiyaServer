@@ -32,10 +32,11 @@ export const getUserById = async (req: Request, res: Response) => {
 
 export const createAdminUser = async (req: Request, res: Response) => {
   console.log('in controller createAdminUser')
-  const { firstName, lastName, email, phone, role, phonePrefix } = req.body
-  if (!firstName || !lastName || !email || !phone || !role) res.status(400).json(failureResponse('missing Params'))
+  const { firstName, lastName, email, phoneNumber, role, phonePrefix } = req.body
+  if (!firstName || !lastName || !email || !phoneNumber || !role)
+    res.status(400).json(failureResponse('missing Params'))
   try {
-    const ADUser = await createAdminUserInB2C(firstName, lastName, email, phone, role, phonePrefix)
+    const ADUser = await createAdminUserInB2C(firstName, lastName, email, phoneNumber, role, phonePrefix)
     const user = await usersHelper.createAdminUserFromADRespond(ADUser)
     res.status(200).json(successResponse(user))
   } catch (error: any) {
@@ -47,8 +48,10 @@ export const createAdminUser = async (req: Request, res: Response) => {
 export const updateAccountUser = async (req: Request, res: Response) => {
   try {
     const user = req.body
-    await userModel.updateUser(_.omit(user, ['userId', 'accountId']), { id: user.userId })
-    const updatedAccount = await accountModel.getAccount({ [Tables.ACCOUNTS + '.id']: user.accountId })
+    const updatedUser = await userModel.updateUser(_.omit(user, ['id', 'phoneNumber', 'email']), {
+      phoneNumber: user.phoneNumber
+    })
+    const updatedAccount = await accountModel.getAccount({ [Tables.USERS + '.id']: updatedUser.id })
     return res.status(200).json(successResponse(updatedAccount[0]))
   } catch (error) {
     return res.status(500).json(failureResponse(error))

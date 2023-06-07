@@ -33,14 +33,14 @@ export const createAdminUserInB2C = async (
   firstName: string,
   lastName: string,
   email: string,
-  phone: string,
+  phoneNumber: string,
   role: string,
   phonePrefix?: string
 ): Promise<any> => {
   const tenantName = process.env.AZURE_TENANT_NAME
   if (!tenantName) throw new Error('Define AZURE_TENANT_NAME in env')
   const roleExtension = process.env.ROLE_EXTENSION || 'extension_483899360d944bc29b67a8d2d087e15b_role'
-  const userPrincipalName = `${firstName}${phone}@${tenantName}`
+  const userPrincipalName = `${firstName}${phoneNumber}@${tenantName}`
   const accessToken = await getAccessToken()
 
   const headers = {
@@ -54,7 +54,7 @@ export const createAdminUserInB2C = async (
     givenName: firstName,
     surname: lastName,
     userPrincipalName: userPrincipalName,
-    mobilePhone: phone,
+    mobilePhone: phoneNumber,
     mail: email,
     [roleExtension]: role,
     identities: [
@@ -72,7 +72,7 @@ export const createAdminUserInB2C = async (
   const createUserUrl = 'https://graph.microsoft.com/v1.0/users'
   try {
     const newUser = await axios.post(createUserUrl, data, { headers })
-    updateADUserRegisteredPhone(phone, newUser?.data?.id, phonePrefix || '+972', accessToken)
+    updateADUserRegisteredPhone(phoneNumber, newUser?.data?.id, phonePrefix || '+972', accessToken)
     return newUser.data
   } catch (error) {
     console.log(error?.response?.data)
