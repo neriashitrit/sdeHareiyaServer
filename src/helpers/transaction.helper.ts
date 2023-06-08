@@ -12,7 +12,7 @@ import {
   TransactionStatus
 } from 'safe-shore-common'
 
-import { EmailTemplateName, Tables } from '../constants'
+import { EmailTemplateName, Tables, emailSubjectMapping } from '../constants'
 import {
   commissionModel,
   fileModel,
@@ -254,7 +254,7 @@ const transactionHelper = {
     globalHelper.sendEmailTrigger(
       EmailTemplateName.TRANSACTION_CANCEL,
       [...transactionSides.filter((side) => side).map((side) => side!.user.email), EmailService.defaultMailSender],
-      `${EmailTemplateName.TRANSACTION_CANCEL}`
+      emailSubjectMapping[EmailTemplateName.TRANSACTION_CANCEL]
     )
 
     return canceledTransaction
@@ -276,7 +276,7 @@ const transactionHelper = {
     globalHelper.sendEmailTrigger(
       EmailTemplateName.TRANSACTION_CANCEL,
       [...transactionSides.map((side) => side!.user.email), EmailService.defaultMailSender],
-      `${EmailTemplateName.TRANSACTION_CANCEL}`
+      emailSubjectMapping[EmailTemplateName.TRANSACTION_CANCEL]
     )
 
     return canceledTransaction

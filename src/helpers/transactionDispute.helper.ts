@@ -1,6 +1,6 @@
 import { ITransactionDispute, TransactionStatus } from 'safe-shore-common'
 
-import { EmailTemplateName, Tables } from '../constants'
+import { EmailTemplateName, Tables, emailSubjectMapping } from '../constants'
 import { transactionDisputeModel, transactionModel, transactionSideModel } from '../models/index'
 import '../models/transactionDispute.model'
 import EmailService from '../services/email.service'
@@ -51,7 +51,7 @@ const transactionDisputeHelper = {
     globalHelper.sendEmailTrigger(
       EmailTemplateName.OPEN_DISPUTE,
       [...transactionSides.map((side) => side!.user.email), EmailService.defaultMailSender],
-      `${EmailTemplateName.OPEN_DISPUTE}`
+      emailSubjectMapping[EmailTemplateName.OPEN_DISPUTE]
     )
   },
   cancelTransactionDisputeById: async (
@@ -84,7 +84,7 @@ const transactionDisputeHelper = {
     globalHelper.sendEmailTrigger(
       EmailTemplateName.RESOLVED_DISPUTE,
       [...transactionSides.map((side) => side!.user.email), EmailService.defaultMailSender],
-      `${EmailTemplateName.RESOLVED_DISPUTE}`
+      emailSubjectMapping[EmailTemplateName.RESOLVED_DISPUTE]
     )
 
     return transactionDispute
@@ -116,7 +116,7 @@ const transactionDisputeHelper = {
     globalHelper.sendEmailTrigger(
       EmailTemplateName.RESOLVED_DISPUTE,
       [...transactionSides.map((side) => side!.user.email), EmailService.defaultMailSender],
-      `${EmailTemplateName.RESOLVED_DISPUTE}`
+      emailSubjectMapping[EmailTemplateName.RESOLVED_DISPUTE]
     )
 
     return transactionDispute !== undefined

@@ -2,12 +2,14 @@ import { Request, Response } from 'express'
 import { IUser } from 'safe-shore-common'
 import { AuthInfo } from 'types'
 
-import { EmailTemplateName } from '../constants'
+import { EmailTemplateName, emailSubjectMapping } from '../constants'
 import globalHelper from '../helpers/global.helper'
 import usersHelper from '../helpers/users.helper'
 import { userModel } from '../models/index'
 import { failureResponse, successResponse } from '../utils/db.utils'
 import { isUpdateUserBody } from '../utils/typeCheckers.utils'
+
+const appUrl = process.env.APP_URL!
 
 export const userLogin = async (req: Request, res: Response) => {
   const authInfo: AuthInfo = req?.authInfo as AuthInfo
@@ -20,7 +22,7 @@ export const userLogin = async (req: Request, res: Response) => {
       globalHelper.sendEmailTrigger(
         EmailTemplateName.SIGN_UP_COMPLETED,
         [newUser.email],
-        `${EmailTemplateName.SIGN_UP_COMPLETED}`
+        emailSubjectMapping[EmailTemplateName.SIGN_UP_COMPLETED]
       )
 
       return res.status(200).json(successResponse(newUser))
@@ -32,7 +34,8 @@ export const userLogin = async (req: Request, res: Response) => {
       globalHelper.sendEmailTrigger(
         EmailTemplateName.SIGN_UP_COMPLETED,
         [updatedUser.email],
-        `${EmailTemplateName.SIGN_UP_COMPLETED}`
+        emailSubjectMapping[EmailTemplateName.SIGN_UP_COMPLETED],
+        { link: `${appUrl}/private-area` }
       )
 
       return res.status(200).json(successResponse(updatedUser))
@@ -71,7 +74,8 @@ export const updateUser = async (req: Request, res: Response) => {
     globalHelper.sendEmailTrigger(
       EmailTemplateName.PROFILE_UPDATE,
       [updatedUser.email],
-      `${EmailTemplateName.PROFILE_UPDATE}`
+      emailSubjectMapping[EmailTemplateName.PROFILE_UPDATE],
+      { link: `${appUrl}/private-area` }
     )
 
     return res.status(200).json(successResponse(updatedUser))

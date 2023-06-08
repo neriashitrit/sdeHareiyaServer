@@ -38,7 +38,7 @@ export default class EmailService {
         console.log(`Sending ${email} subject "${subject}"`)
       }
       return await sgMail.send({
-        from: from || EmailService.defaultMailSender,
+        from: from || { name: 'Safe Shore', email: EmailService.defaultMailSender },
         to: email,
         subject,
         text: msg,

@@ -12,6 +12,7 @@ import {
 
 import {
   Tables,
+  emailSubjectMapping,
   transactionStageInCharge,
   transactionStagePossiblePaths,
   transactionStageToEmailTriggerMapping
@@ -20,6 +21,8 @@ import { fileModel, transactionModel, transactionSideModel, transactionStageMode
 import EmailService from '../services/email.service'
 import globalHelper from './global.helper'
 import transactionHelper from './transaction.helper'
+
+const appUrl = process.env.APP_URL!
 
 const transactionStageHelper = {
   adminNextStage: async (transactionId: number, userId: number, activeStage: ITransactionStage) => {
@@ -36,11 +39,15 @@ const transactionStageHelper = {
 
       const emailTriggers = transactionStageToEmailTriggerMapping[nextStage.name]
       if (emailTriggers) {
-        emailTriggers.forEach(({ to, subject, template }) => {
+        emailTriggers.forEach(({ to, template }) => {
           globalHelper.sendEmailTrigger(
             template,
             [emailTriggerRecipient(to, transactionSides)?.user.email ?? EmailService.defaultMailSender],
-            subject
+            emailSubjectMapping[template],
+            {
+              transactionId,
+              link: `${appUrl}/private-area`
+            }
           )
         })
       }
@@ -83,11 +90,16 @@ const transactionStageHelper = {
         const emailTriggers = transactionStageToEmailTriggerMapping[nextStage.name]
 
         if (emailTriggers) {
-          emailTriggers.forEach(({ to, subject, template }) => {
+          emailTriggers.forEach(({ to, template }) => {
             globalHelper.sendEmailTrigger(
               template,
               [emailTriggerRecipient(to, [requestingSide, otherSide])?.user.email ?? EmailService.defaultMailSender],
-              subject
+              emailSubjectMapping[template],
+              {
+                transactionId,
+                inChargeUserFullName: `${requestingSide.user.firstName} ${requestingSide.user.lastName}`,
+                link: `${appUrl}/private-area`
+              }
             )
           })
         }

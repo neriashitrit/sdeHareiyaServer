@@ -77,20 +77,18 @@ export enum EmailTemplateName {
 }
 
 export const transactionStageToEmailTriggerMapping: {
-  [key in TransactionStageName]: { to: TransactionSide; subject: string; template: EmailTemplateName }[] | null
+  [key in TransactionStageName]: { to: TransactionSide; template: EmailTemplateName }[] | null
 } = {
   [TransactionStageName.Draft]: null,
   [TransactionStageName.AuthorizationSideA]: [
     {
       to: TransactionSide.SideA,
-      subject: `${EmailTemplateName.TRANSACTION_OPEN}`,
       template: EmailTemplateName.TRANSACTION_OPEN
     }
   ],
   [TransactionStageName.AuthorizationSideAConfirmation]: [
     {
       to: TransactionSide.SideA,
-      subject: `${EmailTemplateName.ACCOUNT_AUTHORIZED}`,
       template: EmailTemplateName.ACCOUNT_AUTHORIZED
     }
   ],
@@ -98,74 +96,81 @@ export const transactionStageToEmailTriggerMapping: {
   [TransactionStageName.AuthorizationSideBConfirmation]: [
     {
       to: TransactionSide.SideB,
-      subject: `${EmailTemplateName.ACCOUNT_AUTHORIZED}`,
       template: EmailTemplateName.ACCOUNT_AUTHORIZED
     }
   ],
   [TransactionStageName.ConfirmationSideB]: [
     {
       to: TransactionSide.SideA,
-      subject: `${EmailTemplateName.TRANSACTION_OPEN}`,
       template: EmailTemplateName.TRANSACTION_OPEN
     },
     {
       to: TransactionSide.SideB,
-      subject: `${EmailTemplateName.TRANSACTION_INVITE_CONFIRMATION}`,
       template: EmailTemplateName.TRANSACTION_INVITE_CONFIRMATION
     }
   ],
   [TransactionStageName.BuyerDeposit]: [
     {
       to: TransactionSide.SideA,
-      subject: `${EmailTemplateName.TRANSACTION_ACCEPTED_CONFIRMATION}`,
       template: EmailTemplateName.TRANSACTION_ACCEPTED_CONFIRMATION
     }
   ],
   [TransactionStageName.DepositConfirmation]: [
     {
       to: TransactionSide.Admin,
-      subject: `${EmailTemplateName.DEPOSIT_TRANSFER}`,
       template: EmailTemplateName.DEPOSIT_TRANSFER
     }
   ],
   [TransactionStageName.SellerProductTransfer]: [
     {
       to: TransactionSide.Buyer,
-      subject: `${EmailTemplateName.DEPOSIT_TRANSFER_SUCCESSFUL}`,
       template: EmailTemplateName.DEPOSIT_TRANSFER_SUCCESSFUL
     },
     {
       to: TransactionSide.Seller,
-      subject: `${EmailTemplateName.DEPOSIT_TRANSFER_SUCCESSFUL}`,
       template: EmailTemplateName.DEPOSIT_TRANSFER_SUCCESSFUL
     }
   ],
   [TransactionStageName.BuyerProductConfirmation]: [
     {
       to: TransactionSide.Buyer,
-      subject: `${EmailTemplateName.PRODUCT_TRANSFER}`,
       template: EmailTemplateName.PRODUCT_TRANSFER
     }
   ],
   [TransactionStageName.SellerPayment]: [
     {
       to: TransactionSide.Seller,
-      subject: `${EmailTemplateName.PRODUCT_TRANSFER_COMPLETED}`,
       template: EmailTemplateName.PRODUCT_TRANSFER_COMPLETED
     }
   ],
   [TransactionStageName.Completed]: [
     {
       to: TransactionSide.Buyer,
-      subject: `${EmailTemplateName.TRANSACTION_COMPLETED}`,
       template: EmailTemplateName.TRANSACTION_COMPLETED
     },
     {
       to: TransactionSide.Seller,
-      subject: `${EmailTemplateName.TRANSACTION_COMPLETED}`,
       template: EmailTemplateName.TRANSACTION_COMPLETED
     }
   ]
+}
+
+export const emailSubjectMapping: { [key in EmailTemplateName]: string } = {
+  [EmailTemplateName.SIGN_UP_COMPLETED]: 'ברכות על הצטרפותך לסייפשור',
+  [EmailTemplateName.PROFILE_UPDATE]: 'פרטיך עודכנו בהצלחה',
+  [EmailTemplateName.CONTACT_US]: '',
+  [EmailTemplateName.TRANSACTION_OPEN]: 'אישור פתיחת עיסקה',
+  [EmailTemplateName.ACCOUNT_AUTHORIZED]: '',
+  [EmailTemplateName.TRANSACTION_INVITE_CONFIRMATION]: 'עיסקה ממתינה לאישורך',
+  [EmailTemplateName.TRANSACTION_ACCEPTED_CONFIRMATION]: 'עידכון על אישור הזמנה לעיסקה',
+  [EmailTemplateName.DEPOSIT_TRANSFER]: 'הודעה על הפקדת כסף בחשבון הנאמנות',
+  [EmailTemplateName.DEPOSIT_TRANSFER_SUCCESSFUL]: 'עידכון על הפקדת כסף בחשבון הנאמנות של סייפשור',
+  [EmailTemplateName.PRODUCT_TRANSFER]: 'עידכון על העברת מוצר',
+  [EmailTemplateName.PRODUCT_TRANSFER_COMPLETED]: 'עידכון על קבלת מוצר',
+  [EmailTemplateName.TRANSACTION_COMPLETED]: 'הודעה על סיום עיסקה',
+  [EmailTemplateName.OPEN_DISPUTE]: 'עידכון על פתיחת בירור',
+  [EmailTemplateName.RESOLVED_DISPUTE]: 'עידכון על תוצאות בירור',
+  [EmailTemplateName.TRANSACTION_CANCEL]: 'עידכון על ביטול עיסקה'
 }
 
 export const conditionForTransactionsNeedStageAuthorization = [

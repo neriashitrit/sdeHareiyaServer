@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { IUser } from 'safe-shore-common'
 
-import { EmailTemplateName } from '../constants'
+import { EmailTemplateName, emailSubjectMapping } from '../constants'
 import globalHelper from '../helpers/global.helper'
 import { fileModel } from '../models/index'
 import { generateRandomPassword } from '../services/auth.service'
@@ -28,7 +28,7 @@ export const sendContactUs = async (req: Request, res: Response) => {
   await globalHelper.sendEmailTrigger(
     EmailTemplateName.CONTACT_US,
     [EmailService.defaultMailSender],
-    EmailTemplateName.CONTACT_US,
+    emailSubjectMapping[EmailTemplateName.CONTACT_US],
     { firstName, lastName, phoneNumber, email, notes }
   )
 
