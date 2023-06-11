@@ -5,8 +5,10 @@ import fileupload from 'express-fileupload'
 import helmet from 'helmet'
 import logger from 'morgan'
 import passport from 'passport'
+import { UserRole } from 'safe-shore-common'
 
 import { adminSenderAuth, bearerStrategy } from './middlewares/auth.middleware'
+import { generalMiddleware } from './middlewares/general.middleware'
 import { roleGuard } from './middlewares/roleGuard.middleware'
 import adminRouter from './routes/adminWebAppRoutes'
 import backOfficeRouter from './routes/backOfficeRoutes'
@@ -23,14 +25,25 @@ app.use(express.json()) // middleware to recognize JSON
 app.use(express.urlencoded({ extended: false })) // recognize object as strings or arrays
 app.use(logger('dev')) // logger middleware
 
+app.use(generalMiddleware)
+
 app.use(passport.initialize())
 passport.use(bearerStrategy)
 
 // Routes
 app.use('/api/backOffice', adminSenderAuth, backOfficeRouter)
-app.use('/api/webapp', passport.authenticate('oauth-bearer', { session: false }), roleGuard(), webAppRouter)
-app.use('/api/admin', passport.authenticate('oauth-bearer', { session: false }), roleGuard(), adminRouter)
-app.use('/api/flutterapp', passport.authenticate('oauth-bearer', { session: false }), roleGuard(), webAppRouter)
+app.use(
+  '/api/webapp',
+  passport.authenticate('oauth-bearer', { session: false }),
+  roleGuard([UserRole.User, UserRole.Admin, UserRole.SuperAdmin]),
+  webAppRouter
+)
+app.use(
+  '/api/admin',
+  passport.authenticate('oauth-bearer', { session: false }),
+  roleGuard([UserRole.Admin, UserRole.SuperAdmin]),
+  adminRouter
+)
 app.use('/api/openRouter', openRouter)
 
 const port = process.env.PORT || 5000

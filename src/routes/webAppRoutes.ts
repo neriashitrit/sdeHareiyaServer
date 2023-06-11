@@ -4,6 +4,7 @@ import * as accountsController from '../controllers/accounts.controller'
 import * as globalController from '../controllers/global.controller'
 import * as transactionsController from '../controllers/transactions.controller'
 import * as usersController from '../controllers/users.controller'
+import { transactionGuard } from '../middlewares/transactionGuard.middleware'
 
 const router = express.Router()
 
@@ -20,11 +21,11 @@ router.put('/updateUser', usersController.updateUser)
 router.get('/getTransactions', transactionsController.getTransactions)
 router.get('/getTransactionsById/:transactionId', transactionsController.getTransaction)
 router.post('/createTransactions', transactionsController.createTransaction)
-router.put('/updateTransactions', transactionsController.updateTransaction)
-router.post('/transactions/approveStage', transactionsController.approveStage)
-router.post('/transactions/openDispute', transactionsController.openDispute)
-router.post('/transactions/cancelDispute', transactionsController.cancelDispute)
-router.post('/transactions/cancelTransaction', transactionsController.cancelTransaction)
+router.put('/updateTransactions', transactionGuard, transactionsController.updateTransaction)
+router.post('/transactions/approveStage', transactionGuard, transactionsController.approveStage)
+router.post('/transactions/openDispute', transactionGuard, transactionsController.openDispute)
+router.post('/transactions/cancelDispute', transactionGuard, transactionsController.cancelDispute)
+router.post('/transactions/cancelTransaction', transactionGuard, transactionsController.cancelTransaction)
 ///////////////////////////
 //       Accounts        //
 ///////////////////////////

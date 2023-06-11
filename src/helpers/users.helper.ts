@@ -1,6 +1,7 @@
 import { AccountType, IAccount, IUser, IUserAccount, UserRole } from 'safe-shore-common'
 import { AuthInfo } from 'types'
 
+import { companyDetailsModel } from '../models/companyDetails.model'
 import { accountModel, userAccountModel, userModel } from '../models/index'
 
 const usersHelper = {
@@ -11,9 +12,11 @@ const usersHelper = {
     const activeDirectoryUuid = authInfo.oid
     const newsletterSubscription = true
     const lastActiveAt = new Date()
-    const accountType = authInfo.extension_account_type ?? 'private'
+    const type = authInfo.extension_companyBN ? AccountType.Company : AccountType.Private
     const idNumber = authInfo.extension_IDnumber
     const phoneNumber = authInfo.extension_phone
+    const companyIdentityNumber = authInfo.extension_companyBN
+    const incorporationName = authInfo.extension_companyname
 
     try {
       const newUser = await userModel.createUser({
@@ -30,8 +33,16 @@ const usersHelper = {
       })
 
       const newAccount = await accountModel.createAccount({
-        type: accountType
+        type
       })
+
+      if (type === AccountType.Company) {
+        await companyDetailsModel.createCompanyDetails({
+          accountId: newAccount.id,
+          companyIdentityNumber,
+          incorporationName
+        })
+      }
 
       const newUserAccount = await userAccountModel.createUserAccount({
         userId: newUser.id,
@@ -54,10 +65,11 @@ const usersHelper = {
     const activeDirectoryUuid = authInfo.oid
     const newsletterSubscription = true
     const lastActiveAt = new Date()
-    const accountType = authInfo.extension_account_type ?? 'private'
+    const type = authInfo.extension_companyBN ? AccountType.Company : AccountType.Private
     const idNumber = authInfo.extension_IDnumber
     const phoneNumber = authInfo.extension_phone
-
+    const companyIdentityNumber = authInfo.extension_companyBN
+    const incorporationName = authInfo.extension_companyname
     try {
       const newUser = await userModel.updateUser(
         {
@@ -77,8 +89,16 @@ const usersHelper = {
       )
 
       const newAccount = await accountModel.createAccount({
-        type: accountType
+        type
       })
+
+      if (type === AccountType.Company) {
+        await companyDetailsModel.createCompanyDetails({
+          accountId: newAccount.id,
+          companyIdentityNumber,
+          incorporationName
+        })
+      }
 
       const newUserAccount = await userAccountModel.createUserAccount({
         userId: newUser.id,

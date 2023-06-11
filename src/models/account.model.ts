@@ -3,12 +3,12 @@ import { IAccount, ICompanyDetails } from 'safe-shore-common'
 
 import { Tables } from '../constants'
 import DbService from '../services/db.service'
-import { buildRange, getJsonBuildObject } from '../utils/db.utils'
+import { getJsonBuildObject } from '../utils/db.utils'
 
 const db = new DbService()
 
 export const accountModel = {
-  getAllAccounts: async (condition?:string): Promise<IAccount[]> => {
+  getAllAccounts: async (condition?: string): Promise<IAccount[]> => {
     try {
       const accounts = await db.knex
         .select(
@@ -64,7 +64,7 @@ export const accountModel = {
           )
         })
         .modify((queryBuilder) => {
-          if(condition){
+          if (condition) {
             const parsedCondition = db.knex.raw(condition)
             queryBuilder.where(parsedCondition)
           }
