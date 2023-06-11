@@ -25,7 +25,7 @@ const globalHelper = {
         })
       }
     } catch (error: unknown) {
-      console.log(`couldnt send en email to ${emails} subject ${subject}`)
+      console.log(`couldnt send en email to ${emails} subject ${subject} ,error`, error)
     }
   }
 }

@@ -35,7 +35,7 @@ app.use('/api/backOffice', adminSenderAuth, backOfficeRouter)
 app.use(
   '/api/webapp',
   passport.authenticate('oauth-bearer', { session: false }),
-  roleGuard([UserRole.User, UserRole.Admin, UserRole.SuperAdmin]),
+  roleGuard([UserRole.User]),
   webAppRouter
 )
 app.use(

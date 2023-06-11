@@ -45,8 +45,8 @@ export default class EmailService {
         html
       })
     } catch (error) {
-      console.log(error.response?.body)
-      return Promise.reject({ code: 500, message: "can't send email" })
+      console.log(error)
+      return Promise.reject({ code: 500, message: "can't send email, error" })
     }
   }
 }

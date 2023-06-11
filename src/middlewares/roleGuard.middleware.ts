@@ -6,7 +6,7 @@ export const roleGuard = (allowedRoles: UserRole[]) => {
     try {
       const user = req.user as IUser
 
-      if (!allowedRoles.includes(user.role)) {
+      if (!allowedRoles.includes(user.role) && req.url !== '/user/login') {
         return res.status(401).send({ success: false, message: 'unauthorized user' })
       }
 

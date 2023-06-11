@@ -6,8 +6,14 @@ import * as adminProductCategoriesController from '../controllers/admin/productC
 import * as adminTransactionsController from '../controllers/admin/transactions.controller'
 import * as adminUsersController from '../controllers/admin/users.controller'
 import * as commissionsController from '../controllers/commissions.controller'
+import * as usersController from '../controllers/users.controller'
 
 const router = express.Router()
+
+///////////////////////////
+//      Auth            //
+///////////////////////////
+router.get('/getUser', usersController.getUser)
 
 ///////////////////////////
 //      Users            //
