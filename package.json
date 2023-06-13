@@ -8,7 +8,7 @@
     "start:prod": "rm -rf dist && tsc && yarn db:migrate:up && node ./dist/app.js",
     "prebuild": "rm -rf dist",
     "build": "tsc && cp -r ./src/templates ./dist",
-    "start": "node ./dist/app.js",
+    "start": "yarn db:migrate:up && node ./dist/app.js",
     "db:create": "ts-node-dev ./src/scripts/createDb.script.ts",
     "db:seed": "ts-node-dev ./src/scripts/createSeed.script.ts",
     "db:migrate": "node-pg-migrate --migrations-dir='./src/db/migrations' --tsconfig=./tsconfig.json --migrations-table='schema_migrations'",
