@@ -98,7 +98,11 @@ const transactionStageHelper = {
               {
                 transactionId,
                 inChargeUserFullName: `${requestingSide.user.firstName} ${requestingSide.user.lastName}`,
-                link: `${appUrl}/private-area`
+                link: `${appUrl}/private-area${
+                  nextStage?.name === TransactionStageName.ConfirmationSideB
+                    ? `?exists=${otherSide.user.isActivated ? '1' : '0'}`
+                    : ''
+                }`
               }
             )
           })
