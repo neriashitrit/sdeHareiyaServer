@@ -37,6 +37,8 @@ const transactionStageHelper = {
         [`${Tables.TRANSACTION_SIDES}.transaction_id`]: transactionId
       })
 
+      const creatorSide = transactionSides.find((transactionSide) => transactionSide.isCreator)
+
       const emailTriggers = transactionStageToEmailTriggerMapping[nextStage.name]
       if (emailTriggers) {
         emailTriggers.forEach(({ to, template }) => {
@@ -46,6 +48,7 @@ const transactionStageHelper = {
             emailSubjectMapping[template],
             {
               transactionId,
+              inChargeUserFullName: `${creatorSide?.user.firstName} ${creatorSide?.user.lastName}`,
               link: `${appUrl}/private-area`
             }
           )
