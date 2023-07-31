@@ -23,7 +23,7 @@ export const userLogin = async (req: Request, res: Response) => {
         EmailTemplateName.SIGN_UP_COMPLETED,
         [newUser.email],
         emailSubjectMapping[EmailTemplateName.SIGN_UP_COMPLETED],
-        { link: appUrl }
+        { link: `${appUrl}/private-area` }
       )
 
       return res.status(200).json(successResponse(newUser))
