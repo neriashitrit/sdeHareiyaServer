@@ -80,17 +80,16 @@ export const transactionStageToEmailTriggerMapping: {
   [key in TransactionStageName]: { to: TransactionSide; template: EmailTemplateName }[] | null
 } = {
   [TransactionStageName.Draft]: null,
-  [TransactionStageName.AuthorizationSideA]: [
+  [TransactionStageName.AuthorizationSideA]: null,
+  [TransactionStageName.AuthorizationSideAConfirmation]: [
     {
       to: TransactionSide.SideA,
       template: EmailTemplateName.TRANSACTION_OPEN
     }
-  ],
-  [TransactionStageName.AuthorizationSideAConfirmation]: [
-    {
-      to: TransactionSide.SideA,
-      template: EmailTemplateName.ACCOUNT_AUTHORIZED
-    }
+    // {
+    //   to: TransactionSide.SideA,
+    //   template: EmailTemplateName.ACCOUNT_AUTHORIZED
+    // }
   ],
   [TransactionStageName.AuthorizationSideB]: null,
   [TransactionStageName.AuthorizationSideBConfirmation]: [

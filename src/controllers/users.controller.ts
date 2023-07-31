@@ -22,7 +22,8 @@ export const userLogin = async (req: Request, res: Response) => {
       globalHelper.sendEmailTrigger(
         EmailTemplateName.SIGN_UP_COMPLETED,
         [newUser.email],
-        emailSubjectMapping[EmailTemplateName.SIGN_UP_COMPLETED]
+        emailSubjectMapping[EmailTemplateName.SIGN_UP_COMPLETED],
+        { link: appUrl }
       )
 
       return res.status(200).json(successResponse(newUser))

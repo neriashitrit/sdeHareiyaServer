@@ -16,19 +16,21 @@ export const getAllAccounts = async (req: Request, res: Response) => {
   try {
     const startDate = req.body.startDate as string
     const endDate = req.body.endDate as string
-    const conditions:conditionTerm[] = [{
-      column: Tables.USERS + '.role',
-      operator: '<>',
-      value: 'admin'
-    }];
-    if(startDate){
+    const conditions: conditionTerm[] = [
+      {
+        column: Tables.USERS + '.role',
+        operator: '<>',
+        value: 'admin'
+      }
+    ]
+    if (startDate) {
       conditions.push({
         column: Tables.USERS + '.last_active_at',
         operator: '>=',
         value: startDate
       })
     }
-    if(endDate){
+    if (endDate) {
       conditions.push({
         column: Tables.USERS + '.last_active_at',
         operator: '<=',
@@ -50,7 +52,7 @@ export const getAccountById = async (req: Request, res: Response) => {
       [`${Tables.ACCOUNTS}.id`]: accountId
     })
     if (_.isEmpty(account)) {
-      return res.status(400).json(failureResponse('No transaction with this id'))
+      return res.status(400).json(failureResponse('No account with this id'))
     }
     return res.status(200).json(successResponse(account[0]))
   } catch (error: any) {
@@ -131,16 +133,13 @@ export const updateAccountBankDetails = async (req: Request, res: Response) => {
       return res.status(400).json(failureResponse('Invalid Parameters'))
     }
 
-    await bankDetailsModel.updateBankDetails(
-      { accountId: body.accountId, isActive: true },
-      { isActive: false }
-    )
+    await bankDetailsModel.updateBankDetails({ accountId: body.accountId, isActive: true }, { isActive: false })
     await bankDetailsModel.createBankDetails({
       ...body,
       isActive: true
     })
-    
-    const updatedAccount = await accountModel.getAccount({ [Tables.ACCOUNTS+'.id']: body.accountId })
+
+    const updatedAccount = await accountModel.getAccount({ [Tables.ACCOUNTS + '.id']: body.accountId })
     return res.status(200).json(successResponse(updatedAccount))
   } catch (error) {
     return res.status(500).json(failureResponse(error))

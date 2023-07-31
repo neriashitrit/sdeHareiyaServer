@@ -91,6 +91,7 @@ const transactionStageHelper = {
 
         if (emailTriggers) {
           emailTriggers.forEach(({ to, template }) => {
+            console.log('template', template, emailSubjectMapping[template])
             globalHelper.sendEmailTrigger(
               template,
               [emailTriggerRecipient(to, [requestingSide, otherSide])?.user.email ?? EmailService.defaultMailSender],
@@ -99,7 +100,7 @@ const transactionStageHelper = {
                 transactionId,
                 inChargeUserFullName: `${requestingSide.user.firstName} ${requestingSide.user.lastName}`,
                 link: `${appUrl}/private-area${
-                  nextStage?.name === TransactionStageName.ConfirmationSideB
+                  activeStage?.name === TransactionStageName.ConfirmationSideB
                     ? `?exists=${otherSide.user.isActivated ? '1' : '0'}`
                     : ''
                 }`
@@ -283,7 +284,7 @@ const createNextStageFromMultiChoice = async (
     case TransactionStageName.ConfirmationSideB:
       sum = await transactionModel.getTransactionsAmountSumLastHalfYear(requestingSide.account.id)
       if (
-        sum + transaction.amount <= 50000 ||
+        sum + transaction.amount < 50000 ||
         requestingSide.account.authorizationStatus === AuthorizationStatus.Authorized
       ) {
         return await transactionStageModel.createTransactionStage({

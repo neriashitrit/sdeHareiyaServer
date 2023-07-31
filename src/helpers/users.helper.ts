@@ -88,24 +88,36 @@ const usersHelper = {
         }
       )
 
-      const newAccount = await accountModel.createAccount({
-        type
+      const userAccount = await userAccountModel.getUserAccount({
+        userId: newUser.id
       })
+
+      if (!userAccount) {
+        throw new Error(`No user account found for user ${newUser?.id}`)
+      }
+
+      const newAccount = await accountModel.updateAccount(
+        {
+          type
+        },
+        {
+          id: userAccount?.account?.id
+        }
+      )
+
+      if (!newAccount) {
+        throw new Error(`No account found for user ${newUser?.id}`)
+      }
 
       if (type === AccountType.Company) {
         await companyDetailsModel.createCompanyDetails({
-          accountId: newAccount.id,
+          accountId: newAccount[0].id,
           companyIdentityNumber,
           incorporationName
         })
       }
 
-      const newUserAccount = await userAccountModel.createUserAccount({
-        userId: newUser.id,
-        accountId: newAccount.id
-      })
-
-      return [newUser, newAccount, newUserAccount]
+      return [newUser, newAccount[0], userAccount]
     } catch (error) {
       console.error('ERROR in users.helper createUserFromToken()', error.message)
       throw {

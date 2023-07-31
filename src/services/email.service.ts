@@ -1,4 +1,4 @@
-import sgMail, { MailDataRequired } from '@sendgrid/mail'
+import sgMail from '@sendgrid/mail'
 import { convert } from 'html-to-text'
 
 export default class EmailService {
@@ -45,7 +45,7 @@ export default class EmailService {
         html
       })
     } catch (error) {
-      console.log(error)
+      console.log(error, error.response.body.errors)
       return Promise.reject({ code: 500, message: "can't send email, error" })
     }
   }
