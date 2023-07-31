@@ -93,7 +93,9 @@ export const getTransactionsByAccount = async (req: Request, res: Response) => {
       condition
     })
 
-    return res.status(200).json(successResponse(transactions))
+    const activeTransactionsSum = await transactionModel.getTransactionsAmountSumLastHalfYear(accountId)
+
+    return res.status(200).json(successResponse({ transactions, activeTransactionsSum }))
   } catch (error: any) {
     console.log(error)
     return res.status(500).json(failureResponse(error))
