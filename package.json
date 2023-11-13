@@ -10,7 +10,7 @@
     "build": "tsc && cp -r ./src/templates ./dist",
     "start": "yarn db:migrate:up && node ./dist/app.js",
     "db:migrate": "node-pg-migrate --migrations-dir='./src/db/migrations' --tsconfig=./tsconfig.json --migrations-table='schema_migrations'",
-    "db:migrate:up": "node-pg-migrate up --no-check-order --migrations-dir='./src/db/migrations' --tsconfig=./tsconfig.json --migrations-table='schema_migrations'",
+    "db:migrate:up": "node-pg-migrate up --no-check-order --migrations-dir='./src/db/migrations' --tsconfig=./tsconfig.json --migrations-table='schema_migrations'"
   },
   "dependencies": {
     "@sendgrid/mail": "^7.7.0",

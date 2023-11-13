@@ -6,7 +6,7 @@ export default class DbConnection {
 
   constructor() {
     dotenv.config()
-    this.connectionString = process.env.DATABASE_URL
+    this.connectionString = process.env.DATABASE_URL || ''
   }
 
   getConnection = () =>
