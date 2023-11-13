@@ -1,10 +1,6 @@
 import express from 'express'
 
-import * as accountsController from '../controllers/accounts.controller'
-import * as globalController from '../controllers/global.controller'
-import * as transactionsController from '../controllers/transactions.controller'
 import * as usersController from '../controllers/users.controller'
-import { transactionGuard } from '../middlewares/transactionGuard.middleware'
 
 const router = express.Router()
 
@@ -14,29 +10,5 @@ const router = express.Router()
 router.post('/user/login', usersController.userLogin)
 router.get('/getUser', usersController.getUser)
 router.put('/updateUser', usersController.updateUser)
-
-///////////////////////////
-//     Transactions      //
-///////////////////////////
-router.get('/getTransactions', transactionsController.getTransactions)
-router.get('/getTransactionsById/:transactionId', transactionsController.getTransaction)
-router.post('/createTransactions', transactionsController.createTransaction)
-router.put('/updateTransactions', transactionGuard, transactionsController.updateTransaction)
-router.post('/transactions/approveStage', transactionGuard, transactionsController.approveStage)
-router.post('/transactions/openDispute', transactionGuard, transactionsController.openDispute)
-router.post('/transactions/cancelDispute', transactionGuard, transactionsController.cancelDispute)
-router.post('/transactions/cancelTransaction', transactionGuard, transactionsController.cancelTransaction)
-///////////////////////////
-//       Accounts        //
-///////////////////////////
-router.post('/accounts/submitAccountAuthorization', accountsController.submitAccountAuthorization)
-router.get('/getAccount', accountsController.getAccount)
-router.post('/accounts/createBankDetails', accountsController.createBankDetails)
-
-///////////////////////////
-//       files        //
-///////////////////////////
-router.post('/files/uploadFile', globalController.uploadFileToStorage)
-router.get('/files/getSas', globalController.getSas)
 
 export default router

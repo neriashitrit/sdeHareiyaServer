@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import { IUser } from 'safe-shore-common'
 
 import { Tables } from '../constants'
 import DbService from '../services/db.service'
