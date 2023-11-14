@@ -4,6 +4,7 @@ import express from 'express'
 import helmet from 'helmet'
 
 import openRouter from './routes/openRoutes'
+import cronRouter from './routes/cronRoutes'
 import webAppRouter from './routes/webAppRoutes'
 
 dotenv.config()
@@ -17,6 +18,7 @@ app.use(express.urlencoded({ extended: false })) // recognize object as strings 
 // Routes
 app.use( '/api/webapp',  webAppRouter)
 app.use('/api/openRouter', openRouter)
+app.use('/api/cronJobs', cronRouter)
 
 const port = process.env.PORT || 5000
 app.listen(port, () => {

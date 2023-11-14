@@ -6,6 +6,8 @@ import globalHelper from '../helpers/global.helper'
 // import globalHelper from 'helpers/global.helper'
 
 export const healthCheck = (req: Request, res: Response) => {
+  console.log('server is alive', new Date);
+  
   return res.status(200).json({ status: 'success', body: 'server is alive' })
 }
 
