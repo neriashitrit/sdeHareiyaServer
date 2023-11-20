@@ -9,9 +9,35 @@ const appUrl = process.env.APP_URL!
 
 
 export const getUser = async (req: Request, res: Response) => {
+  // try {
+  //   const user = await userModel.getUser()
+  //   return res.status(200).json((user))
+  // } catch (error) {
+  //   return res.status(500).json((error))
+  // }
+}
+
+export const createUser = async (req: Request, res: Response) => {
   try {
-    const user = await userModel.getUser()
-    return res.status(200).json((user))
+    const {firstName,
+      lastName,
+      idNumber,
+      address,
+      email,
+      phoneSms,
+      phoneWhatsApp,
+      goodOpinion,
+      badOpinion,
+      getMessages} = req.body
+    if (!firstName || 
+      !lastName || 
+      !address || 
+      !email || 
+      (!phoneSms && !phoneWhatsApp) || 
+      !getMessages) {return res.status(400).json({ status: 'failed', body: 'missing params' })}
+    const createdUser = await userModel.createUser({firstName, lastName, idNumber, address, email, 
+      phoneSms, phoneWhatsApp, goodOpinion, badOpinion, getMessages})
+    return res.status(200).json((createdUser))
   } catch (error) {
     return res.status(500).json((error))
   }

@@ -11,7 +11,7 @@ export default class DbConnection {
 
   getConnection = () =>
     knex({
-      // client: 'pg',
+      client: 'pg',
       connection: this.connectionString,
       pool: { min: 2, max: 10 },
       migrations: {
