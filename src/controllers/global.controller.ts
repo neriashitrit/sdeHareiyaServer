@@ -13,7 +13,7 @@ export const healthCheck = (req: Request, res: Response) => {
 
 export const getErrorLog = (req: Request, res: Response) => {
   console.log('got error log ', new Date ,' ', req.body);
-  return res.status(200)
+  return res.status(200).json({ status: 'success', body: 'server got the error' })
 }
 
 export const sendContactUs = async (req: Request, res: Response) => {
