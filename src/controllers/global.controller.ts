@@ -11,6 +11,11 @@ export const healthCheck = (req: Request, res: Response) => {
   return res.status(200).json({ status: 'success', body: 'server is alive' })
 }
 
+export const getErrorLog = (req: Request, res: Response) => {
+  console.log('got error log ', new Date ,' ', req.body);
+  return res.status(200)
+}
+
 export const sendContactUs = async (req: Request, res: Response) => {
   const body = req.body
 

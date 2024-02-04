@@ -14,4 +14,9 @@ router.get('/healthCheck', globalController.healthCheck)
 ///////////////////////////
 router.post('/sendContactUs', globalController.sendContactUs)
 
+///////////////////////////
+//         logs         //
+///////////////////////////
+router.get('/logError', globalController.getErrorLog)
+
 export default router
