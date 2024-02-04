@@ -46,10 +46,17 @@ export const userModel = {
   },
   createUser: async (newUser: Record<string, any>): Promise<IUser> => {
     try {
+      const existUser = await db.getOne(Tables.USERS,{id_number:newUser.idNumber})
+      if (existUser) {
+        throw {
+          message: `user already exist`
+        }
+      }
       const dbUser = {sms_phone:newUser.phoneSms, first_name:newUser.firstName, last_name:newUser.lastName, id_number:newUser.idNumber,
                      address:newUser.address, email:newUser.email, whatsapp_phone:newUser.phoneWhatsApp, good_feedback:newUser.goodOpinion,
                      bad_feedback:newUser.badOpinion, advertising_confirmation:newUser.getMessages}
       const user = await db.insert(Tables.USERS, dbUser)
+
       return user?.[0]
     } catch (error) {
       console.error('ERROR in users.modal createUser()', error.message)
