@@ -17,6 +17,6 @@ router.post('/sendContactUs', globalController.sendContactUs)
 ///////////////////////////
 //         logs         //
 ///////////////////////////
-router.get('/logError', globalController.getErrorLog)
+router.post('/logError', globalController.getErrorLog)
 
 export default router
