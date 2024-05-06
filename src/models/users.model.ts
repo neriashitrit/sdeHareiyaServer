@@ -49,7 +49,8 @@ export const userModel = {
       const existUser = await db.getOne(Tables.USERS,{id_number:newUser.idNumber})
       if (existUser) {
         throw {
-          message: `user already exist`
+          message: `user already exist`,
+          errorCode:4011
         }
       }
       const dbUser = {sms_phone:newUser.phoneSms, first_name:newUser.firstName, last_name:newUser.lastName, id_number:newUser.idNumber,
@@ -61,7 +62,7 @@ export const userModel = {
     } catch (error) {
       console.error('ERROR in users.modal createUser()', error.message)
       throw {
-        message: `error while trying to createUser. error: ${error.message}`
+        error
       }
     }
   },
