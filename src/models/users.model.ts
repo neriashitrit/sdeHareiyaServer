@@ -60,7 +60,7 @@ export const userModel = {
 
       return user?.[0]
     } catch (error) {
-      console.error('ERROR in users.modal createUser()', error.message)
+      console.error('ERROR in users.modal createUser()', error)
       throw {
         error
       }
