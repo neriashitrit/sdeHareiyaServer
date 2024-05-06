@@ -40,7 +40,7 @@ export const createUser = async (req: Request, res: Response) => {
     return res.status(200).json((createdUser))
   } catch (error) {
     console.log('in contriker user ', error)
-    if(error.errorCode == 4011) return res.status(401).json((error))
+    if(error.error.errorCode == 4011) return res.status(401).json((error))
     return res.status(500).json((error))
   }
 }
