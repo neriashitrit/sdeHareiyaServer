@@ -1,12 +1,32 @@
 import path from 'path'
 import pug from 'pug'
 
-import { EmailTemplateName } from '../constants'
+import { EmailTemplateName, Tables } from '../constants'
 import EmailService from '../services/email.service'
+import DbService from '../services/db.service'
+
+const db = new DbService()
 
 const emailService = EmailService.getInstance()
-
 const globalHelper = {
+  isAuthenticated:async (
+    userName: string,
+    password: string,
+    table: Tables
+  ) : Promise<boolean> => {
+  try {
+    const user = await db.getOne(
+      table,
+      {user_name:userName.toLowerCase().trim()},
+    )
+    return user.password.toLowerCase().trim()===password.toLowerCase().trim()
+  } catch (error) {
+    console.log('error in globalHelper.isAuthenticated ', error)
+    return false
+  }
+},
+
+
   sendEmailTrigger: async (
     templateName: EmailTemplateName,
     emails: string[],
@@ -25,7 +45,7 @@ const globalHelper = {
         })
       }
     } catch (error: unknown) {
-      console.log(`couldnt send en email to ${emails} subject ${subject} ,error`, error)
+      console.log(`couldn't send en email to ${emails} subject ${subject} ,error`, error)
     }
   }
 }

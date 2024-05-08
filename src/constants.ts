@@ -1,6 +1,7 @@
 
 export enum Tables {
   USERS = 'users',
+  ADMIN = 'admin',
 }
 
 export enum EmailTemplateName {

@@ -1,14 +1,20 @@
 import express from 'express'
 
 import * as usersController from '../controllers/users.controller'
+import * as adminController from '../controllers/admin.controller'
 
 const router = express.Router()
 
 ///////////////////////////
 //         Users         //
 ///////////////////////////
-router.get('/getUser', usersController.getUser)
 router.post('/createUser', usersController.createUser)
-router.put('/updateUser', usersController.updateUser)
+
+///////////////////////////
+//         Admin         //
+///////////////////////////
+router.get('/getAllUsers', adminController.getUsers)
+router.post('/adminLogin', adminController.login)
+
 
 export default router
