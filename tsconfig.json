@@ -1,24 +1,53 @@
+// {
+//   "compilerOptions": {
+//     "target": "es2016",
+//     "module": "commonjs",
+//     "baseUrl": "./src",
+//     "typeRoots": [
+//       "node_modules/@types"
+//     ],
+//     "outDir": "./dist",
+//     "allowSyntheticDefaultImports": true,
+//     "esModuleInterop": true,
+//     "forceConsistentCasingInFileNames": true,
+//     "strict": true,
+//     "noImplicitAny": true,
+//     "noImplicitThis": true,
+//     "useUnknownInCatchVariables": false,
+//     "alwaysStrict": true,
+//     "noImplicitReturns": true,
+//     "noFallthroughCasesInSwitch": true,
+//     "skipLibCheck": true,
+//     "allowJs": true,
+//     "strictPropertyInitialization": false
+//   },
+//   "include": ["src/**/*.ts"],
+//   "exclude": ["node_modules"]
+// }
+
 {
   "compilerOptions": {
     "target": "es2016",
-    "module": "commonjs",
-    "baseUrl": "./src",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "outDir": "./dist",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "useUnknownInCatchVariables": false,
-    "alwaysStrict": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true,
-    "allowJs": true,
-    "strictPropertyInitialization": false
-  }
+        "module": "commonjs",
+        "baseUrl": "./src",
+        "typeRoots": [
+          "node_modules/@types"
+        ],
+        "outDir": "./dist",
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "useUnknownInCatchVariables": false,
+        "alwaysStrict": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "skipLibCheck": true,
+        "allowJs": true,
+        "strictPropertyInitialization": false
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
 }
