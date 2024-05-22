@@ -382,7 +382,7 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
-"@types/html-to-text@^9.0.4":
+"@types/html-to-text@^9.0.1":
   version "9.0.4"
   resolved "https://registry.npmjs.org/@types/html-to-text/-/html-to-text-9.0.4.tgz"
   integrity sha512-pUY3cKH/Nm2yYrEmDlPR1mR7yszjGx4DrwPjQ702C4/D5CwHuZTgZdIdwPkRbcuhs7BAh2L5rg3CL5cbRiGTCQ==
@@ -392,7 +392,7 @@
   resolved "https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.11.tgz"
   integrity sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==
 
-"@types/lodash@^4.17.4":
+"@types/lodash@^4.14.182":
   version "4.17.4"
   resolved "https://registry.npmjs.org/@types/lodash/-/lodash-4.17.4.tgz"
   integrity sha512-wYCP26ZLxaT3R39kiN2+HcJ4kTd3U1waI/cY7ivWYqFP6pW3ZNpvi6Wd6PHZx7T/t8z0vlkXMg3QYLa7DZ/IJQ==
@@ -416,7 +416,7 @@
     pg-protocol "*"
     pg-types "^2.2.0"
 
-"@types/pug@^2.0.10":
+"@types/pug@^2.0.6":
   version "2.0.10"
   resolved "https://registry.npmjs.org/@types/pug/-/pug-2.0.10.tgz"
   integrity sha512-Sk/uYFOBAB7mb74XcpizmH0KOR2Pv3D2Hmrh1Dmy5BmK3MpdSa5kqZcg6EKBdklU0bFXX9gCfzvpnyUehrPIuA==
