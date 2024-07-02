@@ -16,6 +16,8 @@ export default class DbService {
 
   static getInstance = () => DbService.instance || new DbService()
 
+  wakeUpDatabase = () => this.knex.raw('SELECT 1');
+
   getOneById = (tableName: string, id: number) => this.knex.select().from(tableName).where({ id }).first()
 
   getOne = (tableName: string, condition: Record<string, any> | string) =>

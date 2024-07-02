@@ -19,6 +19,7 @@ export const userModel = {
   },
   createUser: async (newUser: Record<string, any>): Promise<IUser> => {
     try {
+      await db.wakeUpDatabase()
       const existUser = await db.getOne(Tables.USERS,{id_number:newUser.idNumber})
       if (existUser) {
         throw {
