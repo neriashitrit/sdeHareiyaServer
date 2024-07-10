@@ -7,7 +7,8 @@
     "start:dev": "ts-node-dev --files --transpile-only --respawn --inspect=4321 --project tsconfig.json ./src/app.ts",
     "start:prod": "rm -rf dist && tsc && yarn db:migrate:up && node ./dist/app.js",
     "prebuild": "rm -rf dist",
-    "build": "tsc && cp -r ./src/templates ./dist",
+    "build": "tsc && cp -r ./src/templates ./dist && npm run copy-certs",
+    "copy-certs": "cp src/db/ca.pem dist/db/ca.pem",
     "start": "node ./dist/app.js",
     "db:migrate": "node-pg-migrate --migrations-dir='./src/db/migrations' --tsconfig=./tsconfig.json --migrations-table='schema_migrations'",
     "db:migrate:up": "node-pg-migrate up --no-check-order --migrations-dir='./src/db/migrations' --tsconfig=./tsconfig.json --migrations-table='schema_migrations'"
