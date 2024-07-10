@@ -11,22 +11,11 @@ export default class DbConnection {
 
   getConnection = () =>
     knex({
-      client: 'mssql',
-      connection: {
-        server: 'sde-h-database-server.database.windows.net',
-        user: 'SdeHareiyaDB',
-        password: 'ahn4lH8TM7FZrAxF0OB7MNz_SSxt_brV',
-        database: 'sde-h-free-db',
-        requestTimeout: 60000, // 60 seconds timeout
-        port:1433,
-        options: {
-          encrypt: true, // Use encryption
-          enableArithAbort: true, // Required for Azure
-      }
+      client: 'pg',
+      connection: this.connectionString,
+      pool: { min: 2, max: 10 },
+      migrations: {
+        directory: __dirname + '/db/migrations'
       },
-      // pool: { min: 2, max: 10 },
-      // migrations: {
-      //   directory: __dirname + '/db/migrations'
-      // },
-    })
+})
 }
