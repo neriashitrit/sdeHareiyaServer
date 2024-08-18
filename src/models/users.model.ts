@@ -8,7 +8,7 @@ const db = new DbService()
 export const userModel = {
   getAllUsers: async (condition: Record<string, any> = {}): Promise<IUser[]> => {
     try {
-      const users = await db.getAll(Tables.USERS, {...condition })
+      const users = await db.getAll(Tables.USERS, {...condition }, 'desc')
       return users
     } catch (error) {
       console.error('ERROR in users.modal getAllUsers()', error.message)

@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 import { userModel } from '../models/users.model'
 import { Tables } from '../constants'
 import globalHelper from '../helpers/global.helper'
+import _ from 'lodash'
 export const getUsers = async (req: Request, res: Response) => {
   try {
     const {userName, password} = req.query
@@ -10,7 +11,7 @@ export const getUsers = async (req: Request, res: Response) => {
     const isAuthenticated = await globalHelper.isAuthenticated(userName as string, password as string, Tables.ADMIN)
     if (!isAuthenticated) { res.status(401).json(('user is not authenticated. log out and log in'))}
     const allUsers = await userModel.getAllUsers()
-    return res.status(200).json((allUsers))
+    return res.status(200).json(allUsers)
   } catch (error) {
     console.log('error in users controller ', error)
     return res.status(500).json((error))

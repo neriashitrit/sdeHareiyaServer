@@ -23,8 +23,8 @@ export default class DbService {
   getOne = (tableName: string, condition: Record<string, any> | string) =>
     this.knex.select().from(tableName).where(condition)?.first()
 
-  getAll = (tableName: string, condition: Record<string, any> | string) =>
-    this.knex.select().from(tableName).where(condition)
+  getAll = (tableName: string, condition: Record<string, any> | string, order: string) =>
+    this.knex.select().from(tableName).where(condition).orderBy('created_at', order)
 
   insert = (tableName: string, records: Record<string, any> | Record<string, any>[]) =>
     this.knex.insert(records, ['*']).into(tableName)

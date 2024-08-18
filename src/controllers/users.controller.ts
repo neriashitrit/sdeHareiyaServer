@@ -16,7 +16,7 @@ export const createUser = async (req: Request, res: Response) => {
       getMessages} = req.body
     if (!firstName || 
       !lastName || 
-      !address || 
+      !idNumber || 
       !email || 
       (!phoneSms && !phoneWhatsApp) || 
       !getMessages) {return res.status(400).json({ status: 'failed', body: 'missing params' })}
